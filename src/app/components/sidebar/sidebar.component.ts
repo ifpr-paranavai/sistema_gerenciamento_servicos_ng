@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, ViewChild, WritableSignal, signal }
 import { Sidebar } from "primeng/sidebar";
 
 @Component({
-    selector: 'app-sidebar',
+    selector: 'sgs-sidebar',
     templateUrl: './sidebar.component.html',
     styleUrl: './sidebar.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush
