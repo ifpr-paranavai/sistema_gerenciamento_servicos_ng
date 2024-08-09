@@ -1,6 +1,7 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
 import { LayoutComponent } from "./layout.component";
+import { HomeComponent } from "../home/home.component";
 
 const routes: Routes = [
     {
@@ -12,8 +13,19 @@ const routes: Routes = [
             ),
     },
     {
+        path: "app",
+        component: LayoutComponent,
+        canActivate: [],
+        children: [
+            {
+                path: "home",
+                component: HomeComponent
+            }
+        ]
+    },
+    {
         path: "**",
-        redirectTo: "app",
+        redirectTo: "app/home",
     }
 ];
 
