@@ -2,6 +2,7 @@ import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
 import { LayoutComponent } from "./layout.component";
 import { HomeComponent } from "../home/home.component";
+import { DiagramClassComponent } from "../diagram-class/diagram-class.component";
 
 const routes: Routes = [
     {
@@ -20,6 +21,14 @@ const routes: Routes = [
             {
                 path: "home",
                 component: HomeComponent
+            },
+            {
+                path: "diagram-class-uml",
+                component: DiagramClassComponent
+            },
+            {
+                path: "**",
+                redirectTo: "home"
             }
         ]
     },

@@ -6,6 +6,7 @@ import { AvatarModule } from 'primeng/avatar';
 import { AvatarGroupModule } from 'primeng/avatargroup';
 import { StyleClassModule } from 'primeng/styleclass';
 import { RippleModule } from 'primeng/ripple';
+import { RouterModule } from "@angular/router";
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { RippleModule } from 'primeng/ripple';
         AvatarModule,
         AvatarGroupModule,
         StyleClassModule,
-        RippleModule
+        RippleModule,
+        RouterModule
     ],
 })
 export class SidebarModule {}
