@@ -23,7 +23,7 @@ const routes: Routes = [
                 component: HomeComponent
             },
             {
-                path: "diagrama-classe-uml",
+                path: "diagram-class-uml",
                 component: DiagramClassComponent
             },
             {
