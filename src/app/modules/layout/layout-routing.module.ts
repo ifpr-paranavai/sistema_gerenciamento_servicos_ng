@@ -27,6 +27,13 @@ const routes: Routes = [
                 component: DiagramClassComponent
             },
             {
+                path: "schedules",
+                loadChildren: () =>
+                    import("../schedules/schedules.module").then(
+                        (m) => m.SchedulesModule,
+                    ),
+            },
+            {
                 path: "**",
                 redirectTo: "home"
             }
