@@ -1,0 +1,40 @@
+<div class="card flex flex-column p-3">
+    <div class="flex justify-content-between align-items-center">
+        <h3>Serviços</h3>
+        <span>
+            <p-button
+                label="Novo serviço"
+                icon="pi pi-plus"
+                iconPos="right"
+                size="small"/>
+        </span>
+    </div>
+    <p-table
+        [value]="products"
+        [tableStyle]="{'min-width': '50rem'}">
+        <ng-template pTemplate="header" let-columns>
+            <tr>
+                <th>Descrição</th>
+                <th>Valor</th>
+                <th>Estimativa de conclusão</th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-product let-columns="columns">
+            <tr>
+                <td>
+                    {{product.description}}
+                </td>
+                <td>
+                    {{product.price | currencyFormat}}
+                </td>
+                <td>
+                    90 minutos
+                </td>
+                <td>
+                    Ações
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>

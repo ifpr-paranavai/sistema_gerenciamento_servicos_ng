@@ -16,7 +16,7 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
         AppRoutingModule,
         ToastModule,
         BrowserAnimationsModule,
-        BrowserModule
+        BrowserModule,
     ],
     providers: [
         ToastService,
