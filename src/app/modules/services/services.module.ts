@@ -1,27 +1,25 @@
 import { NgModule } from "@angular/core";
-import { SchedulesComponent } from "./schedules.component";
-import { SchedulesRoutingModule } from "./schedules-routing.module";
-import { SchedulesListComponent } from "./schedules-list/schedules-list.component";
+import { ServicesRoutingModule } from "./services-routing.module";
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { RatingModule } from 'primeng/rating';
-import { FormsModule } from "@angular/forms";
 import { SharedModule } from "../../core/shared/shared.module";
+import { ServicesComponent } from "./services.component";
+import { ServicesListComponent } from "./services-list/services-list.component";
 
 @NgModule({
     imports: [
-        SchedulesRoutingModule,
+        ServicesRoutingModule,
         SharedModule,
         TableModule,
         TagModule,
-        FormsModule,
         RatingModule,
     ],
     exports: [],
     declarations: [
-        SchedulesComponent,
-        SchedulesListComponent
+        ServicesComponent,
+        ServicesListComponent
     ],
     providers: [],
 })
-export class SchedulesModule {}
+export class ServicesModule {}

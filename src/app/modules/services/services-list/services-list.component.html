@@ -1,9 +1,9 @@
 <div class="card flex flex-column p-3">
     <div class="flex justify-content-between align-items-center">
-        <h3>Agendamentos</h3>
+        <h3>Serviços</h3>
         <span>
             <p-button
-                label="Novo agendamento"
+                label="Novo serviço"
                 icon="pi pi-plus"
                 iconPos="right"
                 size="small"/>
@@ -16,9 +16,7 @@
             <tr>
                 <th>Descrição</th>
                 <th>Valor</th>
-                <th>Status</th>
-                <th>Avaliação</th>
-                <th>Data de agendamento</th>
+                <th>Estimativa de conclusão</th>
                 <th></th>
             </tr>
         </ng-template>
@@ -31,18 +29,7 @@
                     {{product.price | currencyFormat}}
                 </td>
                 <td>
-                    <p-tag [value]="product.inventoryStatus" [severity]="getSeverity(product.inventoryStatus)" />
-                </td>
-                <td>
-                    <p-rating
-                        [(ngModel)]="product.rating"
-                        [stars]="5"
-                        [readonly]="true"
-                        [cancel]="false"
-                        />
-                </td>
-                <td>
-                    10/04/2024
+                    90 minutos
                 </td>
                 <td>
                     Ações
