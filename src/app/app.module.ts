@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { MessageService } from 'primeng/api';
 import { ToastService } from './core/services/toastr/toast.service';
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { HttpClientModule } from '@angular/common/http';
 
 
 @NgModule({
@@ -17,6 +18,7 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
         ToastModule,
         BrowserAnimationsModule,
         BrowserModule,
+        HttpClientModule,
     ],
     providers: [
         ToastService,

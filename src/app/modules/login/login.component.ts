@@ -3,10 +3,11 @@ import { ToastService } from "../../core/services/toastr/toast.service";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { AuthenticationService } from "../../core/services/authentication/authentication.service";
 import { Router } from "@angular/router";
-import { finalize, take } from "rxjs/operators";
+import { catchError, finalize, take } from "rxjs/operators";
+import { HttpErrorResponse } from "@angular/common/http";
 
 interface ILoginFormGroup {
-    username: FormControl<string | null>;
+    email: FormControl<string | null>;
     password: FormControl<string | null>;
 }
 
@@ -21,7 +22,7 @@ export class LoginComponent {
     loading: WritableSignal<boolean> = signal(false);
 
     loginFg: FormGroup<ILoginFormGroup> = new FormGroup({
-        username: new FormControl<string | null>(null, [Validators.required]),
+        email: new FormControl<string | null>(null, [Validators.required]),
         password: new FormControl<string | null>(null, [Validators.required]),
     });
 
@@ -40,17 +41,23 @@ export class LoginComponent {
             return;
         }
 
-        // TODO -> Código temporário apenas para teste
         this.loading.set(true);
-        const { username, password } = this.loginFg.controls;
+        const { email, password } = this.loginFg.controls;
 
         this.authenticationService
-            .doUserLogin(username.value!, password.value!)
+            .doUserLogin(email.value!, password.value!)
             .pipe(
                 take(1),
-                finalize(() => {
-                    this.router.navigate(["/app/xpto"])
-                }),
-            ).subscribe();
+                finalize(() => this.loading.set(false)),
+            ).subscribe({
+                next: (response) => {
+                    this.authenticationService.setUserLocalStorage(response);
+                    this.router.navigate(["/app/home"]);
+                    this.toastService.success("Sucesso", "Acesso realizado.");
+                },
+                error: (error: HttpErrorResponse) => {
+                    this.toastService.error("Atenção", error.error.error);
+                }
+            });
     }
 }
