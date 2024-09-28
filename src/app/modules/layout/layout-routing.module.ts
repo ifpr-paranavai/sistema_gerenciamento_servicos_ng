@@ -3,11 +3,13 @@ import { RouterModule, Routes } from "@angular/router";
 import { LayoutComponent } from "./layout.component";
 import { HomeComponent } from "../home/home.component";
 import { DiagramClassComponent } from "../diagram-class/diagram-class.component";
+import { authGuard } from "../../core/guards/auth.guard";
+import { loginGuard } from "../../core/guards/login.guard";
 
 const routes: Routes = [
     {
         path: "auth",
-        canActivate: [],
+        canActivate: [loginGuard],
         loadChildren: () =>
             import("../login/login.module").then(
                 (m) => m.LoginModule,
@@ -16,7 +18,7 @@ const routes: Routes = [
     {
         path: "app",
         component: LayoutComponent,
-        canActivate: [],
+        canActivate: [authGuard],
         children: [
             {
                 path: "home",

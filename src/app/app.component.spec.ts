@@ -1,35 +1,35 @@
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
+import { ToastModule } from 'primeng/toast';
+import { ToastService } from './core/services/toastr/toast.service';
+import { MessageService } from 'primeng/api';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule
+        RouterTestingModule,
+        ToastModule,
       ],
       declarations: [
         AppComponent
       ],
+      providers: [
+        MessageService,
+      ],
     }).compileComponents();
   });
 
-  it('should create the app', () => {
+  it('Deve criar o componente principal', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'sistema_gerenciamento_servicos_ng'`, () => {
+  it(`Deverá ter como título da aplicação 'sistema_gerenciamento_servicos_ng'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app.title).toEqual('sistema_gerenciamento_servicos_ng');
-  });
-
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, sistema_gerenciamento_servicos_ng');
   });
 });
