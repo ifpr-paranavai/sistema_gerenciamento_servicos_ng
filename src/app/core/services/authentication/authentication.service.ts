@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { IAuthResponse } from '../../interfaces/auth-response.interface';
 import { environment } from '../../../../environments/environment';
 import { IFeature } from '../../interfaces/feature.interface';
@@ -9,35 +10,55 @@ import { IFeature } from '../../interfaces/feature.interface';
     providedIn: 'root'
 })
 export class AuthenticationService {
-
     private baseUrl: string = environment.baseUrl;
+    private authenticationKeyLocalStorage = 'authentication';
+    private currentUserSubject: BehaviorSubject<IAuthResponse | null>;
+    public currentUser: Observable<IAuthResponse | null>;
 
-    authenticationKeyLocalStorage = 'authentication';
+    constructor(private http: HttpClient) {
+        this.currentUserSubject = new BehaviorSubject<IAuthResponse | null>(this.getUserFromLocalStorage());
+        this.currentUser = this.currentUserSubject.asObservable();
+    }
 
-    constructor(
-        private http: HttpClient,
-    ) {}
+    private getUserFromLocalStorage(): IAuthResponse | null {
+        const userString = localStorage.getItem(this.authenticationKeyLocalStorage);
+        return userString ? JSON.parse(userString) : null;
+    }
+
+    public get currentUserValue(): IAuthResponse | null {
+        return this.currentUserSubject.value;
+    }
+
+    public get token(): string | null {
+        return this.currentUserValue?.access_token || null;
+    }
 
     doUserLogin(email: string, password: string): Observable<IAuthResponse> {
         return this.http.post<IAuthResponse>(
             `${this.baseUrl}/v1/authentication/login/`, { email, password }
+        ).pipe(
+            tap(user => {
+                this.setUserLocalStorage(user);
+                this.currentUserSubject.next(user);
+            })
         );
     }
 
     logout(): void {
         localStorage.removeItem(this.authenticationKeyLocalStorage);
+        this.currentUserSubject.next(null);
     }
 
     setUserLocalStorage(user: IAuthResponse): void {
         localStorage.setItem(this.authenticationKeyLocalStorage, JSON.stringify(user));
+        this.currentUserSubject.next(user);
     }
 
     hasAuthenticationToken(): boolean {
-        return !!localStorage.getItem(this.authenticationKeyLocalStorage);
+        return !!this.token;
     }
 
     getUserFeatures(): IFeature[] {
-        const token = JSON.parse(localStorage.getItem(this.authenticationKeyLocalStorage)!);
-        return token.user.features;
+        return this.currentUserValue?.user.features || [];
     }
 }
