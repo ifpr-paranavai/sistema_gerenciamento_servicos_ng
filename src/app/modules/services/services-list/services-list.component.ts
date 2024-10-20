@@ -1,8 +1,11 @@
-import { ChangeDetectionStrategy, Component, OnInit, WritableSignal, signal } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, WritableSignal, signal } from "@angular/core";
+import { ServiceResponse } from "../../../core/interfaces/service-response.interface copy";
+import { ServiceService } from "../../../core/services/services_offer/service.service";
 
 interface Column {
     field: string;
     header: string;
+    type?: string;
 }
 
 @Component({
@@ -12,50 +15,22 @@ interface Column {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ServicesListComponent implements OnInit {
-    products!: any[];
+    services: ServiceResponse[] = [];
 
-    cols!: Column[];
+    cols: Column[] = [
+        { field: 'name', header: 'Nome' },
+        { field: 'description', header: 'Descrição' },
+        { field: 'cost', header: 'Valor', type: 'currency' },
+        { field: 'duration', header: 'Duração', type: 'time' },
+    ];
 
-    constructor() { }
+    constructor(
+        private serviceService: ServiceService,
+        private cdr: ChangeDetectorRef,
+    ) { }
 
     ngOnInit() {
-        this.products = [
-            {
-                id: '1000',
-                description: 'Bamboo Watch',
-                inventoryStatus: 'CONCLUÍDO',
-                price: 65,
-                rating: 5
-            },
-            {
-                id: '1000',
-                description: 'Bamboo Watch',
-                inventoryStatus: 'CONCLUÍDO',
-                price: 65,
-                rating: 5
-            },
-            {
-                id: '1000',
-                description: 'Bamboo Watch',
-                inventoryStatus: 'CONCLUÍDO',
-                price: 65,
-                rating: 5
-            },
-            {
-                id: '1000',
-                description: 'Bamboo Watch',
-                inventoryStatus: 'CONCLUÍDO',
-                price: 65,
-                rating: 5
-            },
-        ];
-
-        this.cols = [
-            { field: 'description', header: 'Descrição' },
-            { field: 'price', header: 'Valor' },
-            { field: 'inventoryStatus', header: 'Status' },
-            { field: 'rating', header: 'Avaliação' }
-        ];
+        this.loadServices();
     }
 
     getSeverity(status: string) {
@@ -69,5 +44,27 @@ export class ServicesListComponent implements OnInit {
             default:
                 return 'success';
         }
+    }
+
+    loadServices() {
+        this.serviceService.getServices().subscribe({
+            next: (services: ServiceResponse[]) => {
+                this.services = services;
+                console.log('Serviços carregados:', this.services);
+                this.cdr.detectChanges();
+            },
+            error: (error: Error) => {
+                console.error('Erro ao carregar serviços:', error);
+            }
+        });
+    }
+    editService(service: ServiceResponse) {
+        // Implement edit logic
+        console.log('Edit service:', service);
+    }
+
+    deleteService(service: ServiceResponse) {
+        // Implement delete logic
+        console.log('Delete service:', service);
     }
 }
