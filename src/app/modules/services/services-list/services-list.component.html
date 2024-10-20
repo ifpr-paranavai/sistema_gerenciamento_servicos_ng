@@ -1,5 +1,5 @@
 <div class="card flex flex-column p-3">
-    <div class="flex justify-content-between align-items-center">
+    <div class="flex justify-content-between align-items-center mb-3">
         <h3>Serviços</h3>
         <span>
             <p-button
@@ -10,29 +10,42 @@
         </span>
     </div>
     <p-table
-        [value]="products"
-        [tableStyle]="{'min-width': '50rem'}">
-        <ng-template pTemplate="header" let-columns>
+        [value]="services"
+        [columns]="cols"
+        [tableStyle]="{'min-width': '50rem'}"
+        [paginator]="true"
+        [rows]="10"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} serviços"
+        [rowsPerPageOptions]="[10,25,50]">
+        <ng-template pTemplate="header">
             <tr>
-                <th>Descrição</th>
-                <th>Valor</th>
-                <th>Estimativa de conclusão</th>
-                <th></th>
+                <th *ngFor="let col of cols">
+                    {{col.header}}
+                </th>
+                <th>Ações</th>
             </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-product let-columns="columns">
+        <ng-template pTemplate="body" let-service>
             <tr>
-                <td>
-                    {{product.description}}
+                <td *ngFor="let col of cols">
+                    <ng-container [ngSwitch]="col.type">
+                        <ng-container *ngSwitchCase="'currency'">
+                            {{service[col.field] | currency:'BRL':'symbol':'1.2-2'}}
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'time'">
+                            {{service[col.field]}} minutos
+                        </ng-container>
+                        <ng-container *ngSwitchDefault>
+                            {{service[col.field]}}
+                        </ng-container>
+                    </ng-container>
                 </td>
                 <td>
-                    {{product.price | currencyFormat}}
-                </td>
-                <td>
-                    90 minutos
-                </td>
-                <td>
-                    Ações
+                    <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success mr-2" 
+                        (onClick)="editService(service)"></p-button>
+                    <p-button icon="pi pi-trash" styleClass="p-button-rounded p-button-danger" 
+                        (onClick)="deleteService(service)"></p-button>
                 </td>
             </tr>
         </ng-template>
