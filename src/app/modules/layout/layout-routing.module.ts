@@ -29,10 +29,10 @@ const routes: Routes = [
                 component: DiagramClassComponent
             },
             {
-                path: "schedules",
+                path: "appointments",
                 loadChildren: () =>
-                    import("../schedules/schedules.module").then(
-                        (m) => m.SchedulesModule,
+                    import("../appointments/appointment.module").then(
+                        (m) => m.AppointmentsModule,
                     ),
             },
             {
