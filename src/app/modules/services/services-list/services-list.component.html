@@ -36,6 +36,9 @@
                         <ng-container *ngSwitchCase="'time'">
                             {{service[col.field]}} minutos
                         </ng-container>
+                        <ng-container *ngSwitchCase="'rating'">
+                            <p-rating [ngModel]="service[col.field]" [readonly]="true" [cancel]="false"></p-rating>
+                        </ng-container>
                         <ng-container *ngSwitchDefault>
                             {{service[col.field]}}
                         </ng-container>

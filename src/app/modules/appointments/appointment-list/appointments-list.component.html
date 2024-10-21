@@ -34,6 +34,9 @@
                         <ng-container *ngSwitchCase="'boolean'">
                             <p-checkbox [(ngModel)]="$any(appointment)[col.field]" [binary]="true" [disabled]="true"></p-checkbox>
                         </ng-container>
+                        <ng-container *ngSwitchCase="'rating'">
+                            <p-rating [ngModel]="$any(appointment)[col.field]" [readonly]="true" [cancel]="false"></p-rating>
+                        </ng-container>
                         <ng-container *ngSwitchDefault>
                             {{getCellContent(appointment, col.field)}}
                         </ng-container>

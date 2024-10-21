@@ -13,4 +13,5 @@ export interface AppointmentResponse {
     id: number;
     url: string;
   }[];
+  rating: number;
 }
