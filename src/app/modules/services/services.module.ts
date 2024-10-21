@@ -6,11 +6,13 @@ import { RatingModule } from 'primeng/rating';
 import { SharedModule } from "../../core/shared/shared.module";
 import { ServicesComponent } from "./services.component";
 import { ServicesListComponent } from "./services-list/services-list.component";
+import { FormsModule } from "@angular/forms";
 
 @NgModule({
     imports: [
         ServicesRoutingModule,
         SharedModule,
+        FormsModule,
         TableModule,
         TagModule,
         RatingModule,

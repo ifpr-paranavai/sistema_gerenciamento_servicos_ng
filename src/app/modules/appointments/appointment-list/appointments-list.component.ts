@@ -7,7 +7,7 @@ type AppointmentField = keyof AppointmentResponse;
 interface Column {
     field: AppointmentField;
     header: string;
-    type?: 'date' | 'severity' | 'boolean' | 'object' | 'array';
+    type?: 'date' | 'severity' | 'boolean' | 'object' | 'array' | 'rating';
 }
 
 @Component({
@@ -26,6 +26,7 @@ export class AppointmentsListComponent implements OnInit {
         { field: 'provider', header: 'Provedor', type: 'object' },
         { field: 'services', header: 'Serviços', type: 'array' },
         { field: 'is_completed', header: 'Concluído', type: 'boolean' },
+        { field: 'rating', header: 'Avaliação', type: 'rating' },
     ];
 
     constructor(
@@ -80,7 +81,7 @@ export class AppointmentsListComponent implements OnInit {
         });
     }
 
-    getCellContent(appointment: AppointmentResponse, field: AppointmentField): string {
+    getCellContent(appointment: AppointmentResponse, field: AppointmentField): string | number {
         switch (field) {
             case 'appointment_date':
                 return new Date(appointment[field]).toLocaleString();
@@ -91,6 +92,8 @@ export class AppointmentsListComponent implements OnInit {
                 return appointment[field].map(service => service.description).join(', ');
             case 'is_completed':
                 return appointment[field] ? 'Sim' : 'Não';
+            case 'rating':
+                return appointment[field];
             default:
                 return String(appointment[field]);
         }
