@@ -1,0 +1,51 @@
+<div class="card flex flex-column p-3">
+    <div class="flex justify-content-between align-items-center mb-3">
+        <h3>Agendamentos</h3>
+        <span>
+            <p-button
+                label="Novo agendamento"
+                icon="pi pi-plus"
+                iconPos="right"
+                size="small"/>
+        </span>
+    </div>
+    <p-table
+        [value]="appointments"
+        [columns]="cols"
+        [tableStyle]="{'min-width': '50rem'}"
+        [paginator]="true"
+        [rows]="10"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} agendamentos"
+        [rowsPerPageOptions]="[10,25,50]">
+        <ng-template pTemplate="header">
+            <tr>
+                <th *ngFor="let col of cols">{{col.header}}</th>
+                <th>Ações</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-appointment>
+            <tr>
+                <td *ngFor="let col of cols">
+                    <ng-container [ngSwitch]="col.type">
+                        <ng-container *ngSwitchCase="'severity'">
+                            <p-tag [value]="$any(appointment)[col.field]" [severity]="getSeverity($any(appointment)[col.field])"></p-tag>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'boolean'">
+                            <p-checkbox [(ngModel)]="$any(appointment)[col.field]" [binary]="true" [disabled]="true"></p-checkbox>
+                        </ng-container>
+                        <ng-container *ngSwitchDefault>
+                            {{getCellContent(appointment, col.field)}}
+                        </ng-container>
+                    </ng-container>
+                </td>
+                <td>
+                    <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success mr-2" 
+                        (onClick)="editAppointment(appointment)"></p-button>
+                    <p-button icon="pi pi-trash" styleClass="p-button-rounded p-button-danger" 
+                        (onClick)="deleteAppointment(appointment)"></p-button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>

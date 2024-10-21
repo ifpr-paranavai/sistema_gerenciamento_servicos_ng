@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, WritableSignal, signal } from "@angular/core";
-import { ServiceResponse } from "../../../core/interfaces/service-response.interface copy";
+
 import { ServiceService } from "../../../core/services/services_offer/service.service";
+import { ServiceResponse } from "../../../core/interfaces/service-response.interface";
 
 interface Column {
     field: string;
