@@ -1,14 +1,10 @@
-import { ChangeDetectionStrategy, Component, OnInit, ChangeDetectorRef } from "@angular/core";
-import { AppointmentResponse } from "../../../core/interfaces/appointment-response.interface";
+import { ChangeDetectionStrategy, Component, OnInit, WritableSignal, signal } from "@angular/core";
+import { IAppointmentResponse } from "../../../core/interfaces/appointment-response.interface";
 import { AppointmentsService } from "../../../core/services/appointments/appointments.service";
-
-type AppointmentField = keyof AppointmentResponse;
-
-interface Column {
-    field: AppointmentField;
-    header: string;
-    type?: 'date' | 'severity' | 'boolean' | 'object' | 'array' | 'rating';
-}
+import { catchError, of, take } from "rxjs";
+import { ToastService } from "../../../core/services/toastr/toast.service";
+import { AppointmentsCols } from "../../../core/constants/appointments.constant";
+import { ITableColumn } from "../../../core/interfaces/table-columns.interface";
 
 @Component({
     selector: "sgs-appointments-list",
@@ -17,38 +13,33 @@ interface Column {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppointmentsListComponent implements OnInit {
-    appointments: AppointmentResponse[] = [];
-
-    cols: Column[] = [
-        { field: 'appointment_date', header: 'Data de Agendamento', type: 'date' },
-        { field: 'status', header: 'Status', type: 'severity' },
-        { field: 'client', header: 'Cliente', type: 'object' },
-        { field: 'provider', header: 'Provedor', type: 'object' },
-        { field: 'services', header: 'Serviços', type: 'array' },
-        { field: 'is_completed', header: 'Concluído', type: 'boolean' },
-        { field: 'rating', header: 'Avaliação', type: 'rating' },
-    ];
+    appointments: WritableSignal<IAppointmentResponse[]> = signal([]);
+    appointmentsColumns: ITableColumn[] = AppointmentsCols;
 
     constructor(
         private appointmentsService: AppointmentsService,
-        private cdr: ChangeDetectorRef
+        private toastService: ToastService,
+
     ) { }
 
     ngOnInit() {
         this.loadAppointments();
     }
 
-    loadAppointments() {
-        this.appointmentsService.getAppointments().subscribe(
-            (appointments: AppointmentResponse[]) => {
-                this.appointments = appointments;
-                console.log('Agendamentos carregados:', this.appointments);
-                this.cdr.detectChanges();
-            },
-            (error: Error) => {
-                console.error('Erro ao carregar agendamentos:', error);
+    loadAppointments(): void {
+        this.appointmentsService.getAppointments()
+            .pipe(
+                take(1),
+                catchError(error => {
+                    console.log(error);
+                    return of();
+                })
+            ).subscribe({
+            next: (appointments) => {
+                this.appointments.set(appointments);
+                console.log('Agendamentos carregados:', this.appointments());
             }
-        );
+        });
     }
 
     getSeverity(status: string): 'success' | 'info' | 'warning' | 'danger' {
@@ -64,16 +55,17 @@ export class AppointmentsListComponent implements OnInit {
         }
     }
 
-    editAppointment(appointment: AppointmentResponse) {
+    editAppointment(appointment: IAppointmentResponse): void {
         console.log('Edit appointment:', appointment);
     }
 
-    deleteAppointment(appointment: AppointmentResponse) {
-        this.appointmentsService.deleteAppointment(appointment.id).subscribe({
+    deleteAppointment(appointment: IAppointmentResponse): void {
+        this.appointmentsService.deleteAppointment(appointment.id).pipe(take(1)).subscribe({
             next: () => {
                 console.log('Appointment deleted:', appointment);
-                this.appointments = this.appointments.filter(a => a.id !== appointment.id);
-                this.cdr.detectChanges();
+                this.appointments.set(
+                    this.appointments().filter(a => a.id !== appointment.id)
+                );
             }, 
             error: (error: Error) => {
                 console.error('Error deleting appointment:', error);
@@ -81,11 +73,12 @@ export class AppointmentsListComponent implements OnInit {
         });
     }
 
-    getCellContent(appointment: AppointmentResponse, field: AppointmentField): string | number {
+    getCellContent(appointment: IAppointmentResponse, field: string): string | number {
         switch (field) {
             case 'appointment_date':
                 return new Date(appointment[field]).toLocaleString();
             case 'client':
+                return appointment[field].name; 
             case 'provider':
                 return appointment[field].name;
             case 'services':
@@ -95,7 +88,7 @@ export class AppointmentsListComponent implements OnInit {
             case 'rating':
                 return appointment[field];
             default:
-                return String(appointment[field]);
+                return '';
         }
     }
 }

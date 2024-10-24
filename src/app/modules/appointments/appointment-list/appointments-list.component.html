@@ -10,8 +10,8 @@
         </span>
     </div>
     <p-table
-        [value]="appointments"
-        [columns]="cols"
+        [value]="appointments()"
+        [columns]="appointmentsColumns"
         [tableStyle]="{'min-width': '50rem'}"
         [paginator]="true"
         [rows]="10"
@@ -20,13 +20,13 @@
         [rowsPerPageOptions]="[10,25,50]">
         <ng-template pTemplate="header">
             <tr>
-                <th *ngFor="let col of cols">{{col.header}}</th>
+                <th *ngFor="let col of appointmentsColumns">{{col.header}}</th>
                 <th>Ações</th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-appointment>
             <tr>
-                <td *ngFor="let col of cols">
+                <td *ngFor="let col of appointmentsColumns">
                     <ng-container [ngSwitch]="col.type">
                         <ng-container *ngSwitchCase="'severity'">
                             <p-tag [value]="$any(appointment)[col.field]" [severity]="getSeverity($any(appointment)[col.field])"></p-tag>
@@ -38,7 +38,7 @@
                             <p-rating [ngModel]="$any(appointment)[col.field]" [readonly]="true" [cancel]="false"></p-rating>
                         </ng-container>
                         <ng-container *ngSwitchDefault>
-                            {{getCellContent(appointment, col.field)}}
+                            {{ getCellContent(appointment, col.field) }}
                         </ng-container>
                     </ng-container>
                 </td>

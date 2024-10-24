@@ -1,7 +1,7 @@
 import { ServiceResponse } from "./service-response.interface"
 import { IUser } from "./user.interface";
 
-export interface AppointmentResponse {
+export interface IAppointmentResponse {
   id: string;
   appointment_date: string;
   status: string;
@@ -9,9 +9,11 @@ export interface AppointmentResponse {
   provider: IUser;
   services: ServiceResponse[];
   is_completed: boolean;
-  document: {
-    id: number;
-    url: string;
-  }[];
+  document: IDocument;
   rating: number;
+}
+
+export interface IDocument {
+  id: number;
+  url: string;
 }

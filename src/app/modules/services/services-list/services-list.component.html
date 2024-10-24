@@ -10,8 +10,8 @@
         </span>
     </div>
     <p-table
-        [value]="services"
-        [columns]="cols"
+        [value]="services()"
+        [columns]="servicesColumns"
         [tableStyle]="{'min-width': '50rem'}"
         [paginator]="true"
         [rows]="10"
@@ -20,7 +20,7 @@
         [rowsPerPageOptions]="[10,25,50]">
         <ng-template pTemplate="header">
             <tr>
-                <th *ngFor="let col of cols">
+                <th *ngFor="let col of servicesColumns">
                     {{col.header}}
                 </th>
                 <th>Ações</th>
@@ -28,7 +28,7 @@
         </ng-template>
         <ng-template pTemplate="body" let-service>
             <tr>
-                <td *ngFor="let col of cols">
+                <td *ngFor="let col of servicesColumns">
                     <ng-container [ngSwitch]="col.type">
                         <ng-container *ngSwitchCase="'currency'">
                             {{service[col.field] | currency:'BRL':'symbol':'1.2-2'}}

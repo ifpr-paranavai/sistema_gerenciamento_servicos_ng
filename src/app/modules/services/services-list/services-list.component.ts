@@ -1,13 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, WritableSignal, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, OnInit, WritableSignal, signal } from "@angular/core";
 
 import { ServiceService } from "../../../core/services/services_offer/service.service";
 import { ServiceResponse } from "../../../core/interfaces/service-response.interface";
-
-interface Column {
-    field: string;
-    header: string;
-    type?: string;
-}
+import { catchError, of, take } from "rxjs";
+import { ITableColumn } from "../../../core/interfaces/table-columns.interface";
+import { ServicesCols } from "../../../core/constants/services.constants";
+import { ToastService } from "../../../core/services/toastr/toast.service";
 
 @Component({
     selector: "sgs-services-list",
@@ -16,26 +14,19 @@ interface Column {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ServicesListComponent implements OnInit {
-    services: ServiceResponse[] = [];
-
-    cols: Column[] = [
-        { field: 'name', header: 'Nome' },
-        { field: 'description', header: 'Descrição' },
-        { field: 'cost', header: 'Valor', type: 'currency' },
-        { field: 'duration', header: 'Duração', type: 'time' },
-        { field: 'ratting_avg', header: 'Avaliação', type: 'rating' },
-    ];
-
+    services: WritableSignal<ServiceResponse[]> = signal([]);
+    servicesColumns: ITableColumn[] = ServicesCols;
+    
     constructor(
         private serviceService: ServiceService,
-        private cdr: ChangeDetectorRef,
+        private toastService: ToastService,
     ) { }
 
     ngOnInit() {
         this.loadServices();
     }
 
-    getSeverity(status: string) {
+    getSeverity(status: string): string {
         switch (status) {
             case 'INSTOCK':
                 return 'success';
@@ -48,16 +39,20 @@ export class ServicesListComponent implements OnInit {
         }
     }
 
-    loadServices() {
-        this.serviceService.getServices().subscribe({
-            next: (services: ServiceResponse[]) => {
-                this.services = services;
-                console.log('Serviços carregados:', this.services);
-                this.cdr.detectChanges();
-            },
-            error: (error: Error) => {
-                console.error('Erro ao carregar serviços:', error);
-            }
+    loadServices(): void {
+        this.serviceService.getServices()
+            .pipe(
+                take(1),
+                catchError(error => {
+                    console.log(error);
+                    return of();
+                })
+            )
+            .subscribe({
+                next: (services) => {
+                    this.services.set(services);
+                    console.log('Serviços carregados:', this.services());
+                }
         });
     }
     editService(service: ServiceResponse) {
