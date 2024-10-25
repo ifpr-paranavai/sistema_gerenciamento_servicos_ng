@@ -1,0 +1,19 @@
+<p-dialog 
+    header="Serviço" 
+    [modal]="true" 
+    draggable="false"
+    [(visible)]="visible">
+    <div class="service-wrapper">
+        <form>
+            <p-floatLabel>
+                <input id="name" pInputText />
+                <label for="name">Nome</label>
+            </p-floatLabel>
+
+            <p-floatLabel>
+                <input id="description" pInputText />
+                <label for="description">Descrição</label>
+            </p-floatLabel>
+        </form>
+    </div>
+</p-dialog>

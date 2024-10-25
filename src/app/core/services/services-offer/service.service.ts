@@ -16,7 +16,7 @@ export class ServiceService {
     return this.http.get<ServiceResponse[]>(this.apiUrl);
   }
 
-  getService(id: number): Observable<ServiceResponse> {
+  getServiceById(id: number): Observable<ServiceResponse> {
     return this.http.get<ServiceResponse>(`${this.apiUrl}/${id}`);
   }
 

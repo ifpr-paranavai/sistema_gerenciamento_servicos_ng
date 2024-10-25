@@ -6,6 +6,7 @@
                 label="Novo serviço"
                 icon="pi pi-plus"
                 iconPos="right"
+                (onClick)="openModalService()"
                 size="small"/>
         </span>
     </div>
@@ -54,3 +55,5 @@
         </ng-template>
     </p-table>
 </div>
+
+<sgs-service-modal #serviceModal></sgs-service-modal>
