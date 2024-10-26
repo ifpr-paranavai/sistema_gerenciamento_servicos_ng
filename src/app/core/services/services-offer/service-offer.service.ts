@@ -3,12 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { ServiceResponse } from '../../interfaces/service-response.interface';
+import { IServiceOfferPayload } from '../../interfaces/service-offer.interface';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ServiceService {
-  private apiUrl = `${environment.baseUrl}/v1/service/services`;
+export class ServiceOfferService {
+  private apiUrl = `${environment.baseUrl}/v1/service/services/`;
 
   constructor(private http: HttpClient) { }
 
@@ -20,7 +21,7 @@ export class ServiceService {
     return this.http.get<ServiceResponse>(`${this.apiUrl}/${id}`);
   }
 
-  createService(service: Omit<ServiceResponse, 'id'>): Observable<ServiceResponse> {
+    createService(service: IServiceOfferPayload): Observable<ServiceResponse> {
     return this.http.post<ServiceResponse>(this.apiUrl, service);
   }
 
@@ -31,6 +32,6 @@ export class ServiceService {
   deleteService(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
-  
+
 
 }

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, ViewChild, WritableSignal, signal } from "@angular/core";
 
-import { ServiceService } from "../../../core/services/services-offer/service.service";
+import { ServiceOfferService } from "../../../core/services/services-offer/service-offer.service";
 import { ServiceResponse } from "../../../core/interfaces/service-response.interface";
 import { catchError, of, take } from "rxjs";
 import { ITableColumn } from "../../../core/interfaces/table-columns.interface";
@@ -20,9 +20,9 @@ export class ServicesListComponent implements OnInit {
 
     services: WritableSignal<ServiceResponse[]> = signal([]);
     servicesColumns: ITableColumn[] = ServicesCols;
-    
+
     constructor(
-        private serviceService: ServiceService,
+        private serviceService: ServiceOfferService,
         private toastService: ToastService,
     ) { }
 
@@ -73,5 +73,9 @@ export class ServicesListComponent implements OnInit {
     openModalService(): void {
         if (!this.serviceModal) throw new Error('ServiceModalComponent not found');
         this.serviceModal.showDialog();
+    }
+
+    addService(service: ServiceResponse): void {
+        this.services().push(service);
     }
 }

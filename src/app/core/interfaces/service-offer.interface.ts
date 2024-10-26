@@ -1,4 +1,4 @@
-export interface IServiceOffer {
+export interface IServiceOfferPayload {
     name: string;
     description: string;
     cost: number;

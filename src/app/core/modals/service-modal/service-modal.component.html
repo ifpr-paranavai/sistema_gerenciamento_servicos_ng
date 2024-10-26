@@ -1,55 +1,73 @@
-<p-dialog 
-    header="Serviço" 
-    [modal]="true" 
-    draggable="false"
-    [(visible)]="visible">
+<p-dialog header="Serviço"
+          [modal]="true"
+          draggable="false"
+          [(visible)]="visible">
     <div class="service-wrapper">
-        <form [formGroup]="serviceFg" (ngSubmit)="onSubmit()">
-            <div class="p-fluid">
-        
-                <!-- Campo Nome -->
-                <div class="p-field">
-                    <label for="nome">Nome</label>
-                    <input id="nome" type="text" pInputText formControlName="nome" placeholder="Nome">
-                    <small *ngIf="serviceFg.get('nome').invalid && serviceFg.get('nome').touched" class="p-error">
+        <form [formGroup]="serviceFg"
+              (ngSubmit)="onSubmit()">
+            <div class="service-wrapper__form-container">
+                <div class="flex flex-column gap-1">
+                    <label for="name">Nome</label>
+                    <input id="name"
+                           pInputText
+                           formControlName="name"
+                           placeholder="Nome">
+                    <small *ngIf="serviceFg.get('name')?.invalid && serviceFg.get('name')?.touched"
+                           class="text-red-500 text-xs">
                         Nome é obrigatório.
                     </small>
                 </div>
-        
-                <!-- Campo Descrição -->
-                <div class="p-field">
-                    <label for="descricao">Descrição</label>
-                    <textarea id="descricao" pInputTextarea formControlName="descricao" placeholder="Descrição"></textarea>
-                    <small *ngIf="serviceFg.get('descricao').invalid && serviceFg.get('descricao').touched"
-                        class="p-error">
-                        Descrição é obrigatória.
+
+                <div class="flex flex-column gap-1">
+                    <label for="description">Descrição</label>
+                    <input id="description"
+                           pInputText
+                           formControlName="description"
+                           placeholder="Breve descrição do serviço.">
+                    <small *ngIf="serviceFg.get('description')?.invalid && serviceFg.get('description')?.touched"
+                           class="text-red-500 text-xs">
+                        Descrição é obrigatório.
                     </small>
                 </div>
-        
-                <!-- Campo Valor (Reais) -->
-                <div class="p-field">
-                    <label for="valor">Valor (R$)</label>
-                    <p-inputNumber id="valor" formControlName="valor" mode="currency" currency="BRL"
-                        locale="pt-BR"></p-inputNumber>
-                    <small *ngIf="serviceFg.get('valor').invalid && serviceFg.get('valor').touched" class="p-error">
-                        Valor é obrigatório e deve ser maior ou igual a 0.
-                    </small>
+
+                <div class="flex gap-4 align-items-center justify-content-between">
+                    <div class="flex flex-column gap-1">
+                        <label for="cost">Valor (R$)</label>
+                        <p-inputNumber id="cost"
+                                       formControlName="cost"
+                                       mode="currency"
+                                       currency="BRL"
+                                       placeholder="0,00"
+                                       locale="pt-BR">
+                        </p-inputNumber>
+                        <small *ngIf="serviceFg.get('cost')?.invalid && serviceFg.get('cost')?.touched"
+                               class="text-red-500 text-xs">
+                            Valor é obrigatório e deve ser maior ou igual a 0.
+                        </small>
+                    </div>
+
+                    <div class="flex flex-column gap-1">
+                        <label for="duration"
+                               class="text-sm font-medium">Duração (Minutos)</label>
+                        <p-inputNumber id="duration"
+                                       formControlName="duration"
+                                       [min]="1">
+                        </p-inputNumber>
+                        <small *ngIf="serviceFg?.get('duration')?.invalid && serviceFg.get('duration')?.touched"
+                               class="text-red-500 text-xs">
+                            Duração é obrigatória e deve ser no mínimo 1 minuto.
+                        </small>
+                    </div>
+
+                    <div class="pt-3">
+                        <p-button label="Cadastrar"
+                                  icon="pi pi-check"
+                                  iconPos="right"
+                                  [loading]="loading()"
+                                  [disabled]="serviceFg.invalid"
+                                  type="submit"/>
+                    </div>
                 </div>
-        
-                <!-- Campo Duração (Minutos) -->
-                <div class="p-field">
-                    <label for="duracao">Duração (Minutos)</label>
-                    <p-inputNumber id="duracao" formControlName="duracao" [min]="1"></p-inputNumber>
-                    <small *ngIf="serviceFg.get('duracao').invalid && serviceFg.get('duracao').touched" class="p-error">
-                        Duração é obrigatória e deve ser no mínimo 1 minuto.
-                    </small>
-                </div>
-        
-                <!-- Botão de Envio -->
-                <div class="p-field">
-                    <button type="submit" pButton label="Cadastrar" [disabled]="serviceFg.invalid"></button>
-                </div>
-        
             </div>
         </form>
     </div>

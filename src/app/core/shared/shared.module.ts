@@ -2,17 +2,24 @@ import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { CpfPipe } from "./pipes/cpf.pipe";
 import { ButtonModule } from "primeng/button";
-import { ReactiveFormsModule } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { CurrencyFormatPipe } from "./pipes/currency.pipe";
+import { FloatLabelModule } from "primeng/floatlabel";
+import { InputNumberModule } from "primeng/inputnumber";
+import { InputTextModule } from "primeng/inputtext";
 
 const exportedModules = [
     CommonModule,
     ButtonModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    FormsModule,
+    InputTextModule,
+    FloatLabelModule,
+    InputNumberModule,
 ];
 
 const exportedPipes = [
-    CpfPipe, 
+    CpfPipe,
     CurrencyFormatPipe,
 ];
 
@@ -26,7 +33,7 @@ const exportedPipes = [
     ],
     providers: [],
     exports: [
-        ...exportedModules, 
+        ...exportedModules,
         ...exportedPipes
     ],
 })

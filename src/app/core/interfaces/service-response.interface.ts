@@ -3,5 +3,5 @@ export interface ServiceResponse {
     description: string,
     cost: number,
     duration: number,
-    ratting_avg: number,
+    ratting_avg?: number,
 }
