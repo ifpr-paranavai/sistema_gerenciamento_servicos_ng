@@ -61,8 +61,7 @@ export class ServicesListComponent implements OnInit {
     }
 
     editService(service: ServiceResponse): void {
-        // Implement edit logic
-        console.log('Edit service:', service);
+        this.serviceModal.openDialog(service);
     }
 
     deleteService(service: ServiceResponse): void {
@@ -72,7 +71,7 @@ export class ServicesListComponent implements OnInit {
 
     openModalService(): void {
         if (!this.serviceModal) throw new Error('ServiceModalComponent not found');
-        this.serviceModal.showDialog();
+        this.serviceModal.openDialog();
     }
 
     addService(service: ServiceResponse): void {

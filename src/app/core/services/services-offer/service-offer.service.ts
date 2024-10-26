@@ -25,8 +25,8 @@ export class ServiceOfferService {
     return this.http.post<ServiceResponse>(this.apiUrl, service);
   }
 
-  updateService(id: number, service: Partial<ServiceResponse>): Observable<ServiceResponse> {
-    return this.http.put<ServiceResponse>(`${this.apiUrl}/${id}`, service);
+    updateService(id: number, service: IServiceOfferPayload): Observable<ServiceResponse> {
+        return this.http.put<ServiceResponse>(`${this.apiUrl}${id}/`, service);
   }
 
   deleteService(id: number): Observable<void> {
