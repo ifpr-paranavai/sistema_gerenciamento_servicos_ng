@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
 import { authGuard } from './auth.guard';
-import { AuthenticationService } from '../services/authentication/authentication.service';
+import { AuthenticationRequest } from '../requests/authentication/authentication.request';
 import { RoutesConstants } from '../constants/routes.constants';
 
 describe('AuthGuard', () => {
-    let mockAuthService: jasmine.SpyObj<AuthenticationService>;
+    let mockAuthService: jasmine.SpyObj<AuthenticationRequest>;
     let mockRouter: jasmine.SpyObj<Router>;
     let mockRoute: ActivatedRouteSnapshot;
     let mockState: RouterStateSnapshot;
@@ -18,7 +18,7 @@ describe('AuthGuard', () => {
 
         TestBed.configureTestingModule({
             providers: [
-                { provide: AuthenticationService, useValue: mockAuthService },
+                { provide: AuthenticationRequest, useValue: mockAuthService },
                 { provide: Router, useValue: mockRouter }
             ]
         });

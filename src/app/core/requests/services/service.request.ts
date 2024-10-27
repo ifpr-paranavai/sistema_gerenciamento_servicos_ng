@@ -8,7 +8,7 @@ import { IServiceOfferPayload } from '../../interfaces/service-offer.interface';
 @Injectable({
     providedIn: 'root'
 })
-export class ServiceOfferService {
+export class ServiceRequest {
 
     private apiUrl = `${environment.baseUrl}/v1/service/services`;
 

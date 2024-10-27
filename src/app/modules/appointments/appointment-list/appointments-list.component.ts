@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnInit, WritableSignal, signal } from "@angular/core";
 import { IAppointmentResponse } from "../../../core/interfaces/appointment-response.interface";
-import { AppointmentsService } from "../../../core/services/appointments/appointments.service";
+import { AppointmentsRequest } from "../../../core/requests/appointments/appointments.request";
 import { catchError, of, take } from "rxjs";
-import { ToastService } from "../../../core/services/toastr/toast.service";
+import { ToastService } from "../../../core/requests/toastr/toast.service";
 import { AppointmentsCols } from "../../../core/constants/appointments.constant";
 import { ITableColumn } from "../../../core/interfaces/table-columns.interface";
 
@@ -17,7 +17,7 @@ export class AppointmentsListComponent implements OnInit {
     appointmentsColumns: ITableColumn[] = AppointmentsCols;
 
     constructor(
-        private appointmentsService: AppointmentsService,
+        private appointmentsService: AppointmentsRequest,
         private toastService: ToastService,
 
     ) { }
@@ -66,7 +66,7 @@ export class AppointmentsListComponent implements OnInit {
                 this.appointments.set(
                     this.appointments().filter(a => a.id !== appointment.id)
                 );
-            }, 
+            },
             error: (error: Error) => {
                 console.error('Error deleting appointment:', error);
             }
@@ -78,7 +78,7 @@ export class AppointmentsListComponent implements OnInit {
             case 'appointment_date':
                 return new Date(appointment[field]).toLocaleString();
             case 'client':
-                return appointment[field].name; 
+                return appointment[field].name;
             case 'provider':
                 return appointment[field].name;
             case 'services':

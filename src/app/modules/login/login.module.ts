@@ -6,7 +6,7 @@ import { FloatLabelModule } from "primeng/floatlabel";
 import { PasswordModule } from "primeng/password";
 import { ToastModule } from "primeng/toast";
 import { LoginRoutingModule } from "./login-routing.module";
-import { ToastService } from "../../core/services/toastr/toast.service";
+import { ToastService } from "../../core/requests/toastr/toast.service";
 
 @NgModule({
     declarations: [

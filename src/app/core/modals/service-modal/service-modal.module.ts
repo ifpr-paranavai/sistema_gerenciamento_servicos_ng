@@ -1,7 +1,7 @@
 import { NgModule } from "@angular/core";
 import { ServiceModalComponent } from "./service-modal.component";
 import { DialogModule } from 'primeng/dialog';
-import { ServiceOfferService } from "../../services/services-offer/service-offer.service";
+import { ServiceRequest } from "../../requests/services/service.request";
 import { SharedModule } from "../../shared/shared.module";
 
 @NgModule({
@@ -12,7 +12,7 @@ import { SharedModule } from "../../shared/shared.module";
     exports: [ServiceModalComponent],
     declarations: [ServiceModalComponent],
     providers: [
-        ServiceOfferService
+        ServiceRequest
     ],
 })
 export class ServiceModalModule {}

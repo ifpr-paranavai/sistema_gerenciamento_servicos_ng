@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit, ViewChild, WritableSignal, signal } from "@angular/core";
-import { ServiceOfferService } from "../../../core/services/services-offer/service-offer.service";
+import { ServiceRequest } from "../../../core/requests/services/service.request";
 import { ServiceResponse } from "../../../core/interfaces/service-response.interface";
 import { catchError, of, take } from "rxjs";
 import { ITableColumn } from "../../../core/interfaces/table-columns.interface";
 import { ServicesCols } from "../../../core/constants/services.constants";
-import { ToastService } from "../../../core/services/toastr/toast.service";
+import { ToastService } from "../../../core/requests/toastr/toast.service";
 import { ServiceModalComponent } from "../../../core/modals/service-modal/service-modal.component";
 
 @Component({
@@ -20,7 +20,7 @@ export class ServicesListComponent implements OnInit {
     servicesColumns: ITableColumn[] = ServicesCols;
 
     constructor(
-        private serviceOfferService: ServiceOfferService,
+        private serviceRequest: ServiceRequest,
         private toastService: ToastService,
     ) { }
 
@@ -29,7 +29,7 @@ export class ServicesListComponent implements OnInit {
     }
 
     loadServices(): void {
-        this.serviceOfferService.getServices()
+        this.serviceRequest.getServices()
             .pipe(
                 take(1),
                 catchError(error => {
@@ -52,7 +52,7 @@ export class ServicesListComponent implements OnInit {
     }
 
     deleteService(service: ServiceResponse): void {
-        this.serviceOfferService
+        this.serviceRequest
             .deleteService(service.id!)
             .pipe(
                 take(1),

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, WritableSignal, signal } from "@angular/core";
-import { ToastService } from "../../core/services/toastr/toast.service";
+import { ToastService } from "../../core/requests/toastr/toast.service";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { AuthenticationService } from "../../core/services/authentication/authentication.service";
+import { AuthenticationRequest } from "../../core/requests/authentication/authentication.request";
 import { Router } from "@angular/router";
 import { catchError, finalize, take } from "rxjs/operators";
 import { HttpErrorResponse } from "@angular/common/http";
@@ -28,13 +28,13 @@ export class LoginComponent {
 
     constructor(
         private toastService: ToastService,
-        private authenticationService: AuthenticationService,
+        private authenticationService: AuthenticationRequest,
         private router: Router,
     ) {}
 
     doUserLogin(): void {
         if (this.loading()) return;
-        
+
         if (!this.loginFg.valid) {
             this.loginFg.markAllAsTouched();
             this.toastService.error("", "Preencha todos os campos obrigatórios");

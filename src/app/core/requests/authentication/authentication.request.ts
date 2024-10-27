@@ -9,7 +9,7 @@ import { IFeature } from '../../interfaces/feature.interface';
 @Injectable({
     providedIn: 'root'
 })
-export class AuthenticationService {
+export class AuthenticationRequest {
     private baseUrl: string = environment.baseUrl;
     private authenticationKeyLocalStorage = 'authentication';
     private currentUserSubject: BehaviorSubject<IAuthResponse | null>;

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, ViewChild, WritableSignal, signal }
 import { Sidebar } from "primeng/sidebar";
 import { RoutesConstants } from "../../core/constants/routes.constants";
 import { Router } from "@angular/router";
-import { AuthenticationService } from "../../core/services/authentication/authentication.service";
+import { AuthenticationRequest } from "../../core/requests/authentication/authentication.request";
 
 @Component({
     selector: 'sgs-sidebar',
@@ -19,13 +19,13 @@ export class SidebarComponent {
 
     constructor(
         private router: Router,
-        private authenticationService: AuthenticationService,
+        private authenticationService: AuthenticationRequest,
     ) {}
 
     closeCallback(e: any): void {
         this.sidebarRef.close(e);
     }
-    
+
     redirectRoute(route: string): void {
         this.router.navigate([route]);
         this.sidebarVisible.set(false);

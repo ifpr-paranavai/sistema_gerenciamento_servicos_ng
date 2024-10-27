@@ -8,7 +8,7 @@ import { IAppointmentResponse } from '../../interfaces/appointment-response.inte
 @Injectable({
   providedIn: 'root'
 })
-export class AppointmentsService {
+export class AppointmentsRequest {
   private apiUrl = `${environment.baseUrl}/v1/appointment/appointments`;
 
   constructor(private http: HttpClient) { }
@@ -32,5 +32,5 @@ export class AppointmentsService {
   deleteAppointment(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
-  
+
 }

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Output, WritableSignal, signal } from "@angular/core";
-import { ToastService } from "../../services/toastr/toast.service";
+import { ToastService } from "../../requests/toastr/toast.service";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { ServiceOfferService } from "../../services/services-offer/service-offer.service";
+import { ServiceRequest } from "../../requests/services/service.request";
 import { catchError, of, take } from "rxjs";
 import { IServiceOfferPayload } from "../../interfaces/service-offer.interface";
 import { ServiceResponse } from "../../interfaces/service-response.interface";
@@ -37,7 +37,7 @@ export class ServiceModalComponent {
 
     constructor(
         private toastService: ToastService,
-        private readonly serviceOfferService: ServiceOfferService
+        private readonly serviceRequest: ServiceRequest
     ) { }
 
     openDialog(service?: ServiceResponse): void {
@@ -80,7 +80,7 @@ export class ServiceModalComponent {
     }
 
     createNewService(payload: IServiceOfferPayload): void {
-        this.serviceOfferService
+        this.serviceRequest
             .createService(payload)
             .pipe(
                 take(1),
@@ -99,7 +99,7 @@ export class ServiceModalComponent {
     }
 
     updateService(payload: IServiceOfferPayload): void {
-        this.serviceOfferService
+        this.serviceRequest
             .updateService(payload.id!, payload)
             .pipe(
                 take(1),

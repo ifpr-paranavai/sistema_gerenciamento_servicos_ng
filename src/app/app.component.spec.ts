@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
 import { ToastModule } from 'primeng/toast';
-import { ToastService } from './core/services/toastr/toast.service';
+import { ToastService } from './core/requests/toastr/toast.service';
 import { MessageService } from 'primeng/api';
 
 describe('AppComponent', () => {
