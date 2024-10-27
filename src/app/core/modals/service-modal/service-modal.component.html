@@ -60,7 +60,7 @@
                     </div>
 
                     <div class="pt-3">
-                        <p-button label="Cadastrar"
+                        <p-button label="{{ isEdit() ? 'Salvar' : 'Cadastrar' }}"
                                   icon="pi pi-check"
                                   iconPos="right"
                                   [loading]="loading()"

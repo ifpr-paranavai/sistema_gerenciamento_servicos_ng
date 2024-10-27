@@ -6,32 +6,31 @@ import { ServiceResponse } from '../../interfaces/service-response.interface';
 import { IServiceOfferPayload } from '../../interfaces/service-offer.interface';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class ServiceOfferService {
-  private apiUrl = `${environment.baseUrl}/v1/service/services/`;
 
-  constructor(private http: HttpClient) { }
+    private apiUrl = `${environment.baseUrl}/v1/service/services`;
 
-  getServices(): Observable<ServiceResponse[]> {
-    return this.http.get<ServiceResponse[]>(this.apiUrl);
-  }
+    constructor(private http: HttpClient) { }
 
-  getServiceById(id: number): Observable<ServiceResponse> {
-    return this.http.get<ServiceResponse>(`${this.apiUrl}/${id}`);
-  }
+    getServices(): Observable<ServiceResponse[]> {
+        return this.http.get<ServiceResponse[]>(this.apiUrl);
+    }
+
+    getServiceById(id: number): Observable<ServiceResponse> {
+        return this.http.get<ServiceResponse>(`${this.apiUrl}/${id}`);
+    }
 
     createService(service: IServiceOfferPayload): Observable<ServiceResponse> {
-    return this.http.post<ServiceResponse>(this.apiUrl, service);
-  }
+        return this.http.post<ServiceResponse>(`${this.apiUrl}/`, service);
+    }
 
     updateService(id: number, service: IServiceOfferPayload): Observable<ServiceResponse> {
-        return this.http.put<ServiceResponse>(`${this.apiUrl}${id}/`, service);
-  }
+        return this.http.put<ServiceResponse>(`${this.apiUrl}/${id}/`, service);
+    }
 
-  deleteService(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
-
-
+    deleteService(id: number): Observable<void> {
+        return this.http.delete<void>(`${this.apiUrl}/${id}/`);
+    }
 }

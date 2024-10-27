@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, OnInit, ViewChild, WritableSignal, signal } from "@angular/core";
-
 import { ServiceOfferService } from "../../../core/services/services-offer/service-offer.service";
 import { ServiceResponse } from "../../../core/interfaces/service-response.interface";
 import { catchError, of, take } from "rxjs";
@@ -8,7 +7,6 @@ import { ServicesCols } from "../../../core/constants/services.constants";
 import { ToastService } from "../../../core/services/toastr/toast.service";
 import { ServiceModalComponent } from "../../../core/modals/service-modal/service-modal.component";
 
-
 @Component({
     selector: "sgs-services-list",
     templateUrl: "./services-list.component.html",
@@ -16,13 +14,13 @@ import { ServiceModalComponent } from "../../../core/modals/service-modal/servic
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ServicesListComponent implements OnInit {
-    @ViewChild('serviceModal') serviceModal!: ServiceModalComponent;
+    @ViewChild('serviceModal') serviceModal?: ServiceModalComponent;
 
     services: WritableSignal<ServiceResponse[]> = signal([]);
     servicesColumns: ITableColumn[] = ServicesCols;
 
     constructor(
-        private serviceService: ServiceOfferService,
+        private serviceOfferService: ServiceOfferService,
         private toastService: ToastService,
     ) { }
 
@@ -30,21 +28,8 @@ export class ServicesListComponent implements OnInit {
         this.loadServices();
     }
 
-    getSeverity(status: string): string {
-        switch (status) {
-            case 'INSTOCK':
-                return 'success';
-            case 'LOWSTOCK':
-                return 'warning';
-            case 'OUTOFSTOCK':
-                return 'danger';
-            default:
-                return 'success';
-        }
-    }
-
     loadServices(): void {
-        this.serviceService.getServices()
+        this.serviceOfferService.getServices()
             .pipe(
                 take(1),
                 catchError(error => {
@@ -57,24 +42,43 @@ export class ServicesListComponent implements OnInit {
                     this.services.set(services);
                     console.log('Serviços carregados:', this.services());
                 }
-        });
+            });
     }
 
     editService(service: ServiceResponse): void {
+        if (!this.serviceModal) throw new Error('ServiceModalComponent not found');
+
         this.serviceModal.openDialog(service);
     }
 
     deleteService(service: ServiceResponse): void {
-        // Implement delete logic
-        console.log('Delete service:', service);
+        this.serviceOfferService
+            .deleteService(service.id!)
+            .pipe(
+                take(1),
+                catchError(() => {
+                    this.toastService.error("", "Falha ao deletar o serviço");
+                    return of(null);
+                }),
+            ).subscribe(() => {
+                this.services.update((services) => services.filter((s) => s.id !== service.id));
+                this.toastService.success("", "Serviço deletado com sucesso")
+            });
     }
 
     openModalService(): void {
         if (!this.serviceModal) throw new Error('ServiceModalComponent not found');
+
         this.serviceModal.openDialog();
     }
 
     addService(service: ServiceResponse): void {
+        const index = this.services().findIndex((s) => s.id === service.id);
+        if (index !== -1) {
+            this.services().splice(index, 1, service);
+            return;
+        }
+
         this.services().push(service);
     }
 }
