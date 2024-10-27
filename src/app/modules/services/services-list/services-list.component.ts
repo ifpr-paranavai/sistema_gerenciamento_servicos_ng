@@ -33,16 +33,11 @@ export class ServicesListComponent implements OnInit {
             .pipe(
                 take(1),
                 catchError(error => {
-                    console.log(error);
+                    this.toastService.error("Atenção", error?.error?.error ?? "Falha ao buscar serviços");
                     return of();
                 })
             )
-            .subscribe({
-                next: (services) => {
-                    this.services.set(services);
-                    console.log('Serviços carregados:', this.services());
-                }
-            });
+            .subscribe((services) => this.services.set(services));
     }
 
     editService(service: ServiceResponse): void {

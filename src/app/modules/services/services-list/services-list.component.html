@@ -2,23 +2,21 @@
     <div class="flex justify-content-between align-items-center mb-3">
         <h3>Serviços</h3>
         <span>
-            <p-button
-                label="Novo serviço"
-                icon="pi pi-plus"
-                iconPos="right"
-                (onClick)="openModalService()"
-                size="small"/>
+            <p-button label="Novo serviço"
+                      icon="pi pi-plus"
+                      iconPos="right"
+                      (onClick)="openModalService()"
+                      size="small" />
         </span>
     </div>
-    <p-table
-        [value]="services()"
-        [columns]="servicesColumns"
-        [tableStyle]="{'min-width': '50rem'}"
-        [paginator]="true"
-        [rows]="10"
-        [showCurrentPageReport]="true"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} serviços"
-        [rowsPerPageOptions]="[10,25,50]">
+    <p-table [value]="services()"
+             [columns]="servicesColumns"
+             [tableStyle]="{'min-width': '50rem'}"
+             [paginator]="true"
+             [rows]="10"
+             [showCurrentPageReport]="true"
+             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} serviços"
+             [rowsPerPageOptions]="[10]">
         <ng-template pTemplate="header">
             <tr>
                 <th *ngFor="let col of servicesColumns">
@@ -27,18 +25,21 @@
                 <th>Ações</th>
             </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-service>
+        <ng-template pTemplate="body"
+                     let-service>
             <tr>
                 <td *ngFor="let col of servicesColumns">
                     <ng-container [ngSwitch]="col.type">
                         <ng-container *ngSwitchCase="'currency'">
-                            {{service[col.field] | currency:'BRL':'symbol':'1.2-2'}}
+                            {{service[col.field] | currency: 'BRL'}}
                         </ng-container>
                         <ng-container *ngSwitchCase="'time'">
                             {{service[col.field]}} minutos
                         </ng-container>
                         <ng-container *ngSwitchCase="'rating'">
-                            <p-rating [ngModel]="service[col.field]" [readonly]="true" [cancel]="false"></p-rating>
+                            <p-rating [ngModel]="service[col.field]"
+                                      [readonly]="true"
+                                      [cancel]="false"></p-rating>
                         </ng-container>
                         <ng-container *ngSwitchDefault>
                             {{service[col.field]}}
@@ -46,17 +47,18 @@
                     </ng-container>
                 </td>
                 <td>
-                    <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success mr-2"
-                        (onClick)="editService(service)"></p-button>
-                    <p-button icon="pi pi-trash" styleClass="p-button-rounded p-button-danger"
-                        (onClick)="deleteService(service)"></p-button>
+                    <p-button icon="pi pi-pencil"
+                              styleClass="p-button-rounded p-button-success mr-2"
+                              (onClick)="editService(service)"></p-button>
+                    <p-button icon="pi pi-trash"
+                              styleClass="p-button-rounded p-button-danger"
+                              (onClick)="deleteService(service)"></p-button>
                 </td>
             </tr>
         </ng-template>
     </p-table>
 </div>
 
-<sgs-service-modal
-    #serviceModal
-    (service)="addService($event)">
+<sgs-service-modal #serviceModal
+                   (service)="addService($event)">
 </sgs-service-modal>
