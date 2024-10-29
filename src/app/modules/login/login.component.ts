@@ -30,7 +30,7 @@ export class LoginComponent {
         private toastService: ToastService,
         private authenticationService: AuthenticationRequest,
         private router: Router,
-    ) {}
+    ) { }
 
     doUserLogin(): void {
         if (this.loading()) return;

@@ -1,0 +1,20 @@
+.appointment-wrapper {
+    width: 1000px;
+    height: 600px;
+
+    &__dropdowns-container {
+        display: grid;
+        grid-template-columns: minmax(300px, 1fr) minmax(300px, 1fr) minmax(300px, 1fr);
+    }
+}
+
+.p-dropdown-service,
+.p-dropdown-provider,
+.p-dropdown-client {
+    ::ng-deep {
+        div:first-child {
+            min-width: 300px;
+            max-width: 300px;
+        }
+    }
+}

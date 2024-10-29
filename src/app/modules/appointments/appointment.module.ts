@@ -10,6 +10,7 @@ import { SharedModule } from "../../core/shared/shared.module";
 import { AppointmentsRoutingModule } from "./appointment-routing.module";
 import { AppointmentComponent } from "./appointment.component";
 import { AppointmentsListComponent } from "./appointment-list/appointments-list.component";
+import { AppointmentModalModule } from "../../core/modals/appointment-modal/appointment-modal.module";
 
 @NgModule({
     imports: [
@@ -20,7 +21,7 @@ import { AppointmentsListComponent } from "./appointment-list/appointments-list.
         FormsModule,
         RatingModule,
         CheckboxModule,
-        ButtonModule
+        AppointmentModalModule
     ],
     exports: [],
     declarations: [

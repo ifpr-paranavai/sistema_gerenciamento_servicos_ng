@@ -6,23 +6,22 @@
     </div>
     <div class="login__half login__half--right">
         <div class="login__content">
-            <form [formGroup]="loginFg" class="login__form">
+            <form [formGroup]="loginFg"
+                  class="login__form">
                 <p-floatLabel>
-                    <input
-                        formControlName="email"
-                        pInputText
-                        id="email" />
+                    <input formControlName="email"
+                           pInputText
+                           id="email" />
                     <label for="email">Usuário</label>
                 </p-floatLabel>
 
                 <p-floatLabel>
-                    <p-password
-                        formControlName="password"
-                        [toggleMask]="true"
-                        promptLabel="Escolha uma senha"
-                        weakLabel="Senha Fraca"
-                        mediumLabel="Senha Média"
-                        strongLabel="Senha Forte"/>
+                    <p-password formControlName="password"
+                                [toggleMask]="true"
+                                promptLabel="Escolha uma senha"
+                                weakLabel="Senha Fraca"
+                                mediumLabel="Senha Média"
+                                strongLabel="Senha Forte" />
                     <label for="password">Senha</label>
                 </p-floatLabel>
 

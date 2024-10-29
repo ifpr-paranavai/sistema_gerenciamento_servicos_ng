@@ -6,7 +6,7 @@ import { catchError, of, take } from "rxjs";
 import { IServiceOfferPayload } from "../../interfaces/service-offer.interface";
 import { ServiceResponse } from "../../interfaces/service-response.interface";
 
-interface IServiceOfferFg {
+interface IServiceFg {
     id: FormControl<number | null>;
     name: FormControl<string | null>;
     description: FormControl<string | null>;
@@ -24,7 +24,7 @@ export class ServiceModalComponent {
     @Output() service: EventEmitter<ServiceResponse> = new EventEmitter();
 
     visible: WritableSignal<boolean> = signal(false);
-    serviceFg: FormGroup<IServiceOfferFg> = new FormGroup<IServiceOfferFg>({
+    serviceFg: FormGroup<IServiceFg> = new FormGroup<IServiceFg>({
         id: new FormControl<number | null>(null),
         name: new FormControl<string | null>(null, [Validators.required]),
         description: new FormControl<string | null>(null, [Validators.required]),
@@ -38,7 +38,7 @@ export class ServiceModalComponent {
     constructor(
         private toastService: ToastService,
         private readonly serviceRequest: ServiceRequest
-    ) { }
+    ) {}
 
     openDialog(service?: ServiceResponse): void {
         if (service) {

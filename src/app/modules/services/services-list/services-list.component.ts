@@ -14,7 +14,7 @@ import { ServiceModalComponent } from "../../../core/modals/service-modal/servic
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ServicesListComponent implements OnInit {
-    @ViewChild('serviceModal') serviceModal?: ServiceModalComponent;
+    @ViewChild(ServiceModalComponent) serviceModal?: ServiceModalComponent;
 
     services: WritableSignal<ServiceResponse[]> = signal([]);
     servicesColumns: ITableColumn[] = ServicesCols;

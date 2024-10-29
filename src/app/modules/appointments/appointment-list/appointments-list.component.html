@@ -29,7 +29,8 @@
                     <ng-container [ngSwitch]="col.type">
                         <ng-container *ngSwitchCase="'severity'">
                             <p-tag [value]="$any(appointment)[col.field]"
-                                   [severity]="getSeverity($any(appointment)[col.field])"></p-tag>
+                                   [severity]="$any(appointment).severity">
+                            </p-tag>
                         </ng-container>
                         <ng-container *ngSwitchCase="'boolean'">
                             <p-checkbox [(ngModel)]="$any(appointment)[col.field]"
@@ -58,3 +59,6 @@
         </ng-template>
     </p-table>
 </div>
+
+<sgs-appointment-modal #appointmentModal>
+</sgs-appointment-modal>
