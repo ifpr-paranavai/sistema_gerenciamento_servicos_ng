@@ -43,6 +43,13 @@ const routes: Routes = [
                     ),
             },
             {
+                path: "documents-template",
+                loadChildren: () =>
+                    import("../documents-template/documents-template.module").then(
+                        (m) => m.DocumentsTemplateModule,
+                    ),
+            },
+            {
                 path: "**",
                 redirectTo: "home"
             }

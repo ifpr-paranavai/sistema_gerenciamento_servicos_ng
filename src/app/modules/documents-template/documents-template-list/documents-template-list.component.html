@@ -1,0 +1,42 @@
+<div class="card flex flex-column p-3">
+    <div class="flex justify-content-between align-items-center mb-3">
+        <h3>Documentos Modelo</h3>
+        <span>
+            <p-button label="Novo Documento"
+                      icon="pi pi-plus"
+                      iconPos="right"
+                      size="small" />
+        </span>
+    </div>
+    <p-table [value]="documentsTemplateItems()"
+             [columns]="documentsTemplateColumns"
+             [tableStyle]="{'min-width': '50rem'}"
+             [paginator]="true"
+             [rows]="10"
+             [showCurrentPageReport]="true"
+             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} agendamentos"
+             [rowsPerPageOptions]="[10,25,50]">
+        <ng-template pTemplate="header">
+            <tr>
+                <th *ngFor="let col of documentsTemplateColumns">{{col.header}}</th>
+                <th>Ações</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body"
+                     let-documentTemplate>
+            <tr>
+                <td *ngFor="let col of documentsTemplateColumns">
+                    {{documentTemplate[col.field]}}
+                </td>
+                <td>
+                    <p-button icon="pi pi-pencil"
+                              styleClass="p-button-rounded p-button-success mr-2"
+                              (onClick)="editDocumentTemplate(documentTemplate)"></p-button>
+                    <p-button icon="pi pi-trash"
+                              styleClass="p-button-rounded p-button-danger"
+                              (onClick)="deleteDocumentTemplate(documentTemplate)"></p-button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>

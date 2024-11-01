@@ -19,7 +19,7 @@
                                 emptyMessage="Digite para pesquisar..."
                                 placeholder="Selecione um serviço">
                     </p-dropdown>
-                    <small *ngIf="appointmentFg.get('serviceId')?.invalid && appointmentFg.get('serviceId')?.touched"
+                    <small *ngIf="appointmentFg.controls.serviceId?.invalid && appointmentFg.controls.serviceId?.touched"
                            class="text-red-500 text-xs">
                         Campo Serviço é obrigatório.
                     </small>
@@ -51,7 +51,7 @@
                                     </div>
                                 </ng-template>
                     </p-dropdown>
-                    <small *ngIf="appointmentFg.get('clientId')?.invalid && appointmentFg.get('clientId')?.touched"
+                    <small *ngIf="appointmentFg.controls.clientId?.invalid && appointmentFg.controls.clientId?.touched"
                            class="text-red-500 text-xs">
                         Campo Cliente é obrigatório.
                     </small>
@@ -83,7 +83,7 @@
                                     </div>
                                 </ng-template>
                     </p-dropdown>
-                    <small *ngIf="appointmentFg.get('providerId')?.invalid && appointmentFg.get('providerId')?.touched"
+                    <small *ngIf="appointmentFg.controls.providerId?.invalid && appointmentFg.controls.providerId?.touched"
                            class="text-red-500 text-xs">
                         Campo Prestador é obrigatório.
                     </small>
@@ -92,7 +92,7 @@
             <div class="flex flex-column">
                 <label for="appointmentDate">Data do agendamento</label>
                 <p-calendar formControlName="appointmentDate" />
-                <small *ngIf="appointmentFg.get('appointmentDate')?.invalid && appointmentFg.get('appointmentDate')?.touched"
+                <small *ngIf="appointmentFg.controls.appointmentDate?.invalid && appointmentFg.controls.appointmentDate?.touched"
                        class="text-red-500 text-xs">
                     Campo Data é obrigatória.
                 </small>

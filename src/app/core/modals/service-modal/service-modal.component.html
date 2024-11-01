@@ -12,7 +12,7 @@
                            pInputText
                            formControlName="name"
                            placeholder="Nome">
-                    <small *ngIf="serviceFg.get('name')?.invalid && serviceFg.get('name')?.touched"
+                    <small *ngIf="serviceFg.controls.name?.invalid && serviceFg.controls.name?.touched"
                            class="text-red-500 text-xs">
                         Nome é obrigatório.
                     </small>
@@ -24,7 +24,7 @@
                            pInputText
                            formControlName="description"
                            placeholder="Breve descrição do serviço.">
-                    <small *ngIf="serviceFg.get('description')?.invalid && serviceFg.get('description')?.touched"
+                    <small *ngIf="serviceFg.controls.description?.invalid && serviceFg.controls.description?.touched"
                            class="text-red-500 text-xs">
                         Descrição é obrigatório.
                     </small>
@@ -40,7 +40,7 @@
                                        placeholder="0,00"
                                        locale="pt-BR">
                         </p-inputNumber>
-                        <small *ngIf="serviceFg.get('cost')?.invalid && serviceFg.get('cost')?.touched"
+                        <small *ngIf="serviceFg.controls.cost?.invalid && serviceFg.controls.cost?.touched"
                                class="text-red-500 text-xs">
                             Valor é obrigatório e deve ser maior ou igual a 0.
                         </small>
@@ -53,7 +53,7 @@
                                        formControlName="duration"
                                        [min]="1">
                         </p-inputNumber>
-                        <small *ngIf="serviceFg?.get('duration')?.invalid && serviceFg.get('duration')?.touched"
+                        <small *ngIf="serviceFg.controls.duration?.invalid && serviceFg.controls.duration?.touched"
                                class="text-red-500 text-xs">
                             Duração é obrigatória e deve ser no mínimo 1 minuto.
                         </small>
@@ -65,7 +65,7 @@
                                   iconPos="right"
                                   [loading]="loading()"
                                   [disabled]="serviceFg.invalid"
-                                  type="submit"/>
+                                  type="submit" />
                     </div>
                 </div>
             </div>
