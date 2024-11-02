@@ -5,10 +5,12 @@
             <p-button label="Novo Documento"
                       icon="pi pi-plus"
                       iconPos="right"
-                      size="small" />
+                      size="small"
+                      (click)="openModalDocumentTemplate()"/>
         </span>
     </div>
-    <p-table [value]="documentsTemplateItems()"
+    <p-table class="document-table"
+             [value]="documentsTemplateItems()"
              [columns]="documentsTemplateColumns"
              [tableStyle]="{'min-width': '50rem'}"
              [paginator]="true"
@@ -40,3 +42,6 @@
         </ng-template>
     </p-table>
 </div>
+
+<sgs-documents-template-modal #documentTemplateModal>
+</sgs-documents-template-modal>

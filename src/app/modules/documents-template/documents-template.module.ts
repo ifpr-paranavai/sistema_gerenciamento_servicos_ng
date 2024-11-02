@@ -6,6 +6,7 @@ import { DocumentsTemplateRequest } from "../../core/requests/documents-template
 import { SharedModule } from "../../core/shared/shared.module";
 import { TableModule } from "primeng/table";
 import { TableCellTemplateDirective } from "../../core/directives/table/table-cell-template";
+import { DocumentsTemplateModalModule } from "../../core/modals/documents-template-modal/documents-template-modal.module";
 
 @NgModule({
     declarations: [
@@ -16,6 +17,7 @@ import { TableCellTemplateDirective } from "../../core/directives/table/table-ce
         DocumentsTemplateRoutingModule,
         SharedModule,
         TableModule,
+        DocumentsTemplateModalModule,
     ],
     exports: [
         DocumentsTemplateComponent,

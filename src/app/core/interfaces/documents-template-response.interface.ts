@@ -1,4 +1,8 @@
 export interface IDocumentsTemplateResponse {
+    id: number;
     name: string;
-    status: string;
+    description: string;
+    'file_types': string[];
+    created_at: Date;
+    updated_at: Date;
 }

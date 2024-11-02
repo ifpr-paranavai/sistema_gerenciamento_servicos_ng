@@ -64,11 +64,11 @@ export class ServiceModalComponent {
         }
 
         const payload: IServiceOfferPayload = {
-            id: this.serviceFg.get("id")?.value!,
-            name: this.serviceFg.get("name")?.value!,
-            description: this.serviceFg.get("description")?.value!,
-            cost: this.serviceFg.get("cost")?.value!,
-            duration: this.serviceFg.get("duration")?.value!
+            id: this.serviceFg.controls.id?.value!,
+            name: this.serviceFg.controls.name?.value!,
+            description: this.serviceFg.controls.description?.value!,
+            cost: this.serviceFg.controls.cost?.value!,
+            duration: this.serviceFg.controls.duration?.value!,
         };
 
         if (this.isEdit()) {

@@ -1,10 +1,11 @@
-import { Component, signal, WritableSignal } from "@angular/core";
+import { Component, signal, ViewChild, WritableSignal } from "@angular/core";
 import { DocumentsTemplateRequest } from "../../../core/requests/documents-template/documents-template.request";
 import { AppointmentsCols } from "../../../core/constants/appointments.constant";
 import { ITableColumn } from "../../../core/interfaces/table-columns.interface";
 import { DocumentsTemplateCols } from "../../../core/constants/documents-template.constants";
 import { IDocumentsTemplateResponse } from "../../../core/interfaces/documents-template-response.interface";
 import { ToastService } from "../../../core/requests/toastr/toast.service";
+import { DocumentsTemplateModalComponent } from "../../../core/modals/documents-template-modal/documents-template-modal.component";
 
 @Component({
     selector: "sgs-documents-template-list",
@@ -12,14 +13,26 @@ import { ToastService } from "../../../core/requests/toastr/toast.service";
     styleUrls: ["./documents-template-list.component.scss"],
 })
 export class DocumentsTemplateListComponent {
+    @ViewChild(DocumentsTemplateModalComponent) documentTemplateModal?: DocumentsTemplateModalComponent;
+
     documentsTemplateItems: WritableSignal<IDocumentsTemplateResponse[]> = signal([
         {
-            name: "Template 1",
-            status: "Ativo",
+            id: 1,
+            name: "Raxas",
+            description: "Descricão",
+            file_types: ["pdf", "docx"],
+            created_at: new Date(),
+            updated_at: new Date(),
+
         },
         {
-            name: "Template 2",
-            status: "Inativo",
+            id: 2,
+            name: "Sandero",
+            description: "Descricão",
+            file_types: ["pdf", "docx"],
+            created_at: new Date(),
+            updated_at: new Date(),
+
         },
     ]);
     documentsTemplateColumns: ITableColumn[] = DocumentsTemplateCols;
@@ -29,11 +42,19 @@ export class DocumentsTemplateListComponent {
         private readonly toastService: ToastService,
     ) {}
 
-    editDocumentTemplate(documentTemplate: IDocumentsTemplateResponse): void {
+    openModalDocumentTemplate(): void {
+        if (!this.documentTemplateModal) throw new Error('DocumentsTemplateModalComponent not found');
 
+        this.documentTemplateModal.openDialog();
+    }
+
+    editDocumentTemplate(documentTemplate: IDocumentsTemplateResponse): void {
+        if (!this.documentTemplateModal) throw new Error('DocumentsTemplateModalComponent not found');
+
+        this.documentTemplateModal.openDialog(documentTemplate);
     }
 
     deleteDocumentTemplate(documentTemplate: IDocumentsTemplateResponse): void {
-
+        console.log(documentTemplate);
     }
 }
