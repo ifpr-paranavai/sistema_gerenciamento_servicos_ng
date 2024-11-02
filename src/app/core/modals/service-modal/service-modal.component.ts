@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Output, WritableSignal, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, OnDestroy, Output, WritableSignal, signal } from "@angular/core";
 import { ToastService } from "../../requests/toastr/toast.service";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { ServiceRequest } from "../../requests/services/service.request";
 import { catchError, of, take } from "rxjs";
 import { IServiceOfferPayload } from "../../interfaces/service-offer.interface";
 import { ServiceResponse } from "../../interfaces/service-response.interface";
+import { costValueValidator } from "../../validators/cost.validator";
 
 interface IServiceFg {
     id: FormControl<number | null>;
@@ -28,7 +29,7 @@ export class ServiceModalComponent {
         id: new FormControl<number | null>(null),
         name: new FormControl<string | null>(null, [Validators.required]),
         description: new FormControl<string | null>(null, [Validators.required]),
-        cost: new FormControl<number | null>(null, [Validators.required]),
+        cost: new FormControl<number | null>(null, [Validators.required, costValueValidator()]),
         duration: new FormControl<number | null>(null, [Validators.required]),
     });
 
@@ -41,6 +42,8 @@ export class ServiceModalComponent {
     ) {}
 
     openDialog(service?: ServiceResponse): void {
+        if (!service) this.serviceFg.reset();
+
         if (service) {
             this.serviceFg.patchValue({
                 id: service.id,
@@ -51,6 +54,7 @@ export class ServiceModalComponent {
             });
             this.isEdit.set(true);
         }
+
         this.visible.set(true);
     }
 

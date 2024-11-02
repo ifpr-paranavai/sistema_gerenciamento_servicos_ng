@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, WritableSignal, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component } from "@angular/core";
 
 @Component({
     selector: 'sgs-topbar',
@@ -9,8 +9,4 @@ import { ChangeDetectionStrategy, Component, WritableSignal, signal } from "@ang
 export class TopbarComponent {
 
     constructor() {}
-
-    showDialog(): void {
-        
-    }
 }

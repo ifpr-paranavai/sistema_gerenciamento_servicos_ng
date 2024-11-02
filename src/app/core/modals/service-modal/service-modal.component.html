@@ -40,7 +40,7 @@
                                        placeholder="0,00"
                                        locale="pt-BR">
                         </p-inputNumber>
-                        <small *ngIf="serviceFg.controls.cost?.invalid && serviceFg.controls.cost?.touched"
+                        <small *ngIf="serviceFg.controls.cost?.invalid && serviceFg.controls.cost?.touched || serviceFg.controls.cost?.errors?.['positiveValue']"
                                class="text-red-500 text-xs">
                             Valor é obrigatório e deve ser maior ou igual a 0.
                         </small>

@@ -9,4 +9,5 @@ export interface IUser {
     cpf: string;
     role: Role[] | number;
     features: IFeature[];
+    'profile_image': string | null;
 }

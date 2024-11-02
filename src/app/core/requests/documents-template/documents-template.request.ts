@@ -11,7 +11,7 @@ import { IDocumentsTemplateResponse } from '../../interfaces/documents-template-
 export class DocumentsTemplateRequest {
 
     // TODO -> Alterar
-    private apiUrl = `${environment.baseUrl}/v1/document/documents-templates/`;
+    private apiUrl = `${environment.baseUrl}/v1/documents/document-templates/`;
 
     constructor(private http: HttpClient) {}
 
@@ -25,6 +25,10 @@ export class DocumentsTemplateRequest {
 
     deleteDocumentTemplate(id: number): Observable<void> {
         return this.http.delete<void>(`${this.apiUrl}${id}`);
+    }
+
+    getDocumentsTemplate(): Observable<IDocumentsTemplateResponse[]> {
+        return this.http.get<IDocumentsTemplateResponse[]>(this.apiUrl);
     }
 
 }
