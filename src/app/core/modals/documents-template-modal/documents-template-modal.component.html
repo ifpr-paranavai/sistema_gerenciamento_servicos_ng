@@ -1,11 +1,140 @@
 <p-dialog header="Documento Modelo"
           [modal]="true"
-          draggable="false"
-          [(visible)]="visible">
+          [draggable]="false"
+          [(visible)]="visible"
+          [style]="{width: '800px'}"
+          [closeOnEscape]="true"
+          [closable]="true">
     <div class="documents-template-wrapper">
-        <form [formGroup]="documentTemplateFg"
-              (ngSubmit)="onSubmit()">
-            Not Implementhed!
+        <form [formGroup]="documentTemplateFg" (ngSubmit)="onSubmit()">
+            <div class="field mb-4">
+                <label for="name">Nome do Documento</label>
+                <input type="text" 
+                       pInputText 
+                       id="name"
+                       formControlName="name"
+                       class="w-full"
+                       placeholder="Digite o nome do documento"/>
+                <small *ngIf="documentTemplateFg.get('name')?.errors?.['required'] && documentTemplateFg.get('name')?.touched" 
+                       class="text-red-500">
+                    Nome é obrigatório
+                </small>
+            </div>
+
+            <div class="field mb-4">
+                <label for="description">Descrição</label>
+                <textarea pInputTextarea
+                          id="description"
+                          formControlName="description"
+                          class="w-full"
+                          [rows]="3"
+                          placeholder="Descreva o documento">
+                </textarea>
+                <small *ngIf="documentTemplateFg.get('description')?.errors?.['required'] && documentTemplateFg.get('description')?.touched" 
+                       class="text-red-500">
+                    Descrição é obrigatória
+                </small>
+            </div>
+
+            <div class="field mb-4 flex justify-content-between">
+                <div>
+                    <label for="file_types" class="block mb-2">Tipos de Arquivos Permitidos</label>
+                    <p-multiSelect id="file_types"
+                                formControlName="file_types"
+                                [options]="fileTypes"
+                                optionLabel="name"
+                                optionValue="value"
+                                class="w-full"
+                                placeholder="Selecione os tipos permitidos"
+                                [showClear]="true"
+                                appendTo="body">
+                    </p-multiSelect>
+                    <small *ngIf="documentTemplateFg.get('file_types')?.errors?.['required'] && documentTemplateFg.get('file_types')?.touched" 
+                        class="text-red-500">
+                        Selecione ao menos um tipo de arquivo
+                    </small>
+                </div>
+                <div>
+                    <label for="document_template" class="block mb-2">Documento Modelo</label>
+                    <div class="upload-container">
+                        <p-fileUpload #fileUpload
+                                    mode="basic"
+                                    chooseLabel="Escolher Arquivo"
+                                    name="document_template"
+                                    [customUpload]="true"
+                                    (uploadHandler)="onFileSelect($event)"
+                                    accept=".doc,.docx,.pdf,.txt,.jpg,.jpeg,.png"
+                                    [auto]="true"
+                                    class="w-full">
+                        </p-fileUpload>
+                
+                    
+                    </div>
+                </div>
+                <small *ngIf="documentTemplateFg.get('document_template')?.errors?.['required'] && documentTemplateFg.get('document_template')?.touched" 
+                       class="text-red-500">
+                    Documento modelo é obrigatório
+                </small>
+            </div>
+
+            
+            <div class="field mb-4">
+                
+                 <div *ngIf="selectedFile()" class="preview-container mt-3 p-3 border-1 border-round surface-border">
+                    <div class="flex align-items-center justify-content-between">
+                        <div class="flex align-items-center gap-3">
+                            <div class="preview-icon" [ngSwitch]="selectedFile()?.type">
+                                <img *ngSwitchCase="isImageFile(selectedFile())"
+                                     [src]="previewUrl()"
+                                     class="w-8rem h-8rem border-round"
+                                     alt="Preview">
+                                
+                                <i *ngSwitchCase="'application/pdf'"
+                                   class="pi pi-file-pdf text-4xl text-red-600"></i>
+                                
+                                <i *ngSwitchCase="'application/msword'"
+                                   class="pi pi-file-word text-4xl text-blue-600"></i>
+                                <i *ngSwitchCase="'application/vnd.openxmlformats-officedocument.wordprocessingml.document'"
+                                   class="pi pi-file-word text-4xl text-blue-600"></i>
+                                
+                                <i *ngSwitchCase="'text/plain'"
+                                   class="pi pi-file text-4xl text-gray-600"></i>
+                                
+                                <i *ngSwitchDefault
+                                   class="pi pi-file text-4xl text-gray-600"></i>
+                            </div>
+        
+                            <div class="file-info">
+                                <p class="m-0 font-medium">{{selectedFile()?.name}}</p>
+                                <p class="m-0 text-sm text-gray-600">{{formatFileSize(selectedFile()?.size)}}</p>
+                            </div>
+                        </div>
+        
+                        <button pButton
+                                type="button"
+                                icon="pi pi-times"
+                                class="p-button-rounded p-button-danger p-button-outlined p-button-sm"
+                                (click)="removeFile()">
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <button pButton 
+                        type="button"
+                        label="Cancelar"
+                        class="p-button-outlined"
+                        (click)="onCancel()">
+                </button>
+                <button pButton 
+                        type="submit"
+                        label="Salvar"
+                        [loading]="loading()"
+                        [disabled]="documentTemplateFg.invalid"
+                        class="p-button-primary">
+                </button>
+            </div>
         </form>
     </div>
 </p-dialog>
