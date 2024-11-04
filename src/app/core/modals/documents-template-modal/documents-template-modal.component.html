@@ -9,13 +9,13 @@
         <form [formGroup]="documentTemplateFg" (ngSubmit)="onSubmit()">
             <div class="field mb-4">
                 <label for="name">Nome do Documento</label>
-                <input type="text" 
-                       pInputText 
+                <input type="text"
+                       pInputText
                        id="name"
                        formControlName="name"
                        class="w-full"
                        placeholder="Digite o nome do documento"/>
-                <small *ngIf="documentTemplateFg.get('name')?.errors?.['required'] && documentTemplateFg.get('name')?.touched" 
+                <small *ngIf="documentTemplateFg.get('name')?.errors?.['required'] && documentTemplateFg.get('name')?.touched"
                        class="text-red-500">
                     Nome é obrigatório
                 </small>
@@ -30,7 +30,7 @@
                           [rows]="3"
                           placeholder="Descreva o documento">
                 </textarea>
-                <small *ngIf="documentTemplateFg.get('description')?.errors?.['required'] && documentTemplateFg.get('description')?.touched" 
+                <small *ngIf="documentTemplateFg.get('description')?.errors?.['required'] && documentTemplateFg.get('description')?.touched"
                        class="text-red-500">
                     Descrição é obrigatória
                 </small>
@@ -49,7 +49,7 @@
                                 [showClear]="true"
                                 appendTo="body">
                     </p-multiSelect>
-                    <small *ngIf="documentTemplateFg.get('file_types')?.errors?.['required'] && documentTemplateFg.get('file_types')?.touched" 
+                    <small *ngIf="documentTemplateFg.get('file_types')?.errors?.['required'] && documentTemplateFg.get('file_types')?.touched"
                         class="text-red-500">
                         Selecione ao menos um tipo de arquivo
                     </small>
@@ -67,19 +67,19 @@
                                     [auto]="true"
                                     class="w-full">
                         </p-fileUpload>
-                
-                    
+
+
                     </div>
                 </div>
-                <small *ngIf="documentTemplateFg.get('document_template')?.errors?.['required'] && documentTemplateFg.get('document_template')?.touched" 
+                <small *ngIf="documentTemplateFg.controls.file?.errors?.['required'] && documentTemplateFg.controls.file?.touched"
                        class="text-red-500">
                     Documento modelo é obrigatório
                 </small>
             </div>
 
-            
+
             <div class="field mb-4">
-                
+
                  <div *ngIf="selectedFile()" class="preview-container mt-3 p-3 border-1 border-round surface-border">
                     <div class="flex align-items-center justify-content-between">
                         <div class="flex align-items-center gap-3">
@@ -88,28 +88,28 @@
                                      [src]="previewUrl()"
                                      class="w-8rem h-8rem border-round"
                                      alt="Preview">
-                                
+
                                 <i *ngSwitchCase="'application/pdf'"
                                    class="pi pi-file-pdf text-4xl text-red-600"></i>
-                                
+
                                 <i *ngSwitchCase="'application/msword'"
                                    class="pi pi-file-word text-4xl text-blue-600"></i>
                                 <i *ngSwitchCase="'application/vnd.openxmlformats-officedocument.wordprocessingml.document'"
                                    class="pi pi-file-word text-4xl text-blue-600"></i>
-                                
+
                                 <i *ngSwitchCase="'text/plain'"
                                    class="pi pi-file text-4xl text-gray-600"></i>
-                                
+
                                 <i *ngSwitchDefault
                                    class="pi pi-file text-4xl text-gray-600"></i>
                             </div>
-        
+
                             <div class="file-info">
                                 <p class="m-0 font-medium">{{selectedFile()?.name}}</p>
                                 <p class="m-0 text-sm text-gray-600">{{formatFileSize(selectedFile()?.size)}}</p>
                             </div>
                         </div>
-        
+
                         <button pButton
                                 type="button"
                                 icon="pi pi-times"
@@ -121,13 +121,13 @@
             </div>
 
             <div class="flex justify-end gap-2">
-                <button pButton 
+                <button pButton
                         type="button"
                         label="Cancelar"
                         class="p-button-outlined"
                         (click)="onCancel()">
                 </button>
-                <button pButton 
+                <button pButton
                         type="submit"
                         label="Salvar"
                         [loading]="loading()"

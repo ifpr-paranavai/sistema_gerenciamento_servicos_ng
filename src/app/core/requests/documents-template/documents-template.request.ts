@@ -2,25 +2,23 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { Observable } from 'rxjs';
-import { IDocumentTemplatePayload } from '../../interfaces/document-template-payload.interface';
 import { IDocumentsTemplateResponse } from '../../interfaces/documents-template-response.interface';
 
 @Injectable({
     providedIn: 'root'
 })
 export class DocumentsTemplateRequest {
-
-    // TODO -> Alterar
     private apiUrl = `${environment.baseUrl}/v1/documents/document-templates/`;
 
     constructor(private http: HttpClient) {}
 
-    createDocumentTemplate(documentTemplate: IDocumentTemplatePayload): Observable<IDocumentsTemplateResponse> {
-        return this.http.post<IDocumentsTemplateResponse>(this.apiUrl, documentTemplate);
+    createDocumentTemplate(formData: FormData): Observable<IDocumentsTemplateResponse> {
+        return this.http.post<IDocumentsTemplateResponse>(this.apiUrl, formData);
     }
 
-    updateDocumentTemplate(documentTemplate: IDocumentTemplatePayload): Observable<IDocumentsTemplateResponse> {
-        return this.http.put<IDocumentsTemplateResponse>(`${this.apiUrl}${documentTemplate.id!}`, documentTemplate);
+    updateDocumentTemplate(formData: FormData): Observable<IDocumentsTemplateResponse> {
+        const id = formData.get('id') as string;
+        return this.http.put<IDocumentsTemplateResponse>(`${this.apiUrl}${id}/`, formData);
     }
 
     deleteDocumentTemplate(id: number): Observable<void> {

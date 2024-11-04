@@ -3,4 +3,5 @@ export interface IDocumentTemplatePayload {
     name: string;
     description: string;
     fileTypes: string[] | null;
+    file?: File;
 }

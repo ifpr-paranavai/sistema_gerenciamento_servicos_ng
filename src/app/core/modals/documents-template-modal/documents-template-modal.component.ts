@@ -5,14 +5,14 @@ import { take, catchError, of } from "rxjs";
 import { DocumentsTemplateRequest } from "../../requests/documents-template/documents-template.request";
 import { IDocumentTemplatePayload } from "../../interfaces/document-template-payload.interface";
 import { IDocumentsTemplateResponse } from "../../interfaces/documents-template-response.interface";
-import { FileUpload } from "primeng/fileupload";
+import { FileUpload, FileUploadHandlerEvent } from "primeng/fileupload";
 
 interface IDocumentTemplateFg {
     id: FormControl<number | null>;
     name: FormControl<string | null>;
     description: FormControl<string | null>;
-    file_types: FormControl<string[] | null>;
-    document_template: FormControl<File | null>;
+    file_types: FormControl<string | string[] | null>;
+    file: FormControl<File | null>;
 }
 
 interface FileType {
@@ -26,7 +26,7 @@ interface FileType {
     styleUrls: ["./documents-template-modal.component.scss"],
 })
 export class DocumentsTemplateModalComponent {
-    @Output() documentTemplateEvent: EventEmitter<any> = new EventEmitter();
+    @Output() documentTemplateEvent: EventEmitter<IDocumentsTemplateResponse> = new EventEmitter();
     @ViewChild('fileUpload') fileUpload!: FileUpload;
 
     visible: WritableSignal<boolean> = signal(false);
@@ -49,34 +49,51 @@ export class DocumentsTemplateModalComponent {
         id: new FormControl<number | null>(null),
         name: new FormControl<string | null>(null, [Validators.required]),
         description: new FormControl<string | null>(null, [Validators.required]),
-        file_types: new FormControl<string[] | null>(null, [Validators.required]),
-        document_template: new FormControl<File | null>(null, [Validators.required])
+        file_types: new FormControl<string | string[] | null>(null, [Validators.required]),
+        file: new FormControl<File | null>(null, [Validators.required])
     });
 
     constructor(
         private readonly toastService: ToastService,
         private readonly documentTemplateRequest: DocumentsTemplateRequest,
-    ) { }
+    ) {}
 
     openDialog(documentTemplate?: IDocumentsTemplateResponse): void {
-        this.resetForm();
-        
-        if (documentTemplate) {
-            this.documentTemplateFg.patchValue({
-                id: documentTemplate.id,
-                name: documentTemplate.name,
-                description: documentTemplate.description,
-                file_types: documentTemplate.file_types
-            });
-            this.isEdit.set(true);
+        if (!documentTemplate) {
+            this.documentTemplateFg.reset();
+            this.isEdit.set(false);
+            this.visible.set(true);
+            return;
         }
+
+        this.documentTemplateFg.patchValue({
+            id: documentTemplate.id,
+            name: documentTemplate.name,
+            description: documentTemplate.description,
+            file_types: this.parseFileTypes(documentTemplate!.file_types as string),
+        });
+
+        this.createPreview(documentTemplate.document);
         this.visible.set(true);
+        this.isEdit.set(true);
+    }
+
+    private parseFileTypes(fileTypesString: string): string[] {
+        try {
+            const fileTypesArray = JSON.parse(fileTypesString) as string[];
+            return fileTypesArray
+                .flatMap(item => item.split(','))
+                .map(ext => ext.trim());
+        } catch (error) {
+            console.error('Erro ao parsear os tipos de arquivo:', error);
+            return [];
+        }
     }
 
     onSubmit(): void {
         if (this.loading()) return;
 
-        if (!this.documentTemplateFg.valid) {
+        if (this.documentTemplateFg.invalid) {
             this.documentTemplateFg.markAllAsTouched();
             this.toastService.error("Erro de Validação", "Preencha todos os campos obrigatórios");
             return;
@@ -84,55 +101,56 @@ export class DocumentsTemplateModalComponent {
 
         this.loading.set(true);
 
-        const payload: IDocumentTemplatePayload = {
-            ...(this.documentTemplateFg.value.id && { id: this.documentTemplateFg.value.id }),
-            name: this.documentTemplateFg.value.name!,
-            description: this.documentTemplateFg.value.description!,
-            fileTypes: this.documentTemplateFg.value.file_types || []
-        };
+        const payload: FormData = this.getFormDataValue();
 
         if (this.isEdit()) {
-            this.updateService(payload);
+            this.updateDocumentTemplate(payload);
         } else {
-            this.createNewService(payload);
+            this.createDocumentTemplate(payload);
         }
     }
 
-    private createNewService(payload: IDocumentTemplatePayload): void {
+    getFormDataValue(): FormData {
+        const formData = new FormData();
+        formData.append('id', this.documentTemplateFg.value.id?.toString() || '');
+        formData.append('name', this.documentTemplateFg.value.name!);
+        formData.append('description', this.documentTemplateFg.value.description!);
+        formData.append('file_types', JSON.stringify(this.documentTemplateFg.value.file_types));
+        formData.append('file', this.documentTemplateFg.value.file!);
+        return formData;
+    }
+
+    private createDocumentTemplate(formData: FormData): void {
         this.documentTemplateRequest
-            .createDocumentTemplate(payload)
+            .createDocumentTemplate(formData)
             .pipe(
                 take(1),
                 catchError((error) => {
                     this.toastService.error("Erro", "Falha ao cadastrar o documento modelo");
                     this.loading.set(false);
-                    console.error('Erro ao criar documento modelo:', error);
-                    return of(null);
+                    this.visible.set(false);
+                    throw new Error(error);
                 }),
             )
             .subscribe((documentTemplate) => {
-                if (documentTemplate) {
-                    this.closeDialogWithSuccess("Documento modelo criado com sucesso", documentTemplate);
-                }
+                this.closeDialogWithSuccess("Documento modelo criado com sucesso", documentTemplate);
             });
     }
 
-    private updateService(payload: IDocumentTemplatePayload): void {
+    private updateDocumentTemplate(formData: FormData): void {
         this.documentTemplateRequest
-            .updateDocumentTemplate(payload)
+            .updateDocumentTemplate(formData)
             .pipe(
                 take(1),
                 catchError((error) => {
                     this.toastService.error("Erro", "Falha ao atualizar o documento modelo");
                     this.loading.set(false);
-                    console.error('Erro ao atualizar documento modelo:', error);
-                    return of(null);
+                    this.visible.set(false);
+                    throw new Error(error);
                 }),
             )
             .subscribe((documentTemplate) => {
-                if (documentTemplate) {
-                    this.closeDialogWithSuccess("Documento modelo atualizado com sucesso", documentTemplate);
-                }
+                this.closeDialogWithSuccess("Documento modelo atualizado com sucesso", documentTemplate);
             });
     }
 
@@ -148,38 +166,45 @@ export class DocumentsTemplateModalComponent {
     private resetForm(): void {
         this.documentTemplateFg.reset();
         this.documentTemplateFg.markAsUntouched();
+        this.documentTemplateFg.markAsPristine();
         Object.keys(this.documentTemplateFg.controls).forEach(key => {
             const control = this.documentTemplateFg.get(key);
             control?.setErrors(null);
         });
+        this.selectedFile.set(null);
+        this.previewUrl.set(null);
     }
 
-    onFileSelect(event: any): void {
-        if (event.files && event.files.length > 0) {
-            const file = event.files[0];
-            this.selectedFile.set(file);
-            this.documentTemplateFg.patchValue({
-                document_template: file
-            });
+    onFileSelect(event: FileUploadHandlerEvent): void {
+        if (!event || !event.files || !event.files.length) return;
 
-            // Gerar preview para imagens
-            if (this.isImageFile(file)) {
-                const reader = new FileReader();
-                reader.onload = (e: any) => {
-                    this.previewUrl.set(e.target.result);
-                };
-                reader.readAsDataURL(file);
-            } else {
-                this.previewUrl.set(null);
-            }
+        const file = event.files[0];
+        if (!file) throw new Error('File on upload file');
+
+        this.createPreview(file);
+    }
+
+    createPreview(file: File): void {
+        this.selectedFile.set(file);
+        this.documentTemplateFg.controls.file.setValue(file);
+
+        if (this.isImageFile(file)) {
+            const reader = new FileReader();
+            reader.onload = (e: any) => {
+                this.previewUrl.set(e.target.result);
+            };
+            reader.readAsDataURL(file);
+            return;
         }
+
+        this.previewUrl.set(null);
     }
 
     removeFile(): void {
         this.selectedFile.set(null);
         this.previewUrl.set(null);
         this.documentTemplateFg.patchValue({
-            document_template: null
+            file: null
         });
         if (this.fileUpload) {
             this.fileUpload.clear();
@@ -188,7 +213,7 @@ export class DocumentsTemplateModalComponent {
 
     isImageFile(file: File | null): boolean {
         if (!file) return false;
-        return file.type.startsWith('image/');
+        return file && file.type ? file.type.startsWith('image/') : false;
     }
 
     formatFileSize(bytes: number | undefined): string {

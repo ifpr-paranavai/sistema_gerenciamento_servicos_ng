@@ -57,4 +57,14 @@ export class DocumentsTemplateListComponent implements OnInit {
     deleteDocumentTemplate(documentTemplate: IDocumentsTemplateResponse): void {
         console.log(documentTemplate);
     }
+
+    addDocumentTemplate(documentTemplate: IDocumentsTemplateResponse): void {
+        const index = this.documentsTemplateItems().findIndex((docTemplate) => docTemplate.id === documentTemplate.id);
+        if (index !== -1) {
+            this.documentsTemplateItems().splice(index, 1, documentTemplate);
+            return;
+        }
+
+        this.documentsTemplateItems().push(documentTemplate);
+    }
 }
