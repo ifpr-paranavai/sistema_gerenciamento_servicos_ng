@@ -3,7 +3,6 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { ToastService } from "../../requests/toastr/toast.service";
 import { take, catchError, of } from "rxjs";
 import { DocumentsTemplateRequest } from "../../requests/documents-template/documents-template.request";
-import { IDocumentTemplatePayload } from "../../interfaces/document-template-payload.interface";
 import { IDocumentsTemplateResponse } from "../../interfaces/documents-template-response.interface";
 import { FileUpload, FileUploadHandlerEvent } from "primeng/fileupload";
 
@@ -50,7 +49,7 @@ export class DocumentsTemplateModalComponent {
         name: new FormControl<string | null>(null, [Validators.required]),
         description: new FormControl<string | null>(null, [Validators.required]),
         file_types: new FormControl<string | string[] | null>(null, [Validators.required]),
-        file: new FormControl<File | null>(null, [Validators.required])
+        file: new FormControl<File | null>(null)
     });
 
     constructor(
@@ -61,6 +60,7 @@ export class DocumentsTemplateModalComponent {
     openDialog(documentTemplate?: IDocumentsTemplateResponse): void {
         if (!documentTemplate) {
             this.documentTemplateFg.reset();
+            this.selectedFile.set(null);
             this.isEdit.set(false);
             this.visible.set(true);
             return;
@@ -80,10 +80,16 @@ export class DocumentsTemplateModalComponent {
 
     private parseFileTypes(fileTypesString: string): string[] {
         try {
-            const fileTypesArray = JSON.parse(fileTypesString) as string[];
-            return fileTypesArray
-                .flatMap(item => item.split(','))
-                .map(ext => ext.trim());
+            const fileTypesArray = JSON.parse(fileTypesString);
+            
+            return this.fileTypes
+                .filter(fileType => {
+                    const extensions = fileType.value.split(',');
+                    return extensions.some(ext => 
+                        fileTypesArray.includes(ext.trim())
+                    );
+                })
+                .map(fileType => fileType.value);
         } catch (error) {
             console.error('Erro ao parsear os tipos de arquivo:', error);
             return [];
