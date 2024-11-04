@@ -22,7 +22,7 @@ export class DocumentsTemplateListComponent implements OnInit {
     constructor(
         private readonly docsTemplateRequest: DocumentsTemplateRequest,
         private readonly toastService: ToastService,
-    ) {}
+    ) { }
 
     ngOnInit(): void {
         this.loadDocumentsTemplates();
@@ -38,8 +38,8 @@ export class DocumentsTemplateListComponent implements OnInit {
                     return of();
                 })
             ).subscribe((documentsTemplate) => {
-            this.documentsTemplateItems.set(documentsTemplate);
-        })
+                this.documentsTemplateItems.set(documentsTemplate);
+            })
     }
 
     openModalDocumentTemplate(): void {
@@ -55,7 +55,17 @@ export class DocumentsTemplateListComponent implements OnInit {
     }
 
     deleteDocumentTemplate(documentTemplate: IDocumentsTemplateResponse): void {
-        console.log(documentTemplate);
+        this.docsTemplateRequest.deleteDocumentTemplate(documentTemplate.id!)
+            .pipe(
+                take(1),
+                catchError(() => {
+                    this.toastService.error("", "Falha ao deletar o serviço");
+                    return of(null);
+                }),
+            ).subscribe(() => {
+                this.documentsTemplateItems.update((docTemp) => docTemp.filter((dt) => dt.id !== documentTemplate.id));
+                this.toastService.success("", "Serviço deletado com sucesso")
+            });
     }
 
     addDocumentTemplate(documentTemplate: IDocumentsTemplateResponse): void {
