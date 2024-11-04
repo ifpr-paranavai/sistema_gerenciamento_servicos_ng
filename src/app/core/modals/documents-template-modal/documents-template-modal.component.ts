@@ -1,11 +1,12 @@
 import { Component, EventEmitter, Output, signal, ViewChild, WritableSignal } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { ToastService } from "../../requests/toastr/toast.service";
-import { take, catchError, of } from "rxjs";
+import { take, catchError, of, Observable } from "rxjs";
 import { DocumentsTemplateRequest } from "../../requests/documents-template/documents-template.request";
 import { IDocumentTemplatePayload } from "../../interfaces/document-template-payload.interface";
 import { IDocumentsTemplateResponse } from "../../interfaces/documents-template-response.interface";
 import { FileUpload, FileUploadHandlerEvent } from "primeng/fileupload";
+import { IDocumentFile } from "../../interfaces/document.interface";
 
 interface IDocumentTemplateFg {
     id: FormControl<number | null>;
@@ -63,6 +64,7 @@ export class DocumentsTemplateModalComponent {
             this.documentTemplateFg.reset();
             this.isEdit.set(false);
             this.visible.set(true);
+            this.removeFile();
             return;
         }
 
@@ -73,9 +75,13 @@ export class DocumentsTemplateModalComponent {
             file_types: this.parseFileTypes(documentTemplate!.file_types as string),
         });
 
-        this.createPreview(documentTemplate.document);
-        this.visible.set(true);
-        this.isEdit.set(true);
+        this.createFileFromBase64(documentTemplate.document as IDocumentFile)
+        .pipe(take(1)).subscribe((file) => {
+            this.selectedFile.set(file);
+            this.documentTemplateFg.controls.file.setValue(file);
+            this.visible.set(true);
+            this.isEdit.set(true);
+        });
     }
 
     private parseFileTypes(fileTypesString: string): string[] {
@@ -198,6 +204,28 @@ export class DocumentsTemplateModalComponent {
         }
 
         this.previewUrl.set(null);
+    }
+
+    createFileFromBase64(document: IDocumentFile): Observable<File> {
+        return new Observable<File>((observer) => {
+            const { file_name, file_type, file_content } = document;
+
+            try {
+                const byteCharacters = atob(file_content);
+                const byteNumbers = new Array(byteCharacters.length);
+
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+
+                const byteArray = new Uint8Array(byteNumbers);
+                const file = new File([byteArray], file_name, { type: file_type });
+                observer.next(file);
+                observer.complete();
+            } catch (error) {
+                observer.error(error);
+            }
+        });
     }
 
     removeFile(): void {
