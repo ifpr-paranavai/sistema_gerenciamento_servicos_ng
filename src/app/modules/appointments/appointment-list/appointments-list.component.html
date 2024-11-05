@@ -3,9 +3,11 @@
         <h3>Agendamentos</h3>
         <span>
             <p-button label="Novo agendamento"
-                      icon="pi pi-plus"
-                      iconPos="right"
-                      size="small" />
+                icon="pi pi-plus"
+                iconPos="right"
+                size="small" 
+                (click)="openAppointmentModal()"    
+            />
         </span>
     </div>
     <p-table [value]="appointments()"

@@ -57,7 +57,9 @@ export class AppointmentsListComponent implements OnInit {
     }
 
     editAppointment(appointment: IAppointmentResponse): void {
-        this.openAppointmentModal(appointment);
+        if (!this.appointmentModal) throw new Error('AppointmentModalComponent not found');
+
+        this.appointmentModal.openDialog(appointment);
     }
 
     deleteAppointment(appointment: IAppointmentResponse): void {
@@ -98,9 +100,9 @@ export class AppointmentsListComponent implements OnInit {
         }
     }
 
-    openAppointmentModal(appointment: IAppointmentResponse): void {
-        if (!this.appointmentModal) throw new Error('AppointmentModalComponent not found');
+    openAppointmentModal(): void {
+        if (!this.appointmentModal) throw new Error('DocumentsTemplateModalComponent not found');
 
-        this.appointmentModal.openDialog(appointment);
+        this.appointmentModal.openDialog();
     }
 }
