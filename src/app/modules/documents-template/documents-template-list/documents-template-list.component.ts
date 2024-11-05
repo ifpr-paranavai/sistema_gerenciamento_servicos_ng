@@ -30,7 +30,7 @@ export class DocumentsTemplateListComponent implements OnInit {
 
     loadDocumentsTemplates(): void {
         this.docsTemplateRequest
-            .getDocumentsTemplate()
+            .getDocumentsTemplates()
             .pipe(
                 take(1),
                 catchError(error => {

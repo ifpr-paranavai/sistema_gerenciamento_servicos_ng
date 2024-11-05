@@ -58,15 +58,51 @@
                             Duração é obrigatória e deve ser no mínimo 1 minuto.
                         </small>
                     </div>
+                </div>
 
-                    <div class="pt-3">
-                        <p-button label="{{ isEdit() ? 'Salvar' : 'Cadastrar' }}"
-                                  icon="pi pi-check"
-                                  iconPos="right"
-                                  [loading]="loading()"
-                                  [disabled]="serviceFg.invalid"
-                                  type="submit" />
-                    </div>
+                <div class="flex flex-column gap-1">
+                    <label>Templates de Documentos</label>
+                    <p-table [value]="documentTemplates()" 
+                             [scrollable]="true" 
+                             scrollHeight="200px">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>Selecionar</th>
+                                <th>Nome</th>
+                                <th>Descrição</th>
+                                <th>Obrigatório</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-template>
+                            <tr>
+                                <td>
+                                    <p-checkbox [binary]="true" 
+                                              [(ngModel)]="template.selected"
+                                              [ngModelOptions]="{standalone: true}">
+                                    </p-checkbox>
+                                </td>
+                                <td>{{template.document_template.name}}</td>
+                                <td>{{template.document_template.description}}</td>
+                                <td>
+                                    <p-checkbox [binary]="true" 
+                                              [(ngModel)]="template.required"
+                                              [ngModelOptions]="{standalone: true}"
+                                              [disabled]="!template.selected">
+                                    </p-checkbox>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+
+                
+                <div class="pt-3">
+                    <p-button label="{{ isEdit() ? 'Salvar' : 'Cadastrar' }}"
+                              icon="pi pi-check"
+                              iconPos="right"
+                              [loading]="loading()"
+                              [disabled]="serviceFg.invalid"
+                              type="submit" />
                 </div>
             </div>
         </form>

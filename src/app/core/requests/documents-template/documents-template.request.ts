@@ -25,7 +25,7 @@ export class DocumentsTemplateRequest {
         return this.http.delete<void>(`${this.apiUrl}${id}`);
     }
 
-    getDocumentsTemplate(): Observable<IDocumentsTemplateResponse[]> {
+    getDocumentsTemplates(): Observable<IDocumentsTemplateResponse[]> {
         return this.http.get<IDocumentsTemplateResponse[]>(this.apiUrl);
     }
 

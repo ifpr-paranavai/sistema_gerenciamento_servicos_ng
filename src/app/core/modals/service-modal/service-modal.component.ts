@@ -1,11 +1,13 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, OnDestroy, Output, WritableSignal, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, WritableSignal, signal } from "@angular/core";
 import { ToastService } from "../../requests/toastr/toast.service";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { ServiceRequest } from "../../requests/services/service.request";
 import { catchError, of, take } from "rxjs";
 import { IServiceOfferPayload } from "../../interfaces/service-offer.interface";
-import { ServiceResponse } from "../../interfaces/service-response.interface";
+import { IDocumentRequirement, ServiceResponse } from "../../interfaces/service-response.interface";
 import { costValueValidator } from "../../validators/cost.validator";
+import { IDocumentsTemplateResponse } from "../../interfaces/documents-template-response.interface";
+import { DocumentsTemplateRequest } from "../../requests/documents-template/documents-template.request";
 
 interface IServiceFg {
     id: FormControl<number | null>;
@@ -13,6 +15,7 @@ interface IServiceFg {
     description: FormControl<string | null>;
     cost: FormControl<number | null>;
     duration: FormControl<number | null>;
+    documentTemplates: FormControl<IDocumentRequirement[] | null>;
 }
 
 @Component({
@@ -21,7 +24,7 @@ interface IServiceFg {
     styleUrls: ["./service-modal.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ServiceModalComponent {
+export class ServiceModalComponent implements OnInit{
     @Output() service: EventEmitter<ServiceResponse> = new EventEmitter();
 
     visible: WritableSignal<boolean> = signal(false);
@@ -31,30 +34,80 @@ export class ServiceModalComponent {
         description: new FormControl<string | null>(null, [Validators.required]),
         cost: new FormControl<number | null>(null, [Validators.required, costValueValidator()]),
         duration: new FormControl<number | null>(null, [Validators.required]),
+        documentTemplates: new FormControl<IDocumentRequirement[] | null>(null)
     });
+
+    documentTemplates: WritableSignal<IDocumentRequirement[]> = signal([]);
 
     loading: WritableSignal<boolean> = signal(false);
     isEdit: WritableSignal<boolean> = signal(false);
 
     constructor(
         private toastService: ToastService,
-        private readonly serviceRequest: ServiceRequest
+        private readonly serviceRequest: ServiceRequest,
+        private readonly documentTemplateRequest: DocumentsTemplateRequest
     ) {}
 
-    openDialog(service?: ServiceResponse): void {
-        if (!service) this.serviceFg.reset();
+    ngOnInit(): void {
+        this.loadDocumentTemplates();
+    }
 
-        if (service) {
-            this.serviceFg.patchValue({
-                id: service.id,
-                name: service.name,
-                description: service.description,
-                cost: service.cost,
-                duration: service.duration
-            });
-            this.isEdit.set(true);
+    private closeDialogWithSuccess(message: string, documentTemplate: any): void {
+        this.resetForm();
+        this.visible.set(false);
+        this.loading.set(false);
+        this.isEdit.set(false);
+        this.toastService.success("Sucesso", message);
+    }
+
+    private resetForm(): void {
+        this.serviceFg.reset();
+        this.serviceFg.markAsUntouched();
+        this.serviceFg.markAsPristine();
+        Object.keys(this.serviceFg.controls).forEach(key => {
+            const control = this.serviceFg.get(key);
+            control?.setErrors(null);
+        });
+    }
+
+    openDialog(service?: ServiceResponse): void {
+        if (!service) {
+            this.serviceFg.reset();
+            this.documentTemplates.update(templates => 
+                templates.map(template => ({
+                    ...template,
+                    selected: false,
+                    required: false
+                }))
+            );
+            this.isEdit.set(false);
+            this.visible.set(true);
+            return;
         }
 
+        
+        this.serviceFg.patchValue({
+            id: service.id,
+            name: service.name,
+            description: service.description,
+            cost: service.cost,
+            duration: service.duration
+        });
+        
+        this.documentTemplates.update(templates => 
+            templates.map(template => {
+                const requirement = service.document_requirements.find(
+                    req => req.document_template?.id === template.document_template?.id
+                );
+                return {
+                    ...template,
+                    selected: !!requirement,
+                    required: requirement?.is_required ?? false
+                };
+            })
+        );
+            
+        this.isEdit.set(true);
         this.visible.set(true);
     }
 
@@ -67,12 +120,20 @@ export class ServiceModalComponent {
             return;
         }
 
+        const selectedTemplates = this.documentTemplates()
+            .filter(template => template.selected)
+            .map(template => ({
+                document_template_id: template.document_template.id,
+                is_required: template.required || false
+            }));
+
         const payload: IServiceOfferPayload = {
             id: this.serviceFg.controls.id?.value!,
             name: this.serviceFg.controls.name?.value!,
             description: this.serviceFg.controls.description?.value!,
             cost: this.serviceFg.controls.cost?.value!,
             duration: this.serviceFg.controls.duration?.value!,
+            document_requirements: selectedTemplates
         };
 
         if (this.isEdit()) {
@@ -97,8 +158,8 @@ export class ServiceModalComponent {
             .subscribe((service) => {
                 this.serviceFg.reset();
                 this.visible.set(false);
-                this.toastService.success("", "Serviço criado com sucesso");
                 this.service.emit(service!);
+                this.closeDialogWithSuccess("Serviço criado com sucesso", payload);
             });
     }
 
@@ -116,8 +177,31 @@ export class ServiceModalComponent {
             .subscribe((service) => {
                 this.serviceFg.reset();
                 this.visible.set(false);
-                this.toastService.success("", "Serviço atualizado com sucesso");
+                this.closeDialogWithSuccess("Serviço atualizado com sucesso", payload);
                 this.service.emit(service!);
             });
+    }
+
+    private loadDocumentTemplates(): void {
+        this.documentTemplateRequest.getDocumentsTemplates()
+        .pipe(
+            take(1),
+            catchError(() => {
+                this.toastService.error("", "Falha ao carregar templates");
+                return of([]);
+            })
+        )
+        .subscribe((templates: IDocumentsTemplateResponse[]) => {
+            const templatesWithSelection = templates.map(template => ({
+                document_template: template,
+                is_required: false,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                selected: false,
+                required: false,
+            })) as IDocumentRequirement[];
+            
+            this.documentTemplates.set(templatesWithSelection);
+        });
     }
 }
