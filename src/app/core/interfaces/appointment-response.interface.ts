@@ -4,7 +4,7 @@ import { ServiceResponse } from "./service-response.interface"
 import { IUser } from "./user.interface";
 
 export interface IAppointmentResponse {
-    id: string | number;
+    id: string;
     appointment_date: string;
     status: AppointmentStatusEnum;
     client: IUser;

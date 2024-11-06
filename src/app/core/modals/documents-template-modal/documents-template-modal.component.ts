@@ -70,7 +70,7 @@ export class DocumentsTemplateModalComponent {
             id: documentTemplate.id,
             name: documentTemplate.name,
             description: documentTemplate.description,
-            file_types: this.parseFileTypes(documentTemplate!.file_types as string),
+            file_types: this.parseFileTypes(documentTemplate!.file_types),
         });
 
         this.createPreview(documentTemplate.document);
@@ -78,9 +78,9 @@ export class DocumentsTemplateModalComponent {
         this.isEdit.set(true);
     }
 
-    private parseFileTypes(fileTypesString: string): string[] {
+    private parseFileTypes(fileTypesString: string[]): string[] {
         try {
-            const fileTypesArray = JSON.parse(fileTypesString);
+            const fileTypesArray = fileTypesString;
             
             return this.fileTypes
                 .filter(fileType => {

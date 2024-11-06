@@ -9,13 +9,26 @@ import { AuthenticationRequest } from "../../requests/authentication/authenticat
 import { ProviderRequest } from "../../requests/providers/providers.request";
 import { ClientRequest } from "../../requests/clients/clients.request";
 import { CalendarModule } from "primeng/calendar";
+import { ReactiveFormsModule } from "@angular/forms";
+import { CommonModule } from "@angular/common";
+import { InputTextareaModule } from "primeng/inputtextarea";
+import { ButtonModule } from "primeng/button";
+import { TableModule } from "primeng/table";
+import { TagModule } from "primeng/tag";
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 @NgModule({
     imports: [
-        SharedModule,
+        CommonModule,
+        ReactiveFormsModule,
         DialogModule,
         DropdownModule,
         CalendarModule,
+        InputTextareaModule,
+        ButtonModule,
+        TableModule,
+        TagModule,
+        ProgressSpinnerModule
     ],
     exports: [
         AppointmentModalComponent

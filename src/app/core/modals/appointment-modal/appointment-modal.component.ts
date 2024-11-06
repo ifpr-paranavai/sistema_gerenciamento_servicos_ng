@@ -14,7 +14,7 @@ import { AppointmentStatusEnum } from "../../interfaces/appointment-status.inter
 
 interface IAppointmentFg {
     id: FormControl<number | null>;
-    serviceId: FormControl<string | null>;
+    serviceSelected: FormControl<string | null>;
     documentType: FormControl<DocumentType | null>;
     clientId: FormControl<number | null>;
     providerId: FormControl<number | null>;
@@ -38,12 +38,13 @@ export class AppointmentModalComponent implements OnInit {
     clientDropdownOptions: WritableSignal<IDropdown[]> = signal([]);
     providerDropdownOptions: WritableSignal<IDropdown[]> = signal([]);
     selectedDocuments: { [key: number]: File } = {};
+    services: ServiceResponse[] = [];
     selectedService: ServiceResponse | null = null;
     minDate: Date = new Date();
 
     appointmentFg: FormGroup<IAppointmentFg> = new FormGroup<IAppointmentFg>({
         id: new FormControl<number | null>(null),
-        serviceId: new FormControl<string | null>(null),
+        serviceSelected: new FormControl<string | null>(null),
         documentType: new FormControl<DocumentType | null>(null),
         clientId: new FormControl<number | null>(null),
         providerId: new FormControl<number | null>(null),
@@ -70,7 +71,8 @@ export class AppointmentModalComponent implements OnInit {
             this.isEdit.set(true);
             this.appointmentFg.patchValue({
                 ...appointment,
-                id: parseInt(appointment.id),
+                // passe o id em int
+                id: appointment.id ? parseInt(appointment.id) : null,
             });
         }
     }
@@ -93,6 +95,7 @@ export class AppointmentModalComponent implements OnInit {
             this.getClientsOptions(),
             this.getProvidersOptions(),
         ]).pipe(take(1)).subscribe(([services, clients, providers]) => {
+            this.services = services;
             this.servicesDropdownOptions.set(
                 services.map(service => ({ label: service.name, value: service.id! }))
             );
@@ -136,28 +139,20 @@ export class AppointmentModalComponent implements OnInit {
     }
 
     onServiceSelect(event: any): void {
-        const serviceId = event.value;
-        if (serviceId) {
+        const serviceSelected = event.value;
+        if (serviceSelected) {
             this.loading.set(true);
-            this.serviceRequest.getServiceById(serviceId).pipe(take(1)).subscribe({
-                next: (service) => {
-                    this.selectedService = service;
-                    this.initializeDocuments(service.document_requirements);
-                    this.loading.set(false);
-                },
-                error: () => {
-                    this.toastService.error('Erro', 'Erro ao carregar detalhes do serviço');
-                    this.loading.set(false);
-                }
-            });
-        }
-    }
+            const selectedService = this.services.find(service => service.id === serviceSelected.value) || null;
+            if (!selectedService) {
+                this.toastService.error('Erro', 'Serviço não encontrado');
+                this.loading.set(false);
+                return;
+            }
 
-    getSelectedServiceLabel(): string {
-        const selectedId = this.appointmentFg.get('serviceId')?.value;
-        const service = this.servicesDropdownOptions()
-            .find(option => option.value === selectedId);
-        return service ? service.label : '';
+            this.selectedService = selectedService;
+            this.initializeDocuments(selectedService.document_requirements);
+            this.loading.set(false);
+        }
     }
 
     triggerFileInput(elementId: string): void {
@@ -174,33 +169,41 @@ export class AppointmentModalComponent implements OnInit {
                 .find(req => req.id === requirementId);
             
             if (requirement) {
-                const allowedTypes = requirement.document_template?.file_types;
-                const fileExtension = file.name.split('.').pop()?.toLowerCase();
-                
-                if (!allowedTypes.includes(fileExtension)) {
+                try {
+                    // Suponha que file_types é uma string como "[\"pdf\"]"
+                    const allowedTypes = requirement.document_template.file_types
+                    const fileExtension = file.name.split('.').pop()?.toLowerCase();
+                    
+                    if (fileExtension && allowedTypes.includes(fileExtension)) {
+                        const maxSize = 5 * 1024 * 1024; // 5MB
+                        if (file.size > maxSize) {
+                            this.toastService.error(
+                                'Erro',
+                                'O arquivo é muito grande. Tamanho máximo permitido: 5MB'
+                            );
+                            return;
+                        }
+    
+                        this.selectedDocuments[requirementId] = file;
+                        this.appointmentFg.patchValue({ documents: this.selectedDocuments });
+                        
+                        this.toastService.success(
+                            'Sucesso',
+                            'Documento anexado com sucesso!'
+                        );
+                    } else {
+                        this.toastService.error(
+                            'Erro',
+                            `Tipo de arquivo não permitido. Tipos aceitos: ${allowedTypes.join(', ')}`
+                        );
+                    }
+                } catch (error) {
+                    console.error('Erro ao processar tipos de arquivo:', error);
                     this.toastService.error(
                         'Erro',
-                        `Tipo de arquivo não permitido. Tipos aceitos: ${allowedTypes.join(', ')}`
+                        'Erro ao validar tipo de arquivo'
                     );
-                    return;
                 }
-                
-                const maxSize = 5 * 1024 * 1024; // 5MB
-                if (file.size > maxSize) {
-                    this.toastService.error(
-                        'Erro',
-                        'O arquivo é muito grande. Tamanho máximo permitido: 5MB'
-                    );
-                    return;
-                }
-
-                this.selectedDocuments[requirementId] = file;
-                this.appointmentFg.patchValue({ documents: this.selectedDocuments });
-                
-                this.toastService.success(
-                    'Sucesso',
-                    'Documento anexado com sucesso!'
-                );
             }
         }
     }

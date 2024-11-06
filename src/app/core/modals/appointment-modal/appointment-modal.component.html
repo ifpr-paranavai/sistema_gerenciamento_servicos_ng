@@ -25,12 +25,8 @@
                                       filterBy="label"
                                       [showClear]="true"
                                       placeholder="Selecione um serviço"
+                                      optionLabel="label"
                                       styleClass="w-full">
-                                <ng-template pTemplate="selectedItem">
-                                    <div class="flex align-items-center" *ngIf="appointmentFg.get('serviceId')?.value">
-                                        <div>{{ getSelectedServiceLabel() }}</div>
-                                    </div>
-                                </ng-template>
                             </p-dropdown>
                             <small class="p-error block" 
                                    *ngIf="appointmentFg.get('serviceId')?.invalid && appointmentFg.get('serviceId')?.touched">
@@ -128,7 +124,7 @@
             <div class="col-12" *ngIf="selectedService?.document_requirements?.length">
                 <div class="surface-card p-4 border-round">
                     <div class="text-xl font-medium mb-4">Documentos Necessários</div>
-                    <p-table [value]="selectedService?.document_requirements"
+                    <p-table [value]="selectedService?.document_requirements ?? []"
                             [tableStyle]="{'min-width': '50rem'}">
                         <ng-template pTemplate="header">
                             <tr>
