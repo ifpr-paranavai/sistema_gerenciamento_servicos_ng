@@ -7,7 +7,7 @@ import { IDropdown } from "../../interfaces/dropdown.interface";
 import { FormControl, FormGroup } from "@angular/forms";
 import { ClientRequest } from "../../requests/clients/clients.request";
 import { ProviderRequest } from "../../requests/providers/providers.request";
-import { ServiceResponse } from "../../interfaces/service-response.interface";
+import { IDocumentRequirement, ServiceResponse } from "../../interfaces/service-response.interface";
 import { IClient } from "../../interfaces/client.interface";
 import { IProvider } from "../../interfaces/provider.interface";
 import { AppointmentStatusEnum } from "../../interfaces/appointment-status.interface";
@@ -21,6 +21,7 @@ interface IAppointmentFg {
     status: FormControl<AppointmentStatusEnum | null>;
     appointmentDate: FormControl<Date | null>;
     observation: FormControl<string | null>;
+    documents: FormControl<{ [key: number]: File } | null>;
 }
 
 @Component({
@@ -36,6 +37,9 @@ export class AppointmentModalComponent implements OnInit {
     servicesDropdownOptions: WritableSignal<IDropdown[]> = signal([]);
     clientDropdownOptions: WritableSignal<IDropdown[]> = signal([]);
     providerDropdownOptions: WritableSignal<IDropdown[]> = signal([]);
+    selectedDocuments: { [key: number]: File } = {};
+    selectedService: ServiceResponse | null = null;
+    minDate: Date = new Date();
 
     appointmentFg: FormGroup<IAppointmentFg> = new FormGroup<IAppointmentFg>({
         id: new FormControl<number | null>(null),
@@ -46,6 +50,7 @@ export class AppointmentModalComponent implements OnInit {
         status: new FormControl<AppointmentStatusEnum | null>(null),
         appointmentDate: new FormControl<Date | null>(null),
         observation: new FormControl<string | null>(null),
+        documents: new FormControl<{ [key: number]: File } | null>(null),
     });
 
     constructor(
@@ -61,7 +66,13 @@ export class AppointmentModalComponent implements OnInit {
 
     openDialog(appointment?: IAppointmentResponse): void {
         this.visible.set(true);
-        console.log(appointment);
+        if (appointment) {
+            this.isEdit.set(true);
+            this.appointmentFg.patchValue({
+                ...appointment,
+                id: parseInt(appointment.id),
+            });
+        }
     }
 
     onSubmit(): void {
@@ -110,5 +121,100 @@ export class AppointmentModalComponent implements OnInit {
         return this.providerRequest
             .getProviders()
             .pipe(take(1));
+    }
+
+    closeModal(): void {
+        this.reset();
+        this.visible.set(false);
+    }
+
+    reset(): void {
+        this.appointmentFg.reset();
+        this.selectedDocuments = {};
+        this.selectedService = null;
+        this.isEdit.set(false);
+    }
+
+    onServiceSelect(event: any): void {
+        const serviceId = event.value;
+        if (serviceId) {
+            this.loading.set(true);
+            this.serviceRequest.getServiceById(serviceId).pipe(take(1)).subscribe({
+                next: (service) => {
+                    this.selectedService = service;
+                    this.initializeDocuments(service.document_requirements);
+                    this.loading.set(false);
+                },
+                error: () => {
+                    this.toastService.error('Erro', 'Erro ao carregar detalhes do serviço');
+                    this.loading.set(false);
+                }
+            });
+        }
+    }
+
+    getSelectedServiceLabel(): string {
+        const selectedId = this.appointmentFg.get('serviceId')?.value;
+        const service = this.servicesDropdownOptions()
+            .find(option => option.value === selectedId);
+        return service ? service.label : '';
+    }
+
+    triggerFileInput(elementId: string): void {
+        const element = document.getElementById(elementId) as HTMLInputElement;
+        if (element) {
+          element.click();
+        }
+    }
+    
+    onFileSelect(event: any, requirementId: number): void {
+        const file = event.target.files[0];
+        if (file) {
+            const requirement = this.selectedService?.document_requirements
+                .find(req => req.id === requirementId);
+            
+            if (requirement) {
+                const allowedTypes = requirement.document_template?.file_types;
+                const fileExtension = file.name.split('.').pop()?.toLowerCase();
+                
+                if (!allowedTypes.includes(fileExtension)) {
+                    this.toastService.error(
+                        'Erro',
+                        `Tipo de arquivo não permitido. Tipos aceitos: ${allowedTypes.join(', ')}`
+                    );
+                    return;
+                }
+                
+                const maxSize = 5 * 1024 * 1024; // 5MB
+                if (file.size > maxSize) {
+                    this.toastService.error(
+                        'Erro',
+                        'O arquivo é muito grande. Tamanho máximo permitido: 5MB'
+                    );
+                    return;
+                }
+
+                this.selectedDocuments[requirementId] = file;
+                this.appointmentFg.patchValue({ documents: this.selectedDocuments });
+                
+                this.toastService.success(
+                    'Sucesso',
+                    'Documento anexado com sucesso!'
+                );
+            }
+        }
+    }
+    
+    private initializeDocuments(requirements: IDocumentRequirement[]): void {
+        this.selectedDocuments = {};
+        requirements.forEach(req => {
+          if (req.is_required) {
+            this.appointmentFg.get('documents')?.addValidators([
+              (control) => {
+                return this.selectedDocuments[req.id] ? null : { required: true };
+              }
+            ]);
+          }
+        });
     }
 }

@@ -4,11 +4,11 @@ import { ServiceResponse } from "./service-response.interface"
 import { IUser } from "./user.interface";
 
 export interface IAppointmentResponse {
-    id: string;
+    id: string | number;
     appointment_date: string;
     status: AppointmentStatusEnum;
     client: IUser;
-    provider: IUser;
+    provider: IUser; 
     services: ServiceResponse[];
     is_completed: boolean;
     document: IDocument;

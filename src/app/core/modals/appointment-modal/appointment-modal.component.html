@@ -1,109 +1,210 @@
-<p-dialog header="Agendamento"
-          [modal]="true"
-          draggable="false"
-          [(visible)]="visible">
-    <div class="appointment-wrapper">
-        <form [formGroup]="appointmentFg">
-            <div class="appointment-wrapper__dropdowns-container">
-                <div>
-                    <label for="service">Serviço</label>
-                    <p-dropdown class="p-dropdown-service"
-                                [options]="servicesDropdownOptions()"
-                                formControlName="serviceId"
-                                optionLabel="label"
-                                [filter]="true"
-                                filterBy="label"
-                                appendTo="body"
-                                [showClear]="true"
-                                emptyFilterMessage="Nenhum encontrado"
-                                emptyMessage="Digite para pesquisar..."
-                                placeholder="Selecione um serviço">
-                    </p-dropdown>
-                    <small *ngIf="appointmentFg.controls.serviceId?.invalid && appointmentFg.controls.serviceId?.touched"
-                           class="text-red-500 text-xs">
-                        Campo Serviço é obrigatório.
-                    </small>
-                </div>
-                <div>
-                    <label for="client">Cliente</label>
-                    <p-dropdown class="p-dropdown-client"
-                                [options]="clientDropdownOptions()"
-                                formControlName="clientId"
-                                optionLabel="label"
-                                [filter]="true"
-                                filterBy="label"
-                                appendTo="body"
-                                [showClear]="true"
-                                emptyFilterMessage="Nenhum encontrado"
-                                emptyMessage="Digite para pesquisar..."
-                                placeholder="Selecione um Cliente">
-                                <ng-template let-client
-                                             pTemplate="item">
-                                    <div class="flex flex-column">
-                                        <span>
-                                            {{ client.label | titlecase }} &nbsp;
-                                        </span>
-                                        <ng-container *ngIf="client.complement">
-                                            <span class="text-xs">
-                                                {{ client.complement }};
-                                            </span>
-                                        </ng-container>
+<p-dialog header="Novo Agendamento" 
+          [modal]="true" 
+          [style]="{width: '80vw'}" 
+          [(visible)]="visible"
+          [draggable]="false"
+          [resizable]="false"
+          (onHide)="closeModal()">
+    
+    <div class="p-fluid">
+        <form [formGroup]="appointmentFg" class="grid">
+            <!-- Seção de Informações Básicas -->
+            <div class="col-12 mb-4">
+                <div class="surface-card p-4 border-round">
+                    <div class="text-xl font-medium mb-4">Informações Básicas</div>
+                    <div class="grid">
+                        <!-- Serviço -->
+                        <div class="col-12 md:col-4 field">
+                            <label for="service">Serviço *</label>
+                            <p-dropdown id="service"
+                                      [options]="servicesDropdownOptions()"
+                                      formControlName="serviceId"
+                                      (onChange)="onServiceSelect($event)"
+                                      optionLabel="label"
+                                      [filter]="true"
+                                      filterBy="label"
+                                      [showClear]="true"
+                                      placeholder="Selecione um serviço"
+                                      styleClass="w-full">
+                                <ng-template pTemplate="selectedItem">
+                                    <div class="flex align-items-center" *ngIf="appointmentFg.get('serviceId')?.value">
+                                        <div>{{ getSelectedServiceLabel() }}</div>
                                     </div>
                                 </ng-template>
-                    </p-dropdown>
-                    <small *ngIf="appointmentFg.controls.clientId?.invalid && appointmentFg.controls.clientId?.touched"
-                           class="text-red-500 text-xs">
-                        Campo Cliente é obrigatório.
-                    </small>
-                </div>
-                <div>
-                    <label for="provider">Prestador</label>
-                    <p-dropdown class="p-dropdown-provider"
-                                [options]="providerDropdownOptions()"
-                                formControlName="providerId"
-                                optionLabel="label"
-                                [filter]="true"
-                                filterBy="label"
-                                appendTo="body"
-                                [showClear]="true"
-                                emptyFilterMessage="Nenhum encontrado"
-                                emptyMessage="Digite para pesquisar..."
-                                placeholder="Selecione um Prestador">
-                                <ng-template let-provider
-                                             pTemplate="item">
+                            </p-dropdown>
+                            <small class="p-error block" 
+                                   *ngIf="appointmentFg.get('serviceId')?.invalid && appointmentFg.get('serviceId')?.touched">
+                                Campo obrigatório
+                            </small>
+                        </div>
+
+                        <!-- Cliente -->
+                        <div class="col-12 md:col-4 field">
+                            <label for="client">Cliente *</label>
+                            <p-dropdown id="client"
+                                      [options]="clientDropdownOptions()"
+                                      formControlName="clientId"
+                                      optionLabel="label"
+                                      [filter]="true"
+                                      filterBy="label"
+                                      [showClear]="true"
+                                      placeholder="Selecione um cliente"
+                                      styleClass="w-full">
+                                <ng-template let-client pTemplate="item">
                                     <div class="flex flex-column">
-                                        <span>
-                                            {{ provider.label | titlecase }} &nbsp;
-                                        </span>
-                                        <ng-container *ngIf="provider.complement">
-                                            <span class="text-xs">
-                                                {{ provider.complement }};
-                                            </span>
-                                        </ng-container>
+                                        <span>{{ client.label | titlecase }}</span>
+                                        <small *ngIf="client.complement">
+                                            CPF: {{ client.complement }}
+                                        </small>
                                     </div>
                                 </ng-template>
-                    </p-dropdown>
-                    <small *ngIf="appointmentFg.controls.providerId?.invalid && appointmentFg.controls.providerId?.touched"
-                           class="text-red-500 text-xs">
-                        Campo Prestador é obrigatório.
-                    </small>
+                            </p-dropdown>
+                            <small class="p-error block" 
+                                   *ngIf="appointmentFg.get('clientId')?.invalid && appointmentFg.get('clientId')?.touched">
+                                Campo obrigatório
+                            </small>
+                        </div>
+
+                        <!-- Prestador -->
+                        <div class="col-12 md:col-4 field">
+                            <label for="provider">Prestador *</label>
+                            <p-dropdown id="provider"
+                                      [options]="providerDropdownOptions()"
+                                      formControlName="providerId"
+                                      optionLabel="label"
+                                      [filter]="true"
+                                      filterBy="label"
+                                      [showClear]="true"
+                                      placeholder="Selecione um prestador"
+                                      styleClass="w-full">
+                                <ng-template let-provider pTemplate="item">
+                                    <div class="flex flex-column">
+                                        <span>{{ provider.label | titlecase }}</span>
+                                        <small *ngIf="provider.complement">
+                                            CPF: {{ provider.complement }}
+                                        </small>
+                                    </div>
+                                </ng-template>
+                            </p-dropdown>
+                            <small class="p-error block" 
+                                   *ngIf="appointmentFg.get('providerId')?.invalid && appointmentFg.get('providerId')?.touched">
+                                Campo obrigatório
+                            </small>
+                        </div>
+
+                        <!-- Data do Agendamento -->
+                        <div class="col-12 md:col-4 field">
+                            <label for="appointmentDate">Data do Agendamento *</label>
+                            <p-calendar id="appointmentDate"
+                                      formControlName="appointmentDate"
+                                      [showTime]="true"
+                                      [showIcon]="true"
+                                      dateFormat="dd/mm/yy"
+                                      [minDate]="minDate"
+                                      placeholder="Selecione a data"
+                                      styleClass="w-full">
+                            </p-calendar>
+                            <small class="p-error block" 
+                                   *ngIf="appointmentFg.get('appointmentDate')?.invalid && appointmentFg.get('appointmentDate')?.touched">
+                                Campo obrigatório
+                            </small>
+                        </div>
+
+                        <!-- Observações -->
+                        <div class="col-12 field">
+                            <label for="observation">Observações</label>
+                            <textarea id="observation"
+                                    pInputTextarea
+                                    formControlName="observation"
+                                    [rows]="3"
+                                    placeholder="Digite aqui observações importantes sobre o agendamento">
+                            </textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="flex flex-column">
-                <label for="appointmentDate">Data do agendamento</label>
-                <p-calendar formControlName="appointmentDate" />
-                <small *ngIf="appointmentFg.controls.appointmentDate?.invalid && appointmentFg.controls.appointmentDate?.touched"
-                       class="text-red-500 text-xs">
-                    Campo Data é obrigatória.
-                </small>
-            </div>
-            <div class="flex flex-column gap-1">
-                <label for="observation">Observações</label>
-                <input id="observation"
-                       pInputText
-                       formControlName="observation"
-                       placeholder="Observações">
+
+            <!-- Seção de Documentos -->
+            <div class="col-12" *ngIf="selectedService?.document_requirements?.length">
+                <div class="surface-card p-4 border-round">
+                    <div class="text-xl font-medium mb-4">Documentos Necessários</div>
+                    <p-table [value]="selectedService?.document_requirements"
+                            [tableStyle]="{'min-width': '50rem'}">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>Documento</th>
+                                <th>Descrição</th>
+                                <th>Tipo</th>
+                                <th>Arquivo</th>
+                                <th>Status</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-req>
+                            <tr>
+                                <td>
+                                    <span class="font-medium">{{ req.document_template.name }}</span>
+                                    <span class="text-red-500 ml-1" *ngIf="req.is_required">*</span>
+                                </td>
+                                <td>{{ req.document_template.description }}</td>
+                                <td>{{ req.document_template.file_types }}</td>
+                                <td>
+                                    <div class="flex align-items-center">
+                                        <input type="file" 
+                                               [id]="'doc-' + req.id"
+                                               (change)="onFileSelect($event, req.id)"
+                                               [accept]="req.document_template.file_types"
+                                               class="hidden">
+                                        <button pButton 
+                                                type="button"
+                                                [icon]="selectedDocuments[req.id] ? 'pi pi-check' : 'pi pi-upload'"
+                                                [label]="selectedDocuments[req.id]? selectedDocuments[req.id].name : 'Selecionar'"
+                                                (click)="triggerFileInput('doc-' + req.id)"
+                                                [class]="selectedDocuments[req.id] ? 'p-button-success' : 'p-button-outlined'">
+                                        </button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <p-tag *ngIf="selectedDocuments[req.id]" 
+                                          severity="success" 
+                                          value="Anexado">
+                                    </p-tag>
+                                    <p-tag *ngIf="!selectedDocuments[req.id] && req.is_required" 
+                                          severity="danger" 
+                                          value="Pendente">
+                                    </p-tag>
+                                    <p-tag *ngIf="!selectedDocuments[req.id] && !req.is_required" 
+                                          severity="warning" 
+                                          value="Opcional">
+                                    </p-tag>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
             </div>
         </form>
     </div>
+
+    <!-- Footer com botões de ação -->
+    <ng-template pTemplate="footer">
+        <div class="flex justify-content-end gap-2">
+            <p-button label="Cancelar"
+                     (click)="closeModal()"
+                     styleClass="p-button-text">
+            </p-button>
+            <p-button label="Salvar"
+                     (click)="onSubmit()"
+                     [loading]="loading()"
+                     styleClass="p-button-primary">
+            </p-button>
+        </div>
+    </ng-template>
+
+    <!-- Progress Spinner durante carregamento -->
+    <p-progressSpinner *ngIf="loading()"
+                      styleClass="w-4rem h-4rem"
+                      strokeWidth="8"
+                      fill="var(--surface-ground)"
+                      animationDuration=".5s">
+    </p-progressSpinner>
 </p-dialog>
