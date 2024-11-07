@@ -2,7 +2,9 @@
     <div>
         <sgs-sidebar></sgs-sidebar>
     </div>
-    <div>
+    <div (click)="openProfileModal()">
         <i class="icon-spin pi pi-cog"></i>
     </div>
 </div>
+
+<sgs-profile-modal #profileModal></sgs-profile-modal>

@@ -3,6 +3,7 @@ import { AvatarModule } from 'primeng/avatar';
 import { TopbarComponent } from "./topbar.component";
 import { SharedModule } from "../../core/shared/shared.module";
 import { SidebarModule } from "../sidebar/sidebar.module";
+import { ProfileModalModule } from "../../core/modals/profile-modal/profile-modal.module";
 
 
 @NgModule({
@@ -12,6 +13,7 @@ import { SidebarModule } from "../sidebar/sidebar.module";
         SharedModule,
         AvatarModule,
         SidebarModule,
+        ProfileModalModule,
     ],
 })
 export class TopbarModule {}

@@ -1,0 +1,33 @@
+<p-dialog 
+    header="Meu Perfil" 
+    [modal]="true" 
+    [draggable]="false" 
+    [(visible)]="visible" 
+    [style]="{width: '500px'}"
+    [closeOnEscape]="true" 
+    [closable]="true">
+    <div class="profile-wrapper">
+        <div class="user-image">
+            <img src="{{ '/assets/images/svg/sgs-logo.svg' }}" />
+        </div>
+        <form 
+            [formGroup]="profileFg">
+            <div class="profile-wrapper__info">
+                <div class="field mb-4">
+                    <label for="name">Nome</label>
+                    <input type="text" pInputText id="name" formControlName="name" class="w-full" />
+                </div>
+                <div class="field mb-4">
+                    <label for="email">Email</label>
+                    <input type="text" pInputText id="email" formControlName="email" class="w-full" />
+                </div>
+            </div>
+        </form>
+        <div class="w-full flex justify-content-between gap-2">
+            <button pButton type="button" label="Cancelar" class="p-button-outlined">
+            </button>
+            <button pButton type="button" label="Salvar" [loading]="loading()" class="p-button-primary" (click)="onSubmit()">
+            </button>
+        </div>
+    </div>
+</p-dialog>
