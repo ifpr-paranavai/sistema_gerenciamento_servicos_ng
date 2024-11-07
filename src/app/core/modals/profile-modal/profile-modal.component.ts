@@ -31,7 +31,6 @@ export class ProfileModalComponent implements OnInit {
         ) {}
 
     ngOnInit(): void {
-        this.visible.set(true);
     }
 
     openDialog(): void {
