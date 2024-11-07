@@ -18,7 +18,7 @@
                             <label for="service">Serviço *</label>
                             <p-dropdown id="service"
                                       [options]="servicesDropdownOptions()"
-                                      formControlName="serviceId"
+                                      formControlName="serviceSelected"
                                       (onChange)="onServiceSelect($event)"
                                       optionLabel="label"
                                       [filter]="true"
@@ -29,7 +29,7 @@
                                       styleClass="w-full">
                             </p-dropdown>
                             <small class="p-error block" 
-                                   *ngIf="appointmentFg.get('serviceId')?.invalid && appointmentFg.get('serviceId')?.touched">
+                                   *ngIf="appointmentFg.get('serviceSelected')?.invalid && appointmentFg.get('serviceSelected')?.touched">
                                 Campo obrigatório
                             </small>
                         </div>

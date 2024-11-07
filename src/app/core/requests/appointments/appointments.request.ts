@@ -21,12 +21,13 @@ export class AppointmentsRequest {
     return this.http.get<IAppointmentResponse>(`${this.apiUrl}/${id}`);
   }
 
-  createAppointment(service: Omit<IAppointmentResponse, 'id'>): Observable<IAppointmentResponse> {
-    return this.http.post<IAppointmentResponse>(this.apiUrl, service);
+  createAppointment(formData: FormData): Observable<IAppointmentResponse> {
+    return this.http.post<IAppointmentResponse>(this.apiUrl, formData);
   }
 
-  updateAppointment(id: string, service: Partial<IAppointmentResponse>): Observable<IAppointmentResponse> {
-    return this.http.put<IAppointmentResponse>(`${this.apiUrl}/${id}`, service);
+  updateAppointment(formData: FormData): Observable<IAppointmentResponse> {
+    const id = formData.get('id') as string;
+    return this.http.put<IAppointmentResponse>(`${this.apiUrl}${id}/`, formData);
   }
 
   deleteAppointment(id: string): Observable<void> {

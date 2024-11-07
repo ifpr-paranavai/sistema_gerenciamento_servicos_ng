@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit, signal, WritableSignal } fr
 import { ServiceRequest } from "../../requests/services/service.request";
 import { ToastService } from "../../requests/toastr/toast.service";
 import { IAppointmentResponse } from "../../interfaces/appointment-response.interface";
-import { forkJoin, Observable, take } from "rxjs";
+import { catchError, forkJoin, Observable, take } from "rxjs";
 import { IDropdown } from "../../interfaces/dropdown.interface";
 import { FormControl, FormGroup } from "@angular/forms";
 import { ClientRequest } from "../../requests/clients/clients.request";
@@ -11,6 +11,7 @@ import { IDocumentRequirement, ServiceResponse } from "../../interfaces/service-
 import { IClient } from "../../interfaces/client.interface";
 import { IProvider } from "../../interfaces/provider.interface";
 import { AppointmentStatusEnum } from "../../interfaces/appointment-status.interface";
+import { AppointmentsRequest } from "../../requests/appointments/appointments.request";
 
 interface IAppointmentFg {
     id: FormControl<number | null>;
@@ -59,6 +60,7 @@ export class AppointmentModalComponent implements OnInit {
         private readonly serviceRequest: ServiceRequest,
         private readonly clientRequest: ClientRequest,
         private readonly providerRequest: ProviderRequest,
+        private readonly appointmentRequest: AppointmentsRequest,
     ) { }
 
     ngOnInit(): void {
@@ -77,6 +79,25 @@ export class AppointmentModalComponent implements OnInit {
         }
     }
 
+    getFormDataValue(): FormData {
+        const formData = new FormData();
+        formData.append('service', this.appointmentFg.get('serviceSelected')?.value || '');
+        formData.append('client', (this.appointmentFg.get('clientId')?.value || '').toString());
+        formData.append('provider', (this.appointmentFg.get('providerId')?.value || '').toString());
+        formData.append('status', this.appointmentFg.get('status')?.value || '');
+
+        const appointmentDate = this.appointmentFg.get('appointmentDate')?.value;
+        formData.append('appointment_date', appointmentDate ? appointmentDate.toISOString() : '');
+        
+        const documents = this.appointmentFg.get('documents')?.value;
+        if (documents) {
+            for (const [key, value] of Object.entries(documents)) {
+                formData.append(`documents[${key}]`, value);
+            }
+        }
+        return formData;
+    }
+
     onSubmit(): void {
         if (this.loading()) return;
 
@@ -86,7 +107,66 @@ export class AppointmentModalComponent implements OnInit {
             return;
         }
 
-        console.log(this.appointmentFg.value);
+        const payload: FormData = this.getFormDataValue();
+
+        if (this.isEdit()) {
+            this.updateAppointment(payload);
+        } else {
+            this.createAppointment(payload);
+        }
+        
+    }
+
+    private createAppointment(formData: FormData): void {
+        this.appointmentRequest
+            .createAppointment(formData)
+            .pipe(
+                take(1),
+                catchError((error) => {
+                    this.toastService.error("Erro", "Falha ao cadastrar o documento modelo");
+                    this.loading.set(false);
+                    this.visible.set(false);
+                    throw new Error(error);
+                }),
+            )
+            .subscribe((appointment) => {
+                this.closeDialogWithSuccess("Documento modelo criado com sucesso");
+            });
+    }
+
+    private updateAppointment(formData: FormData): void {
+        this.appointmentRequest
+            .updateAppointment(formData)
+            .pipe(
+                take(1),
+                catchError((error) => {
+                    this.toastService.error("Erro", "Falha ao atualizar o documento modelo");
+                    this.loading.set(false);
+                    this.visible.set(false);
+                    throw new Error(error);
+                }),
+            )
+            .subscribe((appointment) => {
+                this.closeDialogWithSuccess("Documento modelo atualizado com sucesso");
+            });
+    }
+
+    private closeDialogWithSuccess(message: string): void {
+        this.resetForm();
+        this.visible.set(false);
+        this.loading.set(false);
+        this.isEdit.set(false);
+        this.toastService.success("Sucesso", message);
+    }
+
+    private resetForm(): void {
+        this.appointmentFg.reset();
+        this.appointmentFg.markAsUntouched();
+        this.appointmentFg.markAsPristine();
+        Object.keys(this.appointmentFg.controls).forEach(key => {
+            const control = this.appointmentFg.get(key);
+            control?.setErrors(null);
+        });
     }
 
     private getDropdownOptions(): void {
