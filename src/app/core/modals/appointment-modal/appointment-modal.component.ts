@@ -12,13 +12,14 @@ import { IClient } from "../../interfaces/client.interface";
 import { IProvider } from "../../interfaces/provider.interface";
 import { AppointmentStatusEnum } from "../../interfaces/appointment-status.interface";
 import { AppointmentsRequest } from "../../requests/appointments/appointments.request";
+import { IServiceOfferPayload } from "../../interfaces/service-offer.interface";
 
 interface IAppointmentFg {
     id: FormControl<number | null>;
-    serviceSelected: FormControl<string | null>;
+    serviceSelected: FormControl<IDropdown | null>;
     documentType: FormControl<DocumentType | null>;
-    clientId: FormControl<number | null>;
-    providerId: FormControl<number | null>;
+    clientId: FormControl<IDropdown | null>;
+    providerId: FormControl<IDropdown | null>;
     status: FormControl<AppointmentStatusEnum | null>;
     appointmentDate: FormControl<Date | null>;
     observation: FormControl<string | null>;
@@ -45,10 +46,10 @@ export class AppointmentModalComponent implements OnInit {
 
     appointmentFg: FormGroup<IAppointmentFg> = new FormGroup<IAppointmentFg>({
         id: new FormControl<number | null>(null),
-        serviceSelected: new FormControl<string | null>(null),
+        serviceSelected: new FormControl<IDropdown | null>(null),
         documentType: new FormControl<DocumentType | null>(null),
-        clientId: new FormControl<number | null>(null),
-        providerId: new FormControl<number | null>(null),
+        clientId: new FormControl<IDropdown | null>(null),
+        providerId: new FormControl<IDropdown | null>(null),
         status: new FormControl<AppointmentStatusEnum | null>(null),
         appointmentDate: new FormControl<Date | null>(null),
         observation: new FormControl<string | null>(null),
@@ -73,7 +74,6 @@ export class AppointmentModalComponent implements OnInit {
             this.isEdit.set(true);
             this.appointmentFg.patchValue({
                 ...appointment,
-                // passe o id em int
                 id: appointment.id ? parseInt(appointment.id) : null,
             });
         }
@@ -81,11 +81,10 @@ export class AppointmentModalComponent implements OnInit {
 
     getFormDataValue(): FormData {
         const formData = new FormData();
-        formData.append('service', this.appointmentFg.get('serviceSelected')?.value || '');
-        formData.append('client', (this.appointmentFg.get('clientId')?.value || '').toString());
-        formData.append('provider', (this.appointmentFg.get('providerId')?.value || '').toString());
+        formData.append('services', (`${this.appointmentFg.get('serviceSelected')?.value?.value}` || '').toString());
+        formData.append('client', (this.appointmentFg.get('clientId')?.value?.value || '').toString());
+        formData.append('provider', (this.appointmentFg.get('providerId')?.value?.value || '').toString());
         formData.append('status', this.appointmentFg.get('status')?.value || '');
-
         const appointmentDate = this.appointmentFg.get('appointmentDate')?.value;
         formData.append('appointment_date', appointmentDate ? appointmentDate.toISOString() : '');
         

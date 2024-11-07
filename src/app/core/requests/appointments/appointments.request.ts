@@ -22,7 +22,7 @@ export class AppointmentsRequest {
   }
 
   createAppointment(formData: FormData): Observable<IAppointmentResponse> {
-    return this.http.post<IAppointmentResponse>(this.apiUrl, formData);
+    return this.http.post<IAppointmentResponse>(`${this.apiUrl}/`, formData);
   }
 
   updateAppointment(formData: FormData): Observable<IAppointmentResponse> {
