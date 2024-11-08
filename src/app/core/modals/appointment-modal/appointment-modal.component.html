@@ -39,7 +39,7 @@
                             <label for="client">Cliente *</label>
                             <p-dropdown id="client"
                                       [options]="clientDropdownOptions()"
-                                      formControlName="clientId"
+                                      formControlName="client"
                                       optionLabel="label"
                                       [filter]="true"
                                       filterBy="label"
@@ -66,12 +66,13 @@
                             <label for="provider">Prestador *</label>
                             <p-dropdown id="provider"
                                       [options]="providerDropdownOptions()"
-                                      formControlName="providerId"
+                                      formControlName="provider"
                                       optionLabel="label"
                                       [filter]="true"
                                       filterBy="label"
                                       [showClear]="true"
                                       placeholder="Selecione um prestador"
+                                      (onSelect)="onProviderSelect($event)"
                                       styleClass="w-full">
                                 <ng-template let-provider pTemplate="item">
                                     <div class="flex flex-column">
@@ -92,17 +93,31 @@
                         <div class="col-12 md:col-4 field">
                             <label for="appointmentDate">Data do Agendamento *</label>
                             <p-calendar id="appointmentDate"
-                                      formControlName="appointmentDate"
-                                      [showTime]="true"
-                                      [showIcon]="true"
-                                      dateFormat="dd/mm/yy"
-                                      [minDate]="minDate"
-                                      placeholder="Selecione a data"
-                                      styleClass="w-full">
+                                        formControlName="appointmentDate"
+                                        [showTime]="true"
+                                        [showIcon]="true"
+                                        dateFormat="dd/mm/yy"
+                                        [minDate]="minDate"
+                                        [disabledDates]="disabledDates"
+                                        [hourFormat]="hourFormat"
+                                        [stepMinute]="15"
+                                        placeholder="Selecione a data"
+                                        styleClass="w-full"
+                                        [timeOnly]="false"
+                                        (onSelect)="updateDisabledDates()"
+                                        [disabledDays]="[0, 6]">
                             </p-calendar>
                             <small class="p-error block" 
                                    *ngIf="appointmentFg.get('appointmentDate')?.invalid && appointmentFg.get('appointmentDate')?.touched">
                                 Campo obrigatório
+                            </small>
+                            <ng-container *ngIf="selectedService">
+                                <small class="block text-gray-500">
+                                    Duração do serviço: {{ selectedService.duration || '' }} minutos
+                                </small>
+                            </ng-container>
+                            <small class="block text-gray-500">
+                                Horário de atendimento: 8h às 18h (Segunda a Sexta)
                             </small>
                         </div>
 

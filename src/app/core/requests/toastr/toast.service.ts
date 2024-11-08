@@ -25,4 +25,14 @@ export class ToastService {
             summary,
         });
     }
+
+    info(summary: string, message: string): void {
+        this.messageService.add({
+            closable: true,
+            detail: message,
+            severity: "info",
+            life: 5000,
+            summary,
+        });
+    }
 }
