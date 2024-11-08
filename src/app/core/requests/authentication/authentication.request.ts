@@ -5,6 +5,7 @@ import { tap } from 'rxjs/operators';
 import { IAuthResponse } from '../../interfaces/auth-response.interface';
 import { environment } from '../../../../environments/environment';
 import { IFeature } from '../../interfaces/feature.interface';
+import { IUser } from '../../interfaces/user.interface';
 
 @Injectable({
     providedIn: 'root'
@@ -60,5 +61,9 @@ export class AuthenticationRequest {
 
     getUserFeatures(): IFeature[] {
         return this.currentUserValue?.user.features || [];
+    }
+
+    getUserById(pk: string): Observable<IAuthResponse> {
+        return this.http.get<IAuthResponse>(`${this.baseUrl}/v1/authentication/${pk}/`);
     }
 }

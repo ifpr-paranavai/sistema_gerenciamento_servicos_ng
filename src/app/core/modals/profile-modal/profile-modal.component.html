@@ -16,15 +16,29 @@
                 <div class="field mb-4">
                     <label for="name">Nome</label>
                     <input type="text" pInputText id="name" formControlName="name" class="w-full" />
+                    <small *ngIf="profileFg.controls.name?.errors?.['required'] && profileFg.controls.name?.touched"
+                        class="text-red-500">
+                        Nome é obrigatório
+                    </small>
+                </div>
+                <div class="field mb-4">
+                    <label for="cpf">CPF</label>
+                    <input type="text" pInputText id="cpf" formControlName="cpf" class="w-full" />
+                    <small *ngIf="profileFg.controls.cpf?.errors?.['required'] && profileFg.controls.cpf?.touched" class="text-red-500">
+                        CPF é obrigatório
+                    </small>
                 </div>
                 <div class="field mb-4">
                     <label for="email">Email</label>
                     <input type="text" pInputText id="email" formControlName="email" class="w-full" />
+                    <small *ngIf="profileFg.controls.email?.errors?.['required'] && profileFg.controls.email?.touched" class="text-red-500">
+                        Email é obrigatório
+                    </small>
                 </div>
             </div>
         </form>
         <div class="w-full flex justify-content-between gap-2">
-            <button pButton type="button" label="Cancelar" class="p-button-outlined">
+            <button pButton type="button" label="Cancelar" class="p-button-outlined" (click)="closeDialog()">
             </button>
             <button pButton type="button" label="Salvar" [loading]="loading()" class="p-button-primary" (click)="onSubmit()">
             </button>
