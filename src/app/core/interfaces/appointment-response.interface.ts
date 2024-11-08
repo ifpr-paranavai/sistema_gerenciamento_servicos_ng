@@ -12,11 +12,17 @@ export interface IAppointmentResponse {
     services: ServiceResponse[];
     is_completed: boolean;
     document: IDocument;
+    observation: string;
     rating: number;
     severety?: PrimeNgSeverity;
+    documents?: IDocument[];
 }
 
 export interface IDocument {
     id: number;
-    url: string;
+    file_content: string;
+    file_name: string;
+    file_type: string;
+    created_at?: string;
+    updated_at?: string;
 }

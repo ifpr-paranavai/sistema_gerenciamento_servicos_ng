@@ -9,7 +9,7 @@ import { IAppointmentResponse } from '../../interfaces/appointment-response.inte
   providedIn: 'root'
 })
 export class AppointmentsRequest {
-  private apiUrl = `${environment.baseUrl}/v1/appointment/appointments`;
+  private apiUrl = `${environment.baseUrl}/v1/appointment/appointments/`;
 
   constructor(private http: HttpClient) { }
 
@@ -18,11 +18,11 @@ export class AppointmentsRequest {
   }
 
   getAppointment(id: string): Observable<IAppointmentResponse> {
-    return this.http.get<IAppointmentResponse>(`${this.apiUrl}/${id}`);
+    return this.http.get<IAppointmentResponse>(`${this.apiUrl}${id}`);
   }
 
   createAppointment(formData: FormData): Observable<IAppointmentResponse> {
-    return this.http.post<IAppointmentResponse>(`${this.apiUrl}/`, formData);
+    return this.http.post<IAppointmentResponse>(`${this.apiUrl}`, formData);
   }
 
   updateAppointment(formData: FormData): Observable<IAppointmentResponse> {
@@ -31,7 +31,7 @@ export class AppointmentsRequest {
   }
 
   deleteAppointment(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.http.delete<void>(`${this.apiUrl}${id}/`);
   }
 
 }
