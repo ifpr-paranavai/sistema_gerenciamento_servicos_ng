@@ -115,7 +115,9 @@ export class ProfileModalComponent {
             zip_code: this.profileFg.controls.zip_code.value,
         };
 
-        this.authenticationRequest.getUserById
+        this.authenticationRequest.updateUserById("xpt", payload).pipe(
+            take(1)
+        ).subscribe();
         
         console.log(payload);
     }

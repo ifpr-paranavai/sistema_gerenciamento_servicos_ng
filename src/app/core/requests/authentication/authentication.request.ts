@@ -69,6 +69,6 @@ export class AuthenticationRequest {
     }
 
     updateUserById(userId: string, payload: IEditUserPayload): Observable<IUser> {
-        return this.http.put<IUser>(`${this.baseUrl}/v1/user/${userId}/update-user/`, payload);
+        return this.http.put<IUser>(`${this.baseUrl}/v1/user/46e21538-60f3-4fc5-a565-8bd7170d4fea/update-user/`, payload);
     }
 }
