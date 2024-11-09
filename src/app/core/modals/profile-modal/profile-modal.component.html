@@ -8,7 +8,7 @@
     [closable]="true">
     <div class="profile-wrapper">
         <div class="user-image">
-            <img src="{{ profileFg.controls.profileImage.value ?? '/assets/images/svg/sgs-logo.svg' }}" />
+            <img src="{{ profileFg.controls.profile_picture.value ?? '/assets/images/svg/sgs-logo.svg' }}" />
         </div>
         <form 
             [formGroup]="profileFg">
@@ -52,8 +52,8 @@
                     <input type="text" pInputText id="state" formControlName="state" class="w-full" />
                 </div>
                 <div class="field mb-4">
-                    <label for="zipCode">CEP</label>
-                    <input type="text" pInputText id="zipCode" formControlName="zipCode" class="w-full" />
+                    <label for="zip_code">CEP</label>
+                    <input type="text" pInputText id="zip_code" formControlName="zip_code" class="w-full" />
                 </div>
             </div>
         </form>

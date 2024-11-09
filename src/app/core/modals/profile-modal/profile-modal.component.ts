@@ -5,17 +5,18 @@ import { AuthenticationRequest } from "../../requests/authentication/authenticat
 import { catchError, switchMap, take, throwError } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 import { cpfValidator } from "../../validators/cpf.validator";
+import { IEditUserPayload } from "../../interfaces/edit-user-payload.interface";
 
 interface ProfileModalFg {
     name: FormControl<string | null>;
     email: FormControl<string | null>; 
     cpf: FormControl<string | null>; 
-    profileImage: FormControl<string | null>;
+    profile_picture: FormControl<string | null>;
     street: FormControl<string | null>;
     number: FormControl<string | null>;
     city: FormControl<string | null>;
     state: FormControl<string | null>;
-    zipCode: FormControl<string | null>;
+    zip_code: FormControl<string | null>;
 }
 
 @Component({
@@ -32,12 +33,12 @@ export class ProfileModalComponent {
         name: new FormControl(null, [Validators.required]),
         email: new FormControl(null, [Validators.required]),
         cpf: new FormControl(null, [Validators.required, cpfValidator, Validators.minLength(11), Validators.maxLength(11)]),
-        profileImage: new FormControl(null),
+        profile_picture: new FormControl(null),
         street: new FormControl(null),
         number: new FormControl(null),
         city: new FormControl(null),
         state: new FormControl(null),
-        zipCode: new FormControl(null),
+        zip_code: new FormControl(null),
     });
     
     constructor(
@@ -72,23 +73,17 @@ export class ProfileModalComponent {
                 name: user.name,
                 email: user.email,
                 cpf: user.cpf,
-                profileImage: user.profile?.profile_picture,
+                profile_picture: user.profile?.profile_picture,
                 street: user.profile?.street,
                 number: user.profile?.number,
                 city: user.profile?.city,
                 state: user.profile?.state,
-                zipCode: user.profile?.zip_code,
+                zip_code: user.profile?.zip_code,
             });
 
             console.log(this.profileFg.value);
         });
     }
-
-    setUserImg(): void {
-
-    }
-
-
 
     openDialog(): void {
         this.visible.set(true);
@@ -108,5 +103,20 @@ export class ProfileModalComponent {
             return;
         }
 
+        const payload: IEditUserPayload = {
+            name: this.profileFg.controls.name.value!,
+            email: this.profileFg.controls.email.value!,
+            cpf: this.profileFg.controls.cpf.value!,
+            profile_picture: this.profileFg.controls.profile_picture.value!,
+            street: this.profileFg.controls.street.value,
+            number: this.profileFg.controls.number.value,
+            city: this.profileFg.controls.city.value,
+            state: this.profileFg.controls.state.value,
+            zip_code: this.profileFg.controls.zip_code.value,
+        };
+
+        this.authenticationRequest.getUserById
+        
+        console.log(payload);
     }
 }

@@ -6,6 +6,7 @@ import { IAuthResponse } from '../../interfaces/auth-response.interface';
 import { environment } from '../../../../environments/environment';
 import { IFeature } from '../../interfaces/feature.interface';
 import { IUser } from '../../interfaces/user.interface';
+import { IEditUserPayload } from '../../interfaces/edit-user-payload.interface';
 
 @Injectable({
     providedIn: 'root'
@@ -65,5 +66,9 @@ export class AuthenticationRequest {
 
     getUserById(pk: string): Observable<IAuthResponse> {
         return this.http.get<IAuthResponse>(`${this.baseUrl}/v1/authentication/${pk}/`);
+    }
+
+    updateUserById(userId: string, payload: IEditUserPayload): Observable<IUser> {
+        return this.http.put<IUser>(`${this.baseUrl}/v1/user/${userId}/update-user/`, payload);
     }
 }
