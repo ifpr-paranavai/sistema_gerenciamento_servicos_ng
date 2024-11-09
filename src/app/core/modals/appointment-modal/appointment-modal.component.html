@@ -72,7 +72,7 @@
                                       filterBy="label"
                                       [showClear]="true"
                                       placeholder="Selecione um prestador"
-                                      (onSelect)="onProviderSelect($event)"
+                                      (onChange)="onProviderSelect($event)"
                                       styleClass="w-full">
                                 <ng-template let-provider pTemplate="item">
                                     <div class="flex flex-column">
@@ -97,7 +97,6 @@
                                         [showTime]="true"
                                         [showIcon]="true"
                                         dateFormat="dd/mm/yy"
-                                        [minDate]="minDate"
                                         [disabledDates]="disabledDates"
                                         [hourFormat]="hourFormat"
                                         [stepMinute]="15"

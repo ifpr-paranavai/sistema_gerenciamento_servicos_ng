@@ -52,21 +52,19 @@ export class AppointmentModalComponent implements OnInit {
     selectedDocuments: { [key: number]: File } = {};
     services: ServiceResponse[] = [];
     selectedService: ServiceResponse | null = null;
-    minDate: Date = new Date();
     providerAppointments: { [key: string]: IProvider } = {};
     selectedProvider: IProvider | null = null;
-    selectedServiceDuration: number = 0;
     disabledDates: Date[] = [];
     hourFormat: string = "24";
     timeIntervals = Array.from({ length: 24 }, (_, i) => i); // 0-23 horas
     invalidHours = this.timeIntervals.filter(hour => hour < 8 || hour >= 18);
     isDateDisabled = (date: Date): boolean => {
-        if (!this.selectedProvider || !this.selectedServiceDuration) {
+        if (!this.selectedProvider || !this.selectedService?.duration ) {
             return false;
         }
     
         const proposedStart = new Date(date);
-        const proposedEnd = new Date(proposedStart.getTime() + this.selectedServiceDuration * 60000);
+        const proposedEnd = new Date(proposedStart.getTime() + (this.selectedService?.duration || 0) * 60000);
     
         return this.selectedProvider.appointments.some(app => {
             const appointmentStart = new Date(app.start);
@@ -119,7 +117,7 @@ export class AppointmentModalComponent implements OnInit {
     }
     
     updateDisabledDates(): void {
-        if (!this.selectedProvider || !this.selectedServiceDuration) {
+        if (!this.selectedProvider || !this.selectedService?.duration ) {
           this.disabledDates = [];
           return;
         }
@@ -139,12 +137,12 @@ export class AppointmentModalComponent implements OnInit {
       }
     
     isDateConflicting(date: Date): boolean {
-        if (!this.selectedProvider || !this.selectedServiceDuration) {
+        if (!this.selectedProvider || !!this.selectedService?.duration ) {
             return false;
         }
     
         const proposedStart = new Date(date);
-        const proposedEnd = new Date(proposedStart.getTime() + this.selectedServiceDuration * 60000);
+        const proposedEnd = new Date(proposedStart.getTime() + (this.selectedService?.duration || 0) * 60000);
     
         return this.selectedProvider.appointments.some(app => {
             const appointmentStart = new Date(app.start);
@@ -384,12 +382,12 @@ export class AppointmentModalComponent implements OnInit {
     }
 
     checkDateAvailability(date: Date): IDateConflict {
-        if (!this.selectedProvider || !this.selectedServiceDuration) {
+        if (!this.selectedProvider || !this.selectedService?.duration ) {
             return { hasConflict: false };
         }
     
         const proposedStart = new Date(date);
-        const proposedEnd = new Date(proposedStart.getTime() + this.selectedServiceDuration * 60000);
+        const proposedEnd = new Date(proposedStart.getTime() + (this.selectedService?.duration || 0 ) * 60000);
         const conflicts: { start: string; end: string; service: string }[] = [];
     
         const hour = proposedStart.getHours();
@@ -475,7 +473,6 @@ export class AppointmentModalComponent implements OnInit {
         
         if (!serviceSelected) {
             this.selectedService = null;
-            this.selectedServiceDuration = 0;
             this.selectedDocuments = {};
             return;
         }
