@@ -33,6 +33,7 @@ export class SidebarComponent implements OnInit {
         this.authenticationService.currentUser.pipe(take(1)).subscribe((data) => {
             if (!data || !data.user) return;
             this.currentUser.set(data.user);
+            console.log(this.currentUser()?.profile);
         })
     }
 

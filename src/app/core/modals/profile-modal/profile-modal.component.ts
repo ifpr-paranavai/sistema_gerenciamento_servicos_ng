@@ -10,7 +10,12 @@ interface ProfileModalFg {
     name: FormControl<string | null>;
     email: FormControl<string | null>; 
     cpf: FormControl<string | null>; 
-    profileImage: FormControl<File | null>;
+    profileImage: FormControl<string | null>;
+    street: FormControl<string | null>;
+    number: FormControl<string | null>;
+    city: FormControl<string | null>;
+    state: FormControl<string | null>;
+    zipCode: FormControl<string | null>;
 }
 
 @Component({
@@ -27,7 +32,12 @@ export class ProfileModalComponent {
         name: new FormControl(null, [Validators.required]),
         email: new FormControl(null, [Validators.required]),
         cpf: new FormControl(null, [Validators.required, cpfValidator, Validators.minLength(11), Validators.maxLength(11)]),
-        profileImage: new FormControl(null)
+        profileImage: new FormControl(null),
+        street: new FormControl(null),
+        number: new FormControl(null),
+        city: new FormControl(null),
+        state: new FormControl(null),
+        zipCode: new FormControl(null),
     });
     
     constructor(
@@ -61,10 +71,24 @@ export class ProfileModalComponent {
             this.profileFg.patchValue({
                 name: user.name,
                 email: user.email,
-                cpf: user.cpf
+                cpf: user.cpf,
+                profileImage: user.profile?.profile_picture,
+                street: user.profile?.street,
+                number: user.profile?.number,
+                city: user.profile?.city,
+                state: user.profile?.state,
+                zipCode: user.profile?.zip_code,
             });
+
+            console.log(this.profileFg.value);
         });
     }
+
+    setUserImg(): void {
+
+    }
+
+
 
     openDialog(): void {
         this.visible.set(true);

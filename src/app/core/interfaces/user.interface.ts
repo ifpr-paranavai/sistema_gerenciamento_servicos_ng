@@ -9,5 +9,15 @@ export interface IUser {
     cpf: string;
     role: Role[] | number;
     features: IFeature[];
-    'profile_image': string | null;
+    profile?: IProfile | null;
+}
+
+export interface IProfile {
+    id: number;
+    street: string | null;
+    number: string | null;
+    city: string | null;
+    state: string | null;
+    'zip_code': string | null;
+    'profile_picture': string | null;
 }
