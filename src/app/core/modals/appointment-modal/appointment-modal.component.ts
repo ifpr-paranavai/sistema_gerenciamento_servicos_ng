@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, signa
 import { ServiceRequest } from "../../requests/services/service.request";
 import { ToastService } from "../../requests/toastr/toast.service";
 import { IAppointmentResponse } from "../../interfaces/appointment-response.interface";
-import { catchError, forkJoin, Observable, take } from "rxjs";
+import { catchError, EMPTY, forkJoin, Observable, take } from "rxjs";
 import { IDropdown } from "../../interfaces/dropdown.interface";
 import { AbstractControl, FormControl, FormGroup } from "@angular/forms";
 import { ClientRequest } from "../../requests/clients/clients.request";
@@ -12,6 +12,7 @@ import { IClient } from "../../interfaces/client.interface";
 import { IProvider } from "../../interfaces/provider.interface";
 import { AppointmentStatusEnum } from "../../interfaces/appointment-status.interface";
 import { AppointmentsRequest } from "../../requests/appointments/appointments.request";
+import { DocumentFile } from "../../interfaces/documents-template-response.interface";
 
 interface IAppointmentFg {
     id: FormControl<string | null>;
@@ -49,7 +50,7 @@ export class AppointmentModalComponent implements OnInit {
     servicesDropdownOptions: WritableSignal<IDropdown[]> = signal([]);
     clientDropdownOptions: WritableSignal<IDropdown[]> = signal([]);
     providerDropdownOptions: WritableSignal<IDropdown[]> = signal([]);
-    selectedDocuments: { [key: number]: File } = {};
+    selectedDocuments: { [key: number]: DocumentFile } = {};
     services: ServiceResponse[] = [];
     selectedService: ServiceResponse | null = null;
     providerAppointments: { [key: string]: IProvider } = {};
@@ -126,7 +127,6 @@ export class AppointmentModalComponent implements OnInit {
         const today = new Date();
         const nextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
     
-        // Verifica cada dia do período
         for (let d = new Date(today); d <= nextMonth; d.setDate(d.getDate() + 1)) {
           if (this.isDateConflicting(new Date(d))) {
             newDisabledDates.push(new Date(d));
@@ -204,15 +204,16 @@ export class AppointmentModalComponent implements OnInit {
                 const requirement = this.selectedService?.document_requirements.find(
                     req => req.document_template.file_types.includes(doc.file_type)
                 );
+                if (!requirement) return;
                 
-                if (requirement) {
-                    const file = new File(
-                        [new Blob([doc.file_content])], 
-                        doc.file_name,
-                        { type: doc.file_type }
-                    );
-                    this.selectedDocuments[requirement.id] = file;
-                }
+                const documentFile: DocumentFile = {
+                    lastModified: doc.created_at ? new Date(doc.created_at).getTime() : 0,
+                    name: doc.file_name,
+                    size: doc.file_size,
+                    type: `application/${doc.file_type}`,
+                    dataUrl: doc.file_content
+                };
+                this.selectedDocuments[requirement.id] = documentFile;
             });
         }
 
@@ -235,24 +236,52 @@ export class AppointmentModalComponent implements OnInit {
             status: appointment.status as AppointmentStatusEnum,
             appointmentDate: new Date(appointment.appointment_date),
             observation: appointment.observation,
-            documents: this.selectedDocuments
+            documents: Object.fromEntries(
+                Object.entries(this.selectedDocuments).map(([key, docFile]) => [key, new File([docFile.dataUrl], docFile.name, { type: docFile.type })])
+            )
         });
     }
 
     getFormDataValue(): FormData {
         const formData = new FormData();
+        
         formData.append('id', (this.appointmentFg.get('id')?.value || '').toString());
-        formData.append('services', (`${this.appointmentFg.get('serviceSelected')?.value?.value}` || '').toString());
-        formData.append('client', (this.appointmentFg.get('client')?.value?.value || '').toString());
-        formData.append('provider', (this.appointmentFg.get('provider')?.value?.value || '').toString());
+        formData.append('services', this.appointmentFg.get('serviceSelected')?.value?.value?.toString() || '');
+        formData.append('client', this.appointmentFg.get('client')?.value?.value?.toString() || '');
+        formData.append('provider', this.appointmentFg.get('provider')?.value?.value?.toString() || '');
         formData.append('status', this.appointmentFg.get('status')?.value || '');
+        
         const appointmentDate = this.appointmentFg.get('appointmentDate')?.value;
         formData.append('appointment_date', appointmentDate ? appointmentDate.toISOString() : '');
         
-        Object.entries(this.selectedDocuments).forEach(([requirementId, file]) => {
-            formData.append(`document_requirement_${requirementId}`, file);
+        console.log('Documentos selecionados:', this.selectedDocuments);
+        
+        for (const [requirementId, documentFile] of Object.entries(this.selectedDocuments)) {
+            console.log(`Processando documento ${requirementId}:`, documentFile);
+            
+            if (documentFile instanceof File) {
+                console.log('Anexando arquivo direto:', documentFile);
+                formData.append(`document_requirement_${requirementId}`, documentFile);
+            } else {
+                const file = documentFile as unknown as DocumentFile;
+                const byteString = atob(file.dataUrl.split(',')[1]);
+                const ab = new ArrayBuffer(byteString.length);
+                const ia = new Uint8Array(ab);
+                for (let i = 0; i < byteString.length; i++) {
+                    ia[i] = byteString.charCodeAt(i);
+                }
+                const blob = new Blob([ab], { type: file.type });
+                const newFile = new File([blob], file.name, { type: file.type });
+                
+                console.log('Anexando arquivo convertido:', newFile);
+                formData.append(`document_requirement_${requirementId}`, newFile);
+            }
+        }
+    
+        formData.forEach((value, key) => {
+            console.log(`FormData contém: ${key}:`, value);
         });
-
+    
         return formData;
     }
 
@@ -293,20 +322,26 @@ export class AppointmentModalComponent implements OnInit {
         this.createAppointment(payload);
     }
 
-    private createAppointment(formData: FormData): void {
+    createAppointment(formData: FormData): void {
+        console.log('Enviando FormData:', formData);
         this.appointmentRequest
             .createAppointment(formData)
             .pipe(
                 take(1),
                 catchError((error) => {
-                    this.toastService.error("Erro", "Falha ao cadastrar o documento modelo");
+                    let errorMessage = "Erro ao criar agendamento";
+                    if (error.error?.detail) {
+                        errorMessage = error.error.detail;
+                    }
+                    this.toastService.error("Erro", errorMessage);
                     this.loading.set(false);
-                    this.visible.set(false);
-                    throw new Error(error);
-                }),
+                    return EMPTY;
+                })
             )
-            .subscribe((appointment) => {
-                this.closeDialogWithSuccess("Documento modelo criado com sucesso");
+            .subscribe({
+                next: (appointment) => {
+                    this.closeDialogWithSuccess("Agendamento criado com sucesso");
+                }
             });
     }
 
@@ -513,13 +548,16 @@ export class AppointmentModalComponent implements OnInit {
     
     onFileSelect(event: any, requirementId: number): void {
         const file = event.target.files[0];
+        if (!file) return;
+    
         const requirement = this.selectedService?.document_requirements
             .find(req => req.id === requirementId);
         
-        if (!file || !requirement) {
+        if (!requirement) {
+            this.toastService.error('Erro', 'Requisito não encontrado');
             return;
         }
-        
+    
         try {
             const allowedTypes = requirement.document_template.file_types;
             const fileExtension = file.name.split('.').pop()?.toLowerCase();
@@ -528,21 +566,25 @@ export class AppointmentModalComponent implements OnInit {
                 this.toastService.error('Erro', `Tipos aceitos: ${allowedTypes.join(', ')}`);
                 return;
             }
-
-            const maxSize = 5 * 1024 * 1024;
+    
+            const maxSize = 5 * 1024 * 1024; // 5MB
             if (file.size > maxSize) {
                 this.toastService.error('Erro', 'Arquivo muito grande. Máximo: 5MB');
                 return;
             }
 
             this.selectedDocuments[requirementId] = file;
-            this.appointmentFg.patchValue({ documents: this.selectedDocuments });
+            console.log(`Arquivo armazenado para requisito ${requirementId}:`, file);
+    
+            const currentFiles = this.appointmentFg.get('documents')?.value || {};
+            currentFiles[requirementId] = file;
+            this.appointmentFg.patchValue({ documents: currentFiles });
             
             this.toastService.success('Sucesso', 'Documento anexado!');
             
         } catch (error) {
             console.error('Erro ao processar arquivo:', error);
-            this.toastService.error('Erro', 'Erro ao validar arquivo');
+            this.toastService.error('Erro', 'Erro ao processar arquivo');
         }
     }
     
@@ -567,6 +609,64 @@ export class AppointmentModalComponent implements OnInit {
                 documentsControl.setValidators(requiredValidators);
                 documentsControl.updateValueAndValidity();
             }
+        }
+    }
+
+    downloadTemplate(serviceTemplateId: number): void {
+        try {
+            const documentRequirement = this.selectedService?.document_requirements.find(
+                req => req.document_template?.id === serviceTemplateId
+            );
+    
+            if (!documentRequirement?.document_template?.document) {
+                this.toastService.error('Erro', 'Template não encontrado');
+                return;
+            }
+    
+            const file = documentRequirement.document_template.document;
+            
+            const link = document.createElement('a');
+            link.href = file.dataUrl;
+            link.download = file.name;
+            
+            document.body.appendChild(link);
+            link.click();
+            
+            setTimeout(() => {
+                document.body.removeChild(link);
+            }, 100);
+            
+            this.toastService.success('Sucesso', 'Template baixado com sucesso!');
+        } catch (error) {
+            console.error('Erro ao baixar template:', error);
+            this.toastService.error('Erro', 'Não foi possível baixar o template');
+        }
+    }
+    
+    
+    downloadUploadedDocument(requirementId: number): void {
+        try {
+            const file = this.selectedDocuments[requirementId];
+            if (!file) {
+                this.toastService.error('Erro', 'Nenhum arquivo encontrado');
+                return;
+            }
+            
+            const link = document.createElement('a');
+            link.href = file.dataUrl;
+            link.download = file.name;
+            
+            document.body.appendChild(link);
+            link.click();
+            
+            setTimeout(() => {
+                document.body.removeChild(link);
+            }, 100);
+
+            this.toastService.success('Sucesso', 'Documento baixado com sucesso!');
+        } catch (error) {
+            console.error('Erro ao baixar documento:', error);
+            this.toastService.error('Erro', 'Não foi possível baixar o documento');
         }
     }
 }

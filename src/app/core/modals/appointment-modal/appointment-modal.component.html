@@ -145,6 +145,7 @@
                                 <th>Documento</th>
                                 <th>Descrição</th>
                                 <th>Tipo</th>
+                                <th>Template</th>
                                 <th>Arquivo</th>
                                 <th>Status</th>
                             </tr>
@@ -158,7 +159,16 @@
                                 <td>{{ req.document_template.description }}</td>
                                 <td>{{ req.document_template.file_types }}</td>
                                 <td>
-                                    <div class="flex align-items-center">
+                                    <button pButton 
+                                            type="button"
+                                            icon="pi pi-download"
+                                            (click)="downloadTemplate(req.document_template.id)"
+                                            [label]="'Template'"
+                                            class="p-button-outlined p-button-info">
+                                    </button>
+                                </td>
+                                <td>
+                                    <div class="flex align-items-center gap-2">
                                         <input type="file" 
                                                [id]="'doc-' + req.id"
                                                (change)="onFileSelect($event, req.id)"
@@ -170,6 +180,13 @@
                                                 [label]="selectedDocuments[req.id]? selectedDocuments[req.id].name : 'Selecionar'"
                                                 (click)="triggerFileInput('doc-' + req.id)"
                                                 [class]="selectedDocuments[req.id] ? 'p-button-success' : 'p-button-outlined'">
+                                        </button>
+                                        <button *ngIf="selectedDocuments[req.id]"
+                                                pButton 
+                                                type="button"
+                                                icon="pi pi-download"
+                                                (click)="downloadUploadedDocument(req.id)"
+                                                class="p-button-outlined p-button-secondary">
                                         </button>
                                     </div>
                                 </td>

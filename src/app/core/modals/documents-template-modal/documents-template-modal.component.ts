@@ -73,7 +73,7 @@ export class DocumentsTemplateModalComponent {
             file_types: this.parseFileTypes(documentTemplate!.file_types),
         });
 
-        this.createPreview(documentTemplate.document);
+        // this.createPreview(documentTemplate.document);
         this.visible.set(true);
         this.isEdit.set(true);
     }
@@ -187,24 +187,24 @@ export class DocumentsTemplateModalComponent {
         const file = event.files[0];
         if (!file) throw new Error('File on upload file');
 
-        this.createPreview(file);
+        // this.createPreview(file);
     }
 
-    createPreview(file: File): void {
-        this.selectedFile.set(file);
-        this.documentTemplateFg.controls.file.setValue(file);
+    // createPreview(file: File): void {
+    //     this.selectedFile.set(file);
+    //     this.documentTemplateFg.controls.file.setValue(file);
 
-        if (this.isImageFile(file)) {
-            const reader = new FileReader();
-            reader.onload = (e: any) => {
-                this.previewUrl.set(e.target.result);
-            };
-            reader.readAsDataURL(file);
-            return;
-        }
+    //     if (this.isImageFile(file)) {
+    //         const reader = new FileReader();
+    //         reader.onload = (e: any) => {
+    //             this.previewUrl.set(e.target.result);
+    //         };
+    //         reader.readAsDataURL(file);
+    //         return;
+    //     }
 
-        this.previewUrl.set(null);
-    }
+    //     this.previewUrl.set(null);
+    // }
 
     removeFile(): void {
         this.selectedFile.set(null);
