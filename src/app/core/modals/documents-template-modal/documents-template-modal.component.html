@@ -37,7 +37,7 @@
             </div>
 
             <div class="field mb-4 flex justify-content-between">
-                <div>
+                <div class="w-6">
                     <label for="file_types" class="block mb-2">Tipos de Arquivos Permitidos</label>
                     <p-multiSelect id="file_types"
                                 formControlName="file_types"
@@ -54,7 +54,7 @@
                         Selecione ao menos um tipo de arquivo
                     </small>
                 </div>
-                <div>
+                <div class="w-5">
                     <label for="document_template" class="block mb-2">Documento Modelo</label>
                     <div class="upload-container">
                         <p-fileUpload #fileUpload
@@ -67,39 +67,36 @@
                                     [auto]="true"
                                     class="w-full">
                         </p-fileUpload>
-
-
                     </div>
                 </div>
-                <small *ngIf="documentTemplateFg.controls.file?.errors?.['required'] && documentTemplateFg.controls.file?.touched"
-                       class="text-red-500">
-                    Documento modelo é obrigatório
-                </small>
             </div>
 
-
             <div class="field mb-4">
-
-                 <div *ngIf="selectedFile()" class="preview-container mt-3 p-3 border-1 border-round surface-border">
+                <div *ngIf="selectedFile()" class="preview-container mt-3 p-3 border-1 border-round surface-border">
                     <div class="flex align-items-center justify-content-between">
                         <div class="flex align-items-center gap-3">
                             <div class="preview-icon" [ngSwitch]="selectedFile()?.type">
-                                <img *ngSwitchCase="isImageFile(selectedFile())"
+                                <!-- Caso seja imagem e tenha preview -->
+                                <img *ngSwitchCase="isImageFile(selectedFile()) && previewUrl()"
                                      [src]="previewUrl()"
-                                     class="w-8rem h-8rem border-round"
-                                     alt="Preview">
+                                     class="w-8rem h-8rem border-round object-cover"
+                                     [alt]="selectedFile()?.name"/>
 
+                                <!-- PDF -->
                                 <i *ngSwitchCase="'application/pdf'"
                                    class="pi pi-file-pdf text-4xl text-red-600"></i>
 
+                                <!-- Word -->
                                 <i *ngSwitchCase="'application/msword'"
                                    class="pi pi-file-word text-4xl text-blue-600"></i>
                                 <i *ngSwitchCase="'application/vnd.openxmlformats-officedocument.wordprocessingml.document'"
                                    class="pi pi-file-word text-4xl text-blue-600"></i>
 
+                                <!-- Texto -->
                                 <i *ngSwitchCase="'text/plain'"
                                    class="pi pi-file text-4xl text-gray-600"></i>
 
+                                <!-- Outros tipos -->
                                 <i *ngSwitchDefault
                                    class="pi pi-file text-4xl text-gray-600"></i>
                             </div>
@@ -110,17 +107,37 @@
                             </div>
                         </div>
 
-                        <button pButton
-                                type="button"
-                                icon="pi pi-times"
-                                class="p-button-rounded p-button-danger p-button-outlined p-button-sm"
-                                (click)="removeFile()">
-                        </button>
+                        <div class="flex gap-2">
+                            <!-- Botão de Download -->
+                            <button pButton
+                                    type="button"
+                                    icon="pi pi-download"
+                                    pTooltip="Baixar arquivo"
+                                    tooltipPosition="top"
+                                    class="p-button-rounded p-button-primary p-button-outlined p-button-sm"
+                                    (click)="downloadFile()">
+                            </button>
+                            
+                            <!-- Botão de Remover -->
+                            <button pButton
+                                    type="button"
+                                    icon="pi pi-times"
+                                    pTooltip="Remover arquivo"
+                                    tooltipPosition="top"
+                                    class="p-button-rounded p-button-danger p-button-outlined p-button-sm"
+                                    (click)="removeFile()">
+                            </button>
+                        </div>
                     </div>
                 </div>
+
+                <small *ngIf="documentTemplateFg.get('file')?.errors?.['required'] && documentTemplateFg.get('file')?.touched"
+                       class="text-red-500 block mt-2">
+                    Documento modelo é obrigatório
+                </small>
             </div>
 
-            <div class="flex justify-end gap-2">
+            <div class="flex justify-content-end gap-2">
                 <button pButton
                         type="button"
                         label="Cancelar"

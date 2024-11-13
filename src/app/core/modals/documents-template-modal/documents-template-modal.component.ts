@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Output, signal, ViewChild, WritableSignal } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { ToastService } from "../../requests/toastr/toast.service";
-import { take, catchError, of } from "rxjs";
+import { take, catchError } from "rxjs";
 import { DocumentsTemplateRequest } from "../../requests/documents-template/documents-template.request";
-import { IDocumentsTemplateResponse } from "../../interfaces/documents-template-response.interface";
+import { DocumentFile, IDocumentsTemplateResponse } from "../../interfaces/documents-template-response.interface";
 import { FileUpload, FileUploadHandlerEvent } from "primeng/fileupload";
 
 interface IDocumentTemplateFg {
@@ -19,6 +19,10 @@ interface FileType {
     value: string;
 }
 
+interface DocumentFileWithPreview extends DocumentFile {
+    preview?: string;
+}
+
 @Component({
     selector: "sgs-documents-template-modal",
     templateUrl: "./documents-template-modal.component.html",
@@ -32,7 +36,7 @@ export class DocumentsTemplateModalComponent {
     loading: WritableSignal<boolean> = signal(false);
     isEdit: WritableSignal<boolean> = signal(false);
 
-    selectedFile = signal<File | null>(null);
+    selectedFile = signal<DocumentFileWithPreview | null>(null);
     previewUrl = signal<string | null>(null);
 
     fileTypes: FileType[] = [
@@ -70,10 +74,10 @@ export class DocumentsTemplateModalComponent {
             id: documentTemplate.id,
             name: documentTemplate.name,
             description: documentTemplate.description,
-            file_types: this.parseFileTypes(documentTemplate!.file_types),
+            file_types: this.parseFileTypes(documentTemplate.file_types),
         });
 
-        // this.createPreview(documentTemplate.document);
+        this.createPreview(documentTemplate.document);
         this.visible.set(true);
         this.isEdit.set(true);
     }
@@ -122,7 +126,12 @@ export class DocumentsTemplateModalComponent {
         formData.append('name', this.documentTemplateFg.value.name!);
         formData.append('description', this.documentTemplateFg.value.description!);
         formData.append('file_types', JSON.stringify(this.documentTemplateFg.value.file_types));
-        formData.append('file', this.documentTemplateFg.value.file!);
+        
+        const file = this.documentTemplateFg.value.file;
+        if (file) {
+            formData.append('file', file);
+        }
+        
         return formData;
     }
 
@@ -135,7 +144,7 @@ export class DocumentsTemplateModalComponent {
                     this.toastService.error("Erro", "Falha ao cadastrar o documento modelo");
                     this.loading.set(false);
                     this.visible.set(false);
-                    throw new Error(error);
+                    throw error;
                 }),
             )
             .subscribe((documentTemplate) => {
@@ -152,7 +161,7 @@ export class DocumentsTemplateModalComponent {
                     this.toastService.error("Erro", "Falha ao atualizar o documento modelo");
                     this.loading.set(false);
                     this.visible.set(false);
-                    throw new Error(error);
+                    throw error;
                 }),
             )
             .subscribe((documentTemplate) => {
@@ -160,7 +169,7 @@ export class DocumentsTemplateModalComponent {
             });
     }
 
-    private closeDialogWithSuccess(message: string, documentTemplate: any): void {
+    private closeDialogWithSuccess(message: string, documentTemplate: IDocumentsTemplateResponse): void {
         this.resetForm();
         this.visible.set(false);
         this.loading.set(false);
@@ -185,26 +194,36 @@ export class DocumentsTemplateModalComponent {
         if (!event || !event.files || !event.files.length) return;
 
         const file = event.files[0];
-        if (!file) throw new Error('File on upload file');
+        if (!file) {
+            throw new Error('No file selected');
+        }
 
-        // this.createPreview(file);
+        const reader = new FileReader();
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+            if (e.target?.result) {
+                const documentFile: DocumentFileWithPreview = {
+                    lastModified: file.lastModified,
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    dataUrl: e.target.result as string,
+                    preview: this.isImageType(file.type) ? e.target.result as string : undefined
+                };
+                this.createPreview(documentFile);
+                this.documentTemplateFg.patchValue({ file });
+            }
+        };
+        reader.readAsDataURL(file);
     }
 
-    // createPreview(file: File): void {
-    //     this.selectedFile.set(file);
-    //     this.documentTemplateFg.controls.file.setValue(file);
-
-    //     if (this.isImageFile(file)) {
-    //         const reader = new FileReader();
-    //         reader.onload = (e: any) => {
-    //             this.previewUrl.set(e.target.result);
-    //         };
-    //         reader.readAsDataURL(file);
-    //         return;
-    //     }
-
-    //     this.previewUrl.set(null);
-    // }
+    createPreview(file: DocumentFileWithPreview): void {
+        this.selectedFile.set(file);
+        if (file.preview) {
+            this.previewUrl.set(file.preview);
+        } else {
+            this.previewUrl.set(null);
+        }
+    }
 
     removeFile(): void {
         this.selectedFile.set(null);
@@ -217,9 +236,13 @@ export class DocumentsTemplateModalComponent {
         }
     }
 
-    isImageFile(file: File | null): boolean {
+    isImageFile(file: DocumentFileWithPreview | null): boolean {
         if (!file) return false;
-        return file && file.type ? file.type.startsWith('image/') : false;
+        return this.isImageType(file.type);
+    }
+
+    private isImageType(type: string): boolean {
+        return type.startsWith('image/');
     }
 
     formatFileSize(bytes: number | undefined): string {
@@ -228,6 +251,28 @@ export class DocumentsTemplateModalComponent {
         const sizes = ['B', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    downloadFile(): void {
+        const file = this.selectedFile();
+        if (!file || !file.dataUrl) {
+            this.toastService.error("Erro", "Arquivo não encontrado para download");
+            return;
+        }
+
+        try {
+            const link = document.createElement('a');
+            link.href = file.dataUrl;
+            link.download = file.name || 'download'; 
+            document.body.appendChild(link);
+
+            link.click();
+
+            document.body.removeChild(link);
+        } catch (error) {
+            console.error('Erro ao fazer download do arquivo:', error);
+            this.toastService.error("Erro", "Não foi possível baixar o arquivo");
+        }
     }
 
     onCancel(): void {

@@ -9,6 +9,7 @@ import { InputTextModule } from "primeng/inputtext";
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { FileUploadModule } from 'primeng/fileupload';
+import { TooltipModule } from "primeng/tooltip";
 
 @NgModule({
     declarations: [
@@ -22,7 +23,8 @@ import { FileUploadModule } from 'primeng/fileupload';
         InputTextModule,
         InputTextareaModule,
         MultiSelectModule,
-        FileUploadModule
+        FileUploadModule,
+        TooltipModule,
     ],
     exports: [
         DocumentsTemplateModalComponent,
