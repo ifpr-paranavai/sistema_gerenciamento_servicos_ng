@@ -16,6 +16,7 @@ import { ButtonModule } from "primeng/button";
 import { TableModule } from "primeng/table";
 import { TagModule } from "primeng/tag";
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { TooltipModule } from "primeng/tooltip";
 
 @NgModule({
     imports: [
@@ -28,7 +29,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
         ButtonModule,
         TableModule,
         TagModule,
-        ProgressSpinnerModule
+        ProgressSpinnerModule,
+        TooltipModule
     ],
     exports: [
         AppointmentModalComponent

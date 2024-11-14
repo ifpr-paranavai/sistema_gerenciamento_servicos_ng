@@ -50,7 +50,7 @@ export class AppointmentModalComponent implements OnInit {
     servicesDropdownOptions: WritableSignal<IDropdown[]> = signal([]);
     clientDropdownOptions: WritableSignal<IDropdown[]> = signal([]);
     providerDropdownOptions: WritableSignal<IDropdown[]> = signal([]);
-    selectedDocuments: { [key: number]: DocumentFile } = {};
+    selectedDocuments: WritableSignal<{ [key: number]: DocumentFile }> = signal({});
     services: ServiceResponse[] = [];
     selectedService: ServiceResponse | null = null;
     providerAppointments: { [key: string]: IProvider } = {};
@@ -188,7 +188,7 @@ export class AppointmentModalComponent implements OnInit {
         if (!appointment) {
             return;
         }
-
+    
         this.isEdit.set(true);
         if (appointment.services && appointment.services.length > 0) {
             const service = appointment.services[0];
@@ -198,12 +198,19 @@ export class AppointmentModalComponent implements OnInit {
                 this.initializeDocuments(service.document_requirements);
             }
         }
-
+    
+        // Resetar os documentos antes de carregar os novos
+        this.selectedDocuments.set({});
+    
         if (appointment.documents) {
+            // Criar um objeto temporário para acumular todos os documentos
+            const newDocuments: { [key: number]: DocumentFile } = {};
+    
             appointment.documents.forEach(doc => {
                 const requirement = this.selectedService?.document_requirements.find(
                     req => req.document_template.file_types.includes(doc.file_type)
                 );
+                
                 if (!requirement) return;
                 
                 const documentFile: DocumentFile = {
@@ -213,13 +220,17 @@ export class AppointmentModalComponent implements OnInit {
                     type: `application/${doc.file_type}`,
                     dataUrl: doc.file_content
                 };
-                this.selectedDocuments[requirement.id] = documentFile;
+    
+                newDocuments[requirement.id] = documentFile;
             });
+    
+            // Atualizar o Signal com todos os documentos de uma vez
+            this.selectedDocuments.set(newDocuments);
         }
-
+    
         this.appointmentFg.patchValue({
             id: appointment.id,
-            serviceSelected:{
+            serviceSelected: {
                 label: appointment.services[0]?.name || '',
                 value: appointment.services[0]?.id || ''
             },
@@ -235,16 +246,14 @@ export class AppointmentModalComponent implements OnInit {
             },
             status: appointment.status as AppointmentStatusEnum,
             appointmentDate: new Date(appointment.appointment_date),
-            observation: appointment.observation,
-            documents: Object.fromEntries(
-                Object.entries(this.selectedDocuments).map(([key, docFile]) => [key, new File([docFile.dataUrl], docFile.name, { type: docFile.type })])
-            )
+            observation: appointment.observation
         });
     }
 
     getFormDataValue(): FormData {
         const formData = new FormData();
         
+        // Dados básicos do agendamento
         formData.append('id', (this.appointmentFg.get('id')?.value || '').toString());
         formData.append('services', this.appointmentFg.get('serviceSelected')?.value?.value?.toString() || '');
         formData.append('client', this.appointmentFg.get('client')?.value?.value?.toString() || '');
@@ -254,72 +263,113 @@ export class AppointmentModalComponent implements OnInit {
         const appointmentDate = this.appointmentFg.get('appointmentDate')?.value;
         formData.append('appointment_date', appointmentDate ? appointmentDate.toISOString() : '');
         
-        console.log('Documentos selecionados:', this.selectedDocuments);
+        // Obter valor atual do Signal de documentos
+        const selectedDocs = this.selectedDocuments();
         
-        for (const [requirementId, documentFile] of Object.entries(this.selectedDocuments)) {
-            console.log(`Processando documento ${requirementId}:`, documentFile);
-            
-            if (documentFile instanceof File) {
-                console.log('Anexando arquivo direto:', documentFile);
-                formData.append(`document_requirement_${requirementId}`, documentFile);
-            } else {
-                const file = documentFile as unknown as DocumentFile;
-                const byteString = atob(file.dataUrl.split(',')[1]);
-                const ab = new ArrayBuffer(byteString.length);
-                const ia = new Uint8Array(ab);
-                for (let i = 0; i < byteString.length; i++) {
-                    ia[i] = byteString.charCodeAt(i);
+        // Processar documentos
+        for (const [requirementId, documentFile] of Object.entries(selectedDocs)) {
+            if (!documentFile) continue;
+    
+            try {
+                if (documentFile instanceof File) {
+                    formData.append(`document_requirement_${requirementId}`, documentFile);
+                } else {
+                    // Se o documentFile é do tipo DocumentFile
+                    const { dataUrl, type, name } = documentFile;
+                    
+                    // Verificar se o dataUrl é válido
+                    if (!dataUrl || !dataUrl.includes('base64,')) {
+                        console.error(`DataUrl inválido para o documento ${requirementId}`);
+                        continue;
+                    }
+    
+                    // Extrair a parte base64 do dataUrl
+                    const base64Data = dataUrl.split('base64,')[1];
+                    if (!base64Data) {
+                        console.error(`Dados base64 inválidos para o documento ${requirementId}`);
+                        continue;
+                    }
+    
+                    // Converter base64 para Blob
+                    const byteString = atob(base64Data);
+                    const ab = new ArrayBuffer(byteString.length);
+                    const ia = new Uint8Array(ab);
+                    
+                    for (let i = 0; i < byteString.length; i++) {
+                        ia[i] = byteString.charCodeAt(i);
+                    }
+                    
+                    const blob = new Blob([ab], { type });
+                    const file = new File([blob], name, { type });
+                    
+                    formData.append(`document_requirement_${requirementId}`, file);
                 }
-                const blob = new Blob([ab], { type: file.type });
-                const newFile = new File([blob], file.name, { type: file.type });
-                
-                console.log('Anexando arquivo convertido:', newFile);
-                formData.append(`document_requirement_${requirementId}`, newFile);
+            } catch (error) {
+                console.error(`Erro ao processar documento ${requirementId}:`, error);
+                this.toastService.error(
+                    'Erro', 
+                    `Não foi possível processar o documento ${name}. Por favor, tente anexá-lo novamente.`
+                );
             }
         }
-    
-        formData.forEach((value, key) => {
-            console.log(`FormData contém: ${key}:`, value);
-        });
-    
+        
         return formData;
     }
 
     onSubmit(): void {
         if (this.loading()) return;
-
+    
         if (this.appointmentFg.invalid) {
             this.toastService.error("Atenção", "Preencha todos os campos obrigatórios.");
             this.appointmentFg.markAllAsTouched();
             return;
         }
-
+    
         const appointmentDate = this.appointmentFg.get('appointmentDate')?.value;
         if (appointmentDate) {
             const availability = this.checkDateAvailability(appointmentDate);
             if (availability.hasConflict) {
                 let errorMessage = 'Horário indisponível:\n';
-                availability.conflictingAppointments?.forEach(conflict => {
-                    if (conflict.service.includes('Fora do horário') || conflict.service.includes('Não atendemos')) {
-                        errorMessage += `${conflict.service}\n`;
-                    } else {
-                        errorMessage += `Conflito com agendamento existente: ${conflict.start} - ${conflict.end} (${conflict.service})\n`;
-                    }
-                });
+                
+                if (availability.conflictingAppointments && availability.conflictingAppointments.length > 0) {
+                    availability.conflictingAppointments.forEach(conflict => {
+                        if (!conflict) return;
+                        
+                        if (conflict.service && (
+                            conflict.service.includes('Fora do horário') || 
+                            conflict.service.includes('Não atendemos')
+                        )) {
+                            errorMessage += `${conflict.service}\n`;
+                        } else if (conflict.start && conflict.end && conflict.service) {
+                            errorMessage += `Conflito com agendamento existente: ${conflict.start} - ${conflict.end} (${conflict.service})\n`;
+                        }
+                    });
+                } else {
+                    errorMessage += 'Conflito de horário detectado.';
+                }
                 
                 this.toastService.error("Erro", errorMessage);
                 return;
             }
         }
-
-        const payload: FormData = this.getFormDataValue();
-
-        if (this.isEdit()) {
-            this.updateAppointment(payload);
-            return;
+    
+        try {
+            const payload: FormData = this.getFormDataValue();
+    
+            if (this.isEdit()) {
+                this.updateAppointment(payload);
+                return;
+            }
+            
+            this.createAppointment(payload);
+        } catch (error) {
+            console.error('Erro ao processar formulário:', error);
+            this.toastService.error(
+                "Erro", 
+                "Ocorreu um erro ao processar o formulário. Por favor, verifique os dados e tente novamente."
+            );
+            this.loading.set(false);
         }
-        
-        this.createAppointment(payload);
     }
 
     createAppointment(formData: FormData): void {
@@ -375,7 +425,7 @@ export class AppointmentModalComponent implements OnInit {
         this.appointmentFg.reset();
         this.appointmentFg.get('documents')?.clearValidators();
         this.appointmentFg.get('documents')?.updateValueAndValidity();
-        this.selectedDocuments = {};        
+        this.selectedDocuments.set({});      
         this.selectedService = null;
         this.appointmentFg.markAsUntouched();
         this.appointmentFg.markAsPristine();
@@ -417,59 +467,97 @@ export class AppointmentModalComponent implements OnInit {
     }
 
     checkDateAvailability(date: Date): IDateConflict {
-        if (!this.selectedProvider || !this.selectedService?.duration ) {
+        if (!this.selectedProvider || !this.selectedService?.duration) {
             return { hasConflict: false };
         }
     
-        const proposedStart = new Date(date);
-        const proposedEnd = new Date(proposedStart.getTime() + (this.selectedService?.duration || 0 ) * 60000);
-        const conflicts: { start: string; end: string; service: string }[] = [];
+        try {
+            const proposedStart = new Date(date);
+            const proposedEnd = new Date(proposedStart.getTime() + (this.selectedService.duration * 60000));
+            const conflicts: { start: string; end: string; service: string }[] = [];
     
-        const hour = proposedStart.getHours();
-        if (hour < 8 || hour >= 18) {
-            return {
-                hasConflict: true,
-                conflictingAppointments: [{
-                    start: proposedStart.toLocaleTimeString(),
-                    end: proposedEnd.toLocaleTimeString(),
-                    service: 'Fora do horário comercial (8h às 18h)'
-                }]
-            };
-        }
+            // Verificar horário comercial
+            const hour = proposedStart.getHours();
+            if (hour < 8 || hour >= 18) {
+                return {
+                    hasConflict: true,
+                    conflictingAppointments: [{
+                        start: this.formatTime(proposedStart),
+                        end: this.formatTime(proposedEnd),
+                        service: 'Fora do horário comercial (8h às 18h)'
+                    }]
+                };
+            }
     
-        const day = proposedStart.getDay();
-        if (day === 0 || day === 6) {
-            return {
-                hasConflict: true,
-                conflictingAppointments: [{
-                    start: proposedStart.toLocaleDateString(),
-                    end: proposedStart.toLocaleDateString(),
-                    service: 'Não atendemos aos finais de semana'
-                }]
-            };
-        }
+            // Verificar dias da semana
+            const day = proposedStart.getDay();
+            if (day === 0 || day === 6) {
+                return {
+                    hasConflict: true,
+                    conflictingAppointments: [{
+                        start: this.formatDate(proposedStart),
+                        end: this.formatDate(proposedStart),
+                        service: 'Não atendemos aos finais de semana'
+                    }]
+                };
+            }
     
-        this.selectedProvider.appointments?.forEach(app => {
-            const appointmentStart = new Date(app.start);
-            const appointmentEnd = new Date(app.end);
+            // Verificar conflitos com outros agendamentos
+            if (this.selectedProvider.appointments) {
+                this.selectedProvider.appointments.forEach(app => {
+                    if (!app.start || !app.end || !app.service) return;
     
-            if (
-                (proposedStart >= appointmentStart && proposedStart < appointmentEnd) ||
-                (proposedEnd > appointmentStart && proposedEnd <= appointmentEnd) ||
-                (proposedStart <= appointmentStart && proposedEnd >= appointmentEnd)
-            ) {
-                conflicts.push({
-                    start: appointmentStart.toLocaleTimeString(),
-                    end: appointmentEnd.toLocaleTimeString(),
-                    service: app.service
+                    const appointmentStart = new Date(app.start);
+                    const appointmentEnd = new Date(app.end);
+    
+                    if (
+                        (proposedStart >= appointmentStart && proposedStart < appointmentEnd) ||
+                        (proposedEnd > appointmentStart && proposedEnd <= appointmentEnd) ||
+                        (proposedStart <= appointmentStart && proposedEnd >= appointmentEnd)
+                    ) {
+                        conflicts.push({
+                            start: this.formatTime(appointmentStart),
+                            end: this.formatTime(appointmentEnd),
+                            service: app.service
+                        });
+                    }
                 });
             }
-        });
     
-        return {
-            hasConflict: conflicts.length > 0,
-            conflictingAppointments: conflicts
-        };
+            return {
+                hasConflict: conflicts.length > 0,
+                conflictingAppointments: conflicts
+            };
+        } catch (error) {
+            console.error('Erro ao verificar disponibilidade:', error);
+            return {
+                hasConflict: true,
+                conflictingAppointments: [{
+                    start: '',
+                    end: '',
+                    service: 'Erro ao verificar disponibilidade'
+                }]
+            };
+        }
+    }
+
+    private formatTime(date: Date): string {
+        try {
+            return date.toLocaleTimeString('pt-BR', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        } catch {
+            return '';
+        }
+    }
+    
+    private formatDate(date: Date): string {
+        try {
+            return date.toLocaleDateString('pt-BR');
+        } catch {
+            return '';
+        }
     }
 
     private getServicesOptions(): Observable<ServiceResponse[]> {
@@ -497,7 +585,7 @@ export class AppointmentModalComponent implements OnInit {
 
     reset(): void {
         this.appointmentFg.reset();
-        this.selectedDocuments = {};
+        this.selectedDocuments.set({});
         this.selectedService = null;
         this.isEdit.set(false);
     }
@@ -508,7 +596,7 @@ export class AppointmentModalComponent implements OnInit {
         
         if (!serviceSelected) {
             this.selectedService = null;
-            this.selectedDocuments = {};
+            this.selectedDocuments.set({});
             return;
         }
 
@@ -528,7 +616,7 @@ export class AppointmentModalComponent implements OnInit {
     }
 
     private resetDocumentValidations(): void {
-        this.selectedDocuments = {};
+        this.selectedDocuments.set({});
         
         const documentsControl = this.appointmentFg.get('documents');
         if (documentsControl) {
@@ -538,6 +626,7 @@ export class AppointmentModalComponent implements OnInit {
         
         this.appointmentFg.patchValue({ documents: null });
     }
+
 
     triggerFileInput(elementId: string): void {
         const element = document.getElementById(elementId) as HTMLInputElement;
@@ -549,7 +638,7 @@ export class AppointmentModalComponent implements OnInit {
     onFileSelect(event: any, requirementId: number): void {
         const file = event.target.files[0];
         if (!file) return;
-    
+
         const requirement = this.selectedService?.document_requirements
             .find(req => req.id === requirementId);
         
@@ -557,34 +646,59 @@ export class AppointmentModalComponent implements OnInit {
             this.toastService.error('Erro', 'Requisito não encontrado');
             return;
         }
-    
+
         try {
             const allowedTypes = requirement.document_template.file_types;
             const fileExtension = file.name.split('.').pop()?.toLowerCase();
             
             if (!fileExtension || !allowedTypes.includes(fileExtension)) {
-                this.toastService.error('Erro', `Tipos aceitos: ${allowedTypes.join(', ')}`);
-                return;
-            }
-    
-            const maxSize = 5 * 1024 * 1024; // 5MB
-            if (file.size > maxSize) {
-                this.toastService.error('Erro', 'Arquivo muito grande. Máximo: 5MB');
+                this.toastService.error(
+                    'Tipo de arquivo não permitido', 
+                    `Tipos aceitos: ${allowedTypes.join(', ')}`
+                );
                 return;
             }
 
-            this.selectedDocuments[requirementId] = file;
-            console.log(`Arquivo armazenado para requisito ${requirementId}:`, file);
-    
-            const currentFiles = this.appointmentFg.get('documents')?.value || {};
-            currentFiles[requirementId] = file;
-            this.appointmentFg.patchValue({ documents: currentFiles });
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            if (file.size > maxSize) {
+                this.toastService.error(
+                    'Arquivo muito grande', 
+                    'O tamanho máximo permitido é 5MB'
+                );
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e: ProgressEvent<FileReader>) => {
+                if (!e.target?.result) return;
+
+                const documentFile: DocumentFile = {
+                    lastModified: file.lastModified,
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    dataUrl: e.target.result as string
+                };
+                
+                // Atualiza o Signal com o novo documento
+                this.selectedDocuments.update(docs => ({
+                    ...docs,
+                    [requirementId]: documentFile
+                }));
+
+                // Atualiza o FormControl com o arquivo original
+                const currentFiles = this.appointmentFg.get('documents')?.value || {};
+                currentFiles[requirementId] = file;
+                this.appointmentFg.patchValue({ documents: currentFiles });
+                
+                this.toastService.success('Sucesso', 'Documento anexado com sucesso!');
+            };
             
-            this.toastService.success('Sucesso', 'Documento anexado!');
+            reader.readAsDataURL(file);
             
         } catch (error) {
             console.error('Erro ao processar arquivo:', error);
-            this.toastService.error('Erro', 'Erro ao processar arquivo');
+            this.toastService.error('Erro', 'Erro ao processar o arquivo');
         }
     }
     
@@ -597,7 +711,7 @@ export class AppointmentModalComponent implements OnInit {
                 .filter(req => req.is_required)
                 .map(req => {
                     return (control: AbstractControl) => {
-                        return this.selectedDocuments[req.id] ? null : { 
+                        return this.selectedDocuments()[req.id]? null : { 
                             required: {
                                 documentName: req.document_template.name
                             }
@@ -646,7 +760,7 @@ export class AppointmentModalComponent implements OnInit {
     
     downloadUploadedDocument(requirementId: number): void {
         try {
-            const file = this.selectedDocuments[requirementId];
+            const file = this.selectedDocuments()[requirementId];
             if (!file) {
                 this.toastService.error('Erro', 'Nenhum arquivo encontrado');
                 return;
@@ -667,6 +781,33 @@ export class AppointmentModalComponent implements OnInit {
         } catch (error) {
             console.error('Erro ao baixar documento:', error);
             this.toastService.error('Erro', 'Não foi possível baixar o documento');
+        }
+    }
+
+    removeDocument(requirementId: number): void {
+        try {
+            // Atualiza o Signal removendo o documento
+            this.selectedDocuments.update(docs => {
+                const newDocs = { ...docs };
+                delete newDocs[requirementId];
+                return newDocs;
+            });
+            
+            // Atualiza o FormControl
+            const currentFiles = this.appointmentFg.get('documents')?.value || {};
+            delete currentFiles[requirementId];
+            this.appointmentFg.patchValue({ documents: currentFiles });
+            
+            // Limpa o input file
+            const fileInput = document.getElementById(`doc-${requirementId}`) as HTMLInputElement;
+            if (fileInput) {
+                fileInput.value = '';
+            }
+            
+            this.toastService.info('Informação', 'Documento removido com sucesso');
+        } catch (error) {
+            console.error('Erro ao remover documento:', error);
+            this.toastService.error('Erro', 'Não foi possível remover o documento');
         }
     }
 }

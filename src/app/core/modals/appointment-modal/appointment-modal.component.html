@@ -139,69 +139,110 @@
                 <div class="surface-card p-4 border-round">
                     <div class="text-xl font-medium mb-4">Documentos Necessários</div>
                     <p-table [value]="selectedService?.document_requirements ?? []"
+                            styleClass="p-datatable-sm"
                             [tableStyle]="{'min-width': '50rem'}">
                         <ng-template pTemplate="header">
                             <tr>
-                                <th>Documento</th>
-                                <th>Descrição</th>
-                                <th>Tipo</th>
-                                <th>Template</th>
-                                <th>Arquivo</th>
-                                <th>Status</th>
+                                <th class="w-4">Documento</th>
+                                <th class="w-4">Descrição</th>
+                                <th class="w-2">Template</th>
+                                <th class="w-3">Arquivo</th>
+                                <th class="w-2 text-center">Status</th>
                             </tr>
                         </ng-template>
                         <ng-template pTemplate="body" let-req>
                             <tr>
                                 <td>
-                                    <span class="font-medium">{{ req.document_template.name }}</span>
-                                    <span class="text-red-500 ml-1" *ngIf="req.is_required">*</span>
+                                    <div class="flex align-items-center">
+                                        <span class="font-medium">{{ req.document_template.name }}</span>
+                                        <span class="text-red-500 ml-1" *ngIf="req.is_required">*</span>
+                                        <i class="pi pi-info-circle text-primary ml-2" 
+                                        pTooltip="Tipos de arquivo aceitos: {{ req.document_template.file_types }}"
+                                        tooltipPosition="right"></i>
+                                    </div>
                                 </td>
-                                <td>{{ req.document_template.description }}</td>
-                                <td>{{ req.document_template.file_types }}</td>
                                 <td>
+                                    <span class="text-color-secondary">{{ req.document_template.description }}</span>
+                                </td>
+                                <td class="text-center">
                                     <button pButton 
                                             type="button"
                                             icon="pi pi-download"
+                                            pTooltip="Baixar modelo do documento"
+                                            tooltipPosition="top"
                                             (click)="downloadTemplate(req.document_template.id)"
-                                            [label]="'Template'"
-                                            class="p-button-outlined p-button-info">
+                                            class="p-button-rounded p-button-outlined p-button-info">
                                     </button>
                                 </td>
                                 <td>
                                     <div class="flex align-items-center gap-2">
+                                        <!-- Input file oculto -->
                                         <input type="file" 
-                                               [id]="'doc-' + req.id"
-                                               (change)="onFileSelect($event, req.id)"
-                                               [accept]="req.document_template.file_types"
-                                               class="hidden">
-                                        <button pButton 
-                                                type="button"
-                                                [icon]="selectedDocuments[req.id] ? 'pi pi-check' : 'pi pi-upload'"
-                                                [label]="selectedDocuments[req.id]? selectedDocuments[req.id].name : 'Selecionar'"
-                                                (click)="triggerFileInput('doc-' + req.id)"
-                                                [class]="selectedDocuments[req.id] ? 'p-button-success' : 'p-button-outlined'">
-                                        </button>
-                                        <button *ngIf="selectedDocuments[req.id]"
-                                                pButton 
-                                                type="button"
-                                                icon="pi pi-download"
-                                                (click)="downloadUploadedDocument(req.id)"
-                                                class="p-button-outlined p-button-secondary">
-                                        </button>
+                                            [id]="'doc-' + req.id"
+                                            (change)="onFileSelect($event, req.id)"
+                                            [accept]="req.document_template.file_types"
+                                            class="hidden">
+                                        
+                                        <!-- Container para o arquivo -->
+                                        <div class="w-full" *ngIf="selectedDocuments()[req.id]; else uploadButton">
+                                            <div class="flex align-items-center justify-content-between surface-100 border-round p-2">
+                                                <div class="flex align-items-center gap-2">
+                                                    <i class="pi pi-file text-primary"></i>
+                                                    <span class="text-sm">{{ selectedDocuments()[req.id].name }}</span>
+                                                </div>
+                                                <div class="flex gap-2 p-2">
+                                                    <button pButton 
+                                                            type="button"
+                                                            icon="pi pi-download"
+                                                            pTooltip="Baixar arquivo"
+                                                            tooltipPosition="top"
+                                                            (click)="downloadUploadedDocument(req.id)"
+                                                            class="p-button-rounded p-button-outlined p-button-secondary p-button-sm">
+                                                    </button>
+                                                    <button pButton 
+                                                            type="button"
+                                                            icon="pi pi-times"
+                                                            pTooltip="Remover arquivo"
+                                                            tooltipPosition="top"
+                                                            (click)="removeDocument(req.id)"
+                                                            class="p-button-rounded p-button-outlined p-button-danger p-button-sm">
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Template para botão de upload -->
+                                        <ng-template #uploadButton>
+                                            <button pButton 
+                                                    type="button"
+                                                    icon="pi pi-upload"
+                                                    label="Selecionar arquivo"
+                                                    pTooltip="Clique para selecionar um arquivo"
+                                                    tooltipPosition="top"
+                                                    (click)="triggerFileInput('doc-' + req.id)"
+                                                    class="p-button-outlined p-button-secondary w-full">
+                                            </button>
+                                        </ng-template>
                                     </div>
                                 </td>
-                                <td>
-                                    <p-tag *ngIf="selectedDocuments[req.id]" 
-                                          severity="success" 
-                                          value="Anexado">
+                                <td class="text-center">
+                                    <p-tag *ngIf="selectedDocuments()[req.id]" 
+                                        severity="success" 
+                                        [value]="'Anexado'"
+                                        [pTooltip]="'Documento anexado com sucesso'"
+                                        tooltipPosition="top">
                                     </p-tag>
-                                    <p-tag *ngIf="!selectedDocuments[req.id] && req.is_required" 
-                                          severity="danger" 
-                                          value="Pendente">
+                                    <p-tag *ngIf="!selectedDocuments()[req.id] && req.is_required" 
+                                        severity="danger" 
+                                        [value]="'Pendente'"
+                                        [pTooltip]="'Este documento é obrigatório'"
+                                        tooltipPosition="top">
                                     </p-tag>
-                                    <p-tag *ngIf="!selectedDocuments[req.id] && !req.is_required" 
-                                          severity="warning" 
-                                          value="Opcional">
+                                    <p-tag *ngIf="!selectedDocuments()[req.id] && !req.is_required" 
+                                        severity="warning" 
+                                        [value]="'Opcional'"
+                                        [pTooltip]="'Este documento é opcional'"
+                                        tooltipPosition="top">
                                     </p-tag>
                                 </td>
                             </tr>
