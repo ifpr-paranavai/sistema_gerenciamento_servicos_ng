@@ -6,11 +6,13 @@ import { catchError, switchMap, take, throwError } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 import { cpfValidator } from "../../validators/cpf.validator";
 import { IEditUserPayload } from "../../interfaces/edit-user-payload.interface";
+import { ICountryStates } from "../../interfaces/country-states.interface";
+import { CountryStatesConstants } from "../../constants/country-states.constants";
 
 interface ProfileModalFg {
     name: FormControl<string | null>;
-    email: FormControl<string | null>; 
-    cpf: FormControl<string | null>; 
+    email: FormControl<string | null>;
+    cpf: FormControl<string | null>;
     profile_picture: FormControl<string | null>;
     street: FormControl<string | null>;
     number: FormControl<string | null>;
@@ -40,7 +42,9 @@ export class ProfileModalComponent {
         state: new FormControl(null),
         zip_code: new FormControl(null),
     });
-    
+
+    coutryStatesOptions: ICountryStates[] = CountryStatesConstants;
+
     constructor(
         private readonly toastService: ToastService,
         private readonly authenticationRequest: AuthenticationRequest,
@@ -77,12 +81,18 @@ export class ProfileModalComponent {
                 street: user.profile?.street,
                 number: user.profile?.number,
                 city: user.profile?.city,
-                state: user.profile?.state,
+                state: this.setStateOption(user.profile?.state ?? ""),
                 zip_code: user.profile?.zip_code,
             });
 
             console.log(this.profileFg.value);
         });
+    }
+
+    setStateOption(state: string): string {
+        if (!state) return "";
+
+        return this.coutryStatesOptions.find(option => option.uf === state)?.uf ?? "";
     }
 
     openDialog(): void {
@@ -118,7 +128,7 @@ export class ProfileModalComponent {
         this.authenticationRequest.updateUserById("xpt", payload).pipe(
             take(1)
         ).subscribe();
-        
+
         console.log(payload);
     }
 }

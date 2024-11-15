@@ -2,9 +2,11 @@
     <div>
         <sgs-sidebar></sgs-sidebar>
     </div>
-    <div (click)="openProfileModal()">
-        <i class="icon-spin pi pi-cog"></i>
-    </div>
+    <ng-container *ngIf="userPermissions.includes(frontPermissions.CAN_UPDATE_PROFILE)">
+        <div (click)="openProfileModal()">
+            <i class="icon-spin pi pi-cog"></i>
+        </div>
+    </ng-container>
 </div>
 
 <sgs-profile-modal #profileModal></sgs-profile-modal>

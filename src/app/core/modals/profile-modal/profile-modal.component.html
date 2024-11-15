@@ -1,66 +1,111 @@
-<p-dialog 
-    header="Meu Perfil" 
-    [modal]="true" 
-    [draggable]="false" 
-    [(visible)]="visible" 
-    [style]="{width: '800px'}"
-    [closeOnEscape]="true" 
-    [closable]="true">
+<p-dialog header="Meu Perfil"
+          [modal]="true"
+          [draggable]="false"
+          [(visible)]="visible"
+          [style]="{width: '800px'}"
+          [closeOnEscape]="true"
+          [closable]="true">
     <div class="profile-wrapper">
         <div class="user-image">
             <img src="{{ profileFg.controls.profile_picture.value ?? '/assets/images/svg/sgs-logo.svg' }}" />
         </div>
-        <form 
-            [formGroup]="profileFg">
+        <form [formGroup]="profileFg">
             <div class="profile-wrapper__info">
                 <div class="field mb-4">
                     <label for="name">Nome</label>
-                    <input type="text" pInputText id="name" formControlName="name" class="w-full" />
+                    <input type="text"
+                           pInputText
+                           id="name"
+                           formControlName="name"
+                           class="w-full" />
                     <small *ngIf="profileFg.controls.name?.errors?.['required'] && profileFg.controls.name?.touched"
-                        class="text-red-500">
+                           class="text-red-500">
                         Nome é obrigatório
                     </small>
                 </div>
                 <div class="field mb-4">
                     <label for="cpf">CPF</label>
-                    <input type="text" pInputText id="cpf" formControlName="cpf" class="w-full" />
-                    <small *ngIf="profileFg.controls.cpf?.errors?.['required'] && profileFg.controls.cpf?.touched" class="text-red-500">
+                    <input type="text"
+                           pInputText
+                           id="cpf"
+                           formControlName="cpf"
+                           class="w-full" />
+                    <small *ngIf="profileFg.controls.cpf?.errors?.['required'] && profileFg.controls.cpf?.touched"
+                           class="text-red-500">
                         CPF é obrigatório
                     </small>
                 </div>
                 <div class="field mb-4">
                     <label for="email">Email</label>
-                    <input type="text" pInputText id="email" formControlName="email" class="w-full" />
-                    <small *ngIf="profileFg.controls.email?.errors?.['required'] && profileFg.controls.email?.touched" class="text-red-500">
+                    <input type="text"
+                           pInputText
+                           id="email"
+                           formControlName="email"
+                           class="w-full" />
+                    <small *ngIf="profileFg.controls.email?.errors?.['required'] && profileFg.controls.email?.touched"
+                           class="text-red-500">
                         Email é obrigatório
                     </small>
                 </div>
                 <div class="field mb-4">
                     <label for="street">Rua</label>
-                    <input type="text" pInputText id="street" formControlName="street" class="w-full" />
+                    <input type="text"
+                           pInputText
+                           id="street"
+                           formControlName="street"
+                           class="w-full" />
                 </div>
                 <div class="field mb-4">
                     <label for="number">Número</label>
-                    <input type="text" pInputText id="number" formControlName="number" class="w-full" />
+                    <input type="text"
+                           pInputText
+                           id="number"
+                           formControlName="number"
+                           class="w-full" />
                 </div>
                 <div class="field mb-4">
                     <label for="city">Cidade</label>
-                    <input type="text" pInputText id="city" formControlName="city" class="w-full" />
+                    <input type="text"
+                           pInputText
+                           id="city"
+                           formControlName="city"
+                           class="w-full" />
                 </div>
-                <div class="field mb-4">
+                <div class="field mb-4 flex flex-column">
                     <label for="state">Estado</label>
-                    <input type="text" pInputText id="state" formControlName="state" class="w-full" />
+                    <p-dropdown id="state"
+                                styleClass="w-full"
+                                appendTo="body"
+                                [options]="coutryStatesOptions"
+                                optionLabel="name"
+                                optionValue="uf"
+                                formControlName="state"
+                                placeholder="Selecione um estado">
+                    </p-dropdown>
                 </div>
                 <div class="field mb-4">
                     <label for="zip_code">CEP</label>
-                    <input type="text" pInputText id="zip_code" formControlName="zip_code" class="w-full" />
+                    <input type="text"
+                           pInputText
+                           id="zip_code"
+                           formControlName="zip_code"
+                           class="w-full" />
                 </div>
             </div>
         </form>
         <div class="w-full flex justify-content-between gap-2">
-            <button pButton type="button" label="Cancelar" class="p-button-outlined" (click)="closeDialog()">
+            <button pButton
+                    type="button"
+                    label="Cancelar"
+                    class="p-button-outlined"
+                    (click)="closeDialog()">
             </button>
-            <button pButton type="button" label="Salvar" [loading]="loading()" class="p-button-primary" (click)="onSubmit()">
+            <button pButton
+                    type="button"
+                    label="Salvar"
+                    [loading]="loading()"
+                    class="p-button-primary"
+                    (click)="onSubmit()">
             </button>
         </div>
     </div>

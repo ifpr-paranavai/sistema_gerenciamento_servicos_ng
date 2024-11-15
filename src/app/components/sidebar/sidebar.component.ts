@@ -5,6 +5,9 @@ import { Router } from "@angular/router";
 import { AuthenticationRequest } from "../../core/requests/authentication/authentication.request";
 import { take } from "rxjs";
 import { IUser } from "../../core/interfaces/user.interface";
+import { UserPermissionsState } from "../../core/abstractions/user-permissions.state";
+import { IFeature } from "../../core/interfaces/feature.interface";
+import { FrontPermissionsConstants } from "../../core/constants/front-permissions.constants";
 
 @Component({
     selector: 'sgs-sidebar',
@@ -19,22 +22,32 @@ export class SidebarComponent implements OnInit {
 
     public sidebarVisible: WritableSignal<boolean> = signal(false);
     public currentUser: WritableSignal<IUser | null> = signal(null);
+    public userPermissions: WritableSignal<string[]> = signal([]);
+    frontPermissions = FrontPermissionsConstants;
 
     constructor(
         private router: Router,
         private authenticationService: AuthenticationRequest,
-    ) {}
+        private userPermissionsState: UserPermissionsState,
+    ) { }
 
     ngOnInit(): void {
         this.recoverUser();
+        this.recoverUserPermissions();
     }
 
     recoverUser(): void {
         this.authenticationService.currentUser.pipe(take(1)).subscribe((data) => {
             if (!data || !data.user) return;
             this.currentUser.set(data.user);
-            console.log(this.currentUser()?.profile);
         })
+    }
+
+    recoverUserPermissions(): void {
+        this.userPermissionsState.get$().pipe(take(1)).subscribe((data) => {
+            if (!data) return;
+            this.userPermissions.set(data);
+        });
     }
 
     closeCallback(e: any): void {
