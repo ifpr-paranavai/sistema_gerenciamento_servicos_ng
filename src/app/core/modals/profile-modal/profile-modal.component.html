@@ -6,9 +6,10 @@
           [closeOnEscape]="true"
           [closable]="true">
     <div class="profile-wrapper">
-        <div class="user-image">
-            <img src="{{ profileFg.controls.profile_picture.value ?? '/assets/images/svg/sgs-logo.svg' }}" />
+        <div class="user-image" (click)="triggerFileInput(fileInput)">
+            <img src="{{ profileFg.controls.profile_picture.value || '/assets/images/svg/sgs-logo.svg' }}" />
         </div>
+        <input type="file" #fileInput accept=".png,.jpg,.jpeg" style="display: none" (change)="onFileSelected($event)" />
         <form [formGroup]="profileFg">
             <div class="profile-wrapper__info">
                 <div class="field mb-4">

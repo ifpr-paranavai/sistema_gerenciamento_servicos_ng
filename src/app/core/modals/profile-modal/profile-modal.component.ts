@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, signal, WritableSignal } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, signal, WritableSignal } from "@angular/core";
 import { ToastService } from "../../requests/toastr/toast.service";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { AuthenticationRequest } from "../../requests/authentication/authentication.request";
-import { catchError, switchMap, take, throwError } from "rxjs";
+import { catchError, finalize, switchMap, take, throwError } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 import { cpfValidator } from "../../validators/cpf.validator";
 import { IEditUserPayload } from "../../interfaces/edit-user-payload.interface";
@@ -50,6 +50,7 @@ export class ProfileModalComponent {
     constructor(
         private readonly toastService: ToastService,
         private readonly authenticationRequest: AuthenticationRequest,
+        private readonly cdr: ChangeDetectorRef,
     ) {}
 
     recoverUser(): void {
@@ -88,8 +89,6 @@ export class ProfileModalComponent {
                 state: this.setStateOption(user.profile?.state ?? ""),
                 zip_code: user.profile?.zip_code,
             });
-
-            console.log(this.profileFg.value);
         });
     }
 
@@ -129,12 +128,53 @@ export class ProfileModalComponent {
             zip_code: this.profileFg.controls.zip_code.value,
         };
 
-        this.authenticationRequest.updateUserById(this.userId!, payload).pipe(
+        this.authenticationRequest.updateUserById(this.userId!, payload)
+        .pipe(
             take(1),
             catchError((error: HttpErrorResponse) => {
                 this.toastService.error("Erro", "Erro ao atualizar dados");
                 return throwError(() => error)
             }),
+            finalize(() => this.toastService.success("", "Usuário atualizado!")),
         ).subscribe();
+    }
+
+    triggerFileInput(fileInput: HTMLInputElement): void {
+        fileInput.click();
+    }
+
+    onFileSelected(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        if (!input.files || input.files.length === 0) {
+            this.toastService.error("Erro", "Nenhuma imagem foi selecionada.");
+            return;
+        }
+
+        const file = input.files[0];
+
+        const validFormats = ['image/png', 'image/jpeg', 'image/jpg'];
+        if (!validFormats.includes(file.type)) {
+            this.toastService.error("Erro", "Formato inválido. Permitidos: PNG, JPG, JPEG.");
+            return;
+        }
+
+        const SIZE_3MB = 3 * 1024 * 1024
+
+        if (file.size > SIZE_3MB) {
+            this.toastService.error("Erro", "A imagem deve ter no máximo 3MB.");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            const base64String = reader.result as string;
+            this.profileFg.controls.profile_picture.setValue(base64String);
+            this.cdr.detectChanges();
+        };
+        reader.onerror = () => {
+            this.toastService.error("Erro", "Erro ao carregar a imagem.");
+        };
+
+        reader.readAsDataURL(file);
     }
 }
