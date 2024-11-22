@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, signal, WritableSignal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, signal, WritableSignal } from "@angular/core";
 import { ToastService } from "../../requests/toastr/toast.service";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { AuthenticationRequest } from "../../requests/authentication/authentication.request";
@@ -43,6 +43,8 @@ export class ProfileModalComponent {
         zip_code: new FormControl(null),
     });
 
+    userId?: string;
+
     coutryStatesOptions: ICountryStates[] = CountryStatesConstants;
 
     constructor(
@@ -58,6 +60,8 @@ export class ProfileModalComponent {
                     this.toastService.error("Atenção", "Usuário não encontrado.");
                     throw new Error("User not found!");
                 }
+
+                this.userId = dataUser.user.id;
 
                 return this.authenticationRequest.getUserById(dataUser.user.id).pipe(
                     catchError((error: HttpErrorResponse) => {
@@ -125,10 +129,12 @@ export class ProfileModalComponent {
             zip_code: this.profileFg.controls.zip_code.value,
         };
 
-        this.authenticationRequest.updateUserById("xpt", payload).pipe(
-            take(1)
+        this.authenticationRequest.updateUserById(this.userId!, payload).pipe(
+            take(1),
+            catchError((error: HttpErrorResponse) => {
+                this.toastService.error("Erro", "Erro ao atualizar dados");
+                return throwError(() => error)
+            }),
         ).subscribe();
-
-        console.log(payload);
     }
 }
