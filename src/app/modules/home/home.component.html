@@ -1,9 +1,85 @@
-<div class="construction-container">
-    <img 
-        src="/assets/images/svg/construction.svg" 
-        alt="Em construção" 
-        class="construction-image">
-    <h1 class="construction-text">
-        Em construção
-    </h1>
-</div>
+<div class="grid">
+    <!-- Filtro de período -->
+    <div class="col-12 mb-3">
+      <div class="flex justify-content-end">
+        <form [formGroup]="filterForm">
+          <p-calendar 
+            formControlName="dateRange"
+            selectionMode="range"
+            [showButtonBar]="true"
+            [readonlyInput]="true"
+            placeholder="Filtrar por período">
+          </p-calendar>
+        </form>
+      </div>
+    </div>
+  
+    <!-- Total Revenue -->
+    <div class="col-12 md:col-6 lg:col-3">
+      <p-card styleClass="mb-3">
+        <div class="flex flex-column align-items-center">
+          <h3>Ganhos Totais</h3>
+          <span class="text-yellow-500 text-4xl font-bold">
+            {{ totalRevenue() | currency:'BRL' }}
+          </span>
+        </div>
+      </p-card>
+    </div>
+  
+    <!-- Service Chart -->
+    <div class="col-12 md:col-6 lg:col-9">
+      <p-card styleClass="mb-3">
+        <h3>Valor por Serviço</h3>
+        <div class="chart-container">
+          <p-chart type="bar" 
+                   [data]="chartData()" 
+                   [options]="chartOptions()">
+          </p-chart>
+        </div>
+      </p-card>
+    </div>
+  
+    <!-- Current Appointments -->
+    <div class="col-12 lg:col-6">
+      <p-card styleClass="mb-3">
+        <ng-template pTemplate="header">
+          <h3>Agendamentos em Andamento</h3>
+        </ng-template>
+        <div class="grid">
+          <div *ngFor="let appointment of currentAppointments()" 
+               class="col-12 md:col-6">
+            <p-card styleClass="appointment-card mb-3">
+              <div class="flex flex-column">
+                <span class="font-bold text-lg">{{appointment.serviceName}}</span>
+                <span class="text-500">{{appointment.clientName}}</span>
+                <span class="text-sm">{{appointment.date | date:'short'}}</span>
+              </div>
+            </p-card>
+          </div>
+        </div>
+      </p-card>
+    </div>
+  
+    <!-- Upcoming Appointments -->
+    <div class="col-12 lg:col-6">
+      <p-card>
+        <ng-template pTemplate="header">
+          <h3>Próximos Agendamentos</h3>
+        </ng-template>
+        <div class="flex flex-column gap-3">
+          <p-message 
+            *ngFor="let appointment of upcomingAppointments()"
+            [severity]="appointment.status === 'SCHEDULED' ? 'warning' : 'error'"
+            [styleClass]="'w-full'"
+            [text]="appointment.serviceName + ' - ' + appointment.clientName">
+            <ng-template pTemplate="icon">
+              <i class="pi pi-calendar mr-2"></i>
+            </ng-template>
+            <ng-template pTemplate="content">
+              <small class="block mt-1">{{appointment.date | date:'short'}}</small>
+            </ng-template>
+          </p-message>
+        </div>
+      </p-card>
+    </div>
+  </div>
