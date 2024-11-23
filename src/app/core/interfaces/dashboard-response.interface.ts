@@ -6,9 +6,11 @@ export interface IDashboardResponse {
 }
 
 export interface IServiceStats {
-  serviceId: number;
   serviceName: string;
   totalValue: number;
+  quantity: number;
+  averageValue: number;
+  date: string | Date;
 }
 
 export interface IAppointmentStats {
@@ -18,4 +20,10 @@ export interface IAppointmentStats {
   date: string;
   value: number;
   status: 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+}
+
+export interface IServiceMonthlyData {
+  [serviceName: string]: {
+    [month: string]: number;
+  };
 }
