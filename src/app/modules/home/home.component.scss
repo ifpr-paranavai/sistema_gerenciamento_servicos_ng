@@ -1,28 +1,84 @@
-.construction-container {
+:host ::ng-deep {
+    .p-card {
+        height: 100%;
+
+        .p-card-body {
+            height: calc(100% - 4rem); // Ajuste conforme necessário
+            display: flex;
+            flex-direction: column;
+        }
+    }
+
+    .p-message {
+        margin-bottom: 0.5rem;
+    }
+
+    .chart-container {
+        position: relative;
+        margin: auto;
+        height: 40vh;
+
+        canvas {
+            height: 40vh !important;
+        }
+    }
+
+    .table-container {
+        flex: 1;
+
+        .p-datatable {
+            height: 100%;
+        }
+    }
+
+    .appointments-container {
+        scrollbar-width: thin;
+        scrollbar-color: var(--primary-color) var(--surface-ground);
+
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: var(--surface-ground);
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+    }
+
+    // Responsividade para dispositivos móveis
+    @media screen and (max-width: 768px) {
+        .chart-container {
+            min-height: 250px;
+        }
+
+        .appointments-container {
+            max-height: 250px !important;
+        }
+    }
+}
+
+.appointment-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+}
+
+
+.grid {
+    margin: 0;
+}
+
+.chart-card {
+    height: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    text-align: center;
-}
-
-.construction-image {
-    width: 70vh;
-    margin-bottom: 20px;
-}
-
-.construction-text {
-    font-size: 2rem;
-    color: #3b82f6;
-}
-
-@media (max-width: 600px) {
-    .construction-text {
-        font-size: 1.5rem;
-    }
-
-    .construction-image {
-        max-width: 200px;
-    }
+    position: relative;
 }

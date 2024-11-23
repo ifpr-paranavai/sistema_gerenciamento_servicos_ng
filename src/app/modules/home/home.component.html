@@ -1,9 +1,115 @@
-<div class="construction-container">
-    <img 
-        src="/assets/images/svg/construction.svg" 
-        alt="Em construção" 
-        class="construction-image">
-    <h1 class="construction-text">
-        Em construção
-    </h1>
+<div class="grid">
+	<!-- Filtro de período e Toggle View -->
+	<div class="col-12 mb-3">
+		<div class="flex justify-content-between align-items-center">
+			<p-selectButton [options]="viewOptions" [(ngModel)]="currentView" optionLabel="label" optionValue="value">
+			</p-selectButton>
+
+			<form [formGroup]="filterForm">
+				<p-calendar formControlName="dateRange" selectionMode="range" [showButtonBar]="true"
+					[readonlyInput]="true" placeholder="Filtrar por período">
+				</p-calendar>
+			</form>
+		</div>
+	</div>
+
+	<!-- Total Revenue -->
+	<div class="col-12 md:col-6 lg:col-3">
+		<p-card styleClass="h-full">
+			<div class="flex flex-column align-items-center">
+				<h3>Ganhos Totais</h3>
+				<span class="text-primary text-4xl font-bold">
+					{{ totalRevenue() | currency:'BRL' }}
+				</span>
+			</div>
+		</p-card>
+	</div>
+
+	<!-- Service Data -->
+	<div class="col-12 md:col-6 lg:col-9">
+		<p-card styleClass="chart-card h-full">
+			<div class="flex justify-content-between align-items-center mb-3">
+				<h3 class="m-0">Valor por Serviço</h3>
+			</div>
+
+			<!-- Chart View -->
+			<div *ngIf="currentView === 'chart'" class="chart-container">
+				<p-chart type="bar" 
+						[data]="chartData()" 
+						[options]="chartOptions()"
+						>
+				</p-chart>
+			</div>
+
+			<!-- Table View -->
+			<div *ngIf="currentView === 'table'" class="table-container">
+				<p-table [value]="serviceStats()" [scrollable]="true" [scrollHeight]="'300px'"
+					[scrollDirection]="'both'" styleClass="p-datatable-sm">
+					<ng-template pTemplate="header">
+						<tr>
+							<th>Serviço</th>
+							<th>Quantidade</th>
+							<th>Valor Total</th>
+							<th>Média por Serviço</th>
+						</tr>
+					</ng-template>
+					<ng-template pTemplate="body" let-service>
+						<tr>
+							<td>{{service.serviceName}}</td>
+							<td>{{service.quantity}}</td>
+							<td>{{service.totalValue | currency:'BRL'}}</td>
+							<td>{{service.averageValue | currency:'BRL'}}</td>
+						</tr>
+					</ng-template>
+				</p-table>
+			</div>
+		</p-card>
+	</div>
+
+	<!-- Current Appointments -->
+	<div class="col-12 lg:col-6">
+		<p-card styleClass="h-full p-3">
+			<ng-template pTemplate="header">
+				<div class="flex justify-content-between align-items-center">
+					<h3 class="m-0">Agendamentos em Andamento</h3>
+				</div>
+			</ng-template>
+			<div class="appointments-container">
+				<div class="grid" [style.maxHeight.px]="300" [style.overflow-y]="'auto'">
+					<div *ngFor="let appointment of currentAppointments()" class="col-12 md:col-6">
+						<p-card styleClass="appointment-card mb-3">
+							<div class="flex flex-column">
+								<span class="font-bold text-lg">{{appointment.serviceName}}</span>
+								<span class="text-500">{{appointment.clientName}}</span>
+								<span class="text-sm">{{appointment.date | date:'short'}}</span>
+							</div>
+						</p-card>
+					</div>
+				</div>
+			</div>
+		</p-card>
+	</div>
+
+	<!-- Upcoming Appointments -->
+	<div class="col-12 lg:col-6">
+		<p-card styleClass="h-full p-3">
+			<ng-template pTemplate="header">
+				<div class="flex justify-content-between align-items-center">
+					<h3 class="m-0">Próximos Agendamentos</h3>
+				</div>
+			</ng-template>
+			<div class="appointments-container" [style.maxHeight.px]="300" [style.overflow-y]="'auto'">
+				<p-message *ngFor="let appointment of upcomingAppointments()"
+					[severity]="appointment.status === 'SCHEDULED' ? 'warning' : 'error'" [styleClass]="'w-full mb-2'"
+					[text]="appointment.serviceName + ' - ' + appointment.clientName">
+					<ng-template pTemplate="icon">
+						<i class="pi pi-calendar mr-2"></i>
+					</ng-template>
+					<ng-template pTemplate="content">
+						<small class="block mt-1">{{appointment.date | date:'short'}}</small>
+					</ng-template>
+				</p-message>
+			</div>
+		</p-card>
+	</div>
 </div>
