@@ -8,6 +8,9 @@ import { cpfValidator } from "../../validators/cpf.validator";
 import { IEditUserPayload } from "../../interfaces/edit-user-payload.interface";
 import { ICountryStates } from "../../interfaces/country-states.interface";
 import { CountryStatesConstants } from "../../constants/country-states.constants";
+import { UserState } from "../../abstractions/user.state";
+import { IAuthResponse } from "../../interfaces/auth-response.interface";
+import { IUser } from "../../interfaces/user.interface";
 
 interface ProfileModalFg {
     name: FormControl<string | null>;
@@ -51,6 +54,7 @@ export class ProfileModalComponent {
         private readonly toastService: ToastService,
         private readonly authenticationRequest: AuthenticationRequest,
         private readonly cdr: ChangeDetectorRef,
+        private readonly userState: UserState,
     ) {}
 
     recoverUser(): void {
@@ -136,7 +140,22 @@ export class ProfileModalComponent {
                 return throwError(() => error)
             }),
             finalize(() => this.toastService.success("", "Usuário atualizado!")),
-        ).subscribe();
+        ).subscribe(user => {
+            this.updateUserLocalStorage(user);
+            this.userState.update(user);
+            this.cdr.detectChanges();
+        });
+    }
+
+    updateUserLocalStorage(user: IUser): void {
+        this.authenticationRequest.currentUser.pipe(take(1)).subscribe(data => {
+            if (!data) throw new Error("User not found");
+
+            this.authenticationRequest.setUserLocalStorage({
+                ...data,
+                user: user
+            });
+        });
     }
 
     triggerFileInput(fileInput: HTMLInputElement): void {

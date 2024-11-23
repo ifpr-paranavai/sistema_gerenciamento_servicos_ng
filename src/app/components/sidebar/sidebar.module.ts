@@ -7,6 +7,7 @@ import { AvatarGroupModule } from 'primeng/avatargroup';
 import { StyleClassModule } from 'primeng/styleclass';
 import { RippleModule } from 'primeng/ripple';
 import { RouterModule } from "@angular/router";
+import { UserState } from "../../core/abstractions/user.state";
 
 
 @NgModule({
@@ -21,5 +22,6 @@ import { RouterModule } from "@angular/router";
         RippleModule,
         RouterModule
     ],
+    providers: [UserState]
 })
 export class SidebarModule {}

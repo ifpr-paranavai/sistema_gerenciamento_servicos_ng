@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, ViewChild, WritableSignal, signal } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, ViewChild, WritableSignal, signal } from "@angular/core";
 import { Sidebar } from "primeng/sidebar";
 import { RoutesConstants } from "../../core/constants/routes.constants";
 import { Router } from "@angular/router";
@@ -8,6 +8,8 @@ import { IUser } from "../../core/interfaces/user.interface";
 import { UserPermissionsState } from "../../core/abstractions/user-permissions.state";
 import { IFeature } from "../../core/interfaces/feature.interface";
 import { FrontPermissionsConstants } from "../../core/constants/front-permissions.constants";
+import { UserState } from "../../core/abstractions/user.state";
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'sgs-sidebar',
@@ -29,17 +31,34 @@ export class SidebarComponent implements OnInit {
         private router: Router,
         private authenticationService: AuthenticationRequest,
         private userPermissionsState: UserPermissionsState,
+        private userState: UserState,
+        private destroyRef: DestroyRef,
+        private cdr: ChangeDetectorRef,
     ) { }
 
     ngOnInit(): void {
-        this.recoverUser();
         this.recoverUserPermissions();
+        this.recoverUserFromLocalStorage();
+        this.watchUserState();
     }
 
-    recoverUser(): void {
+    recoverUserFromLocalStorage(): void {
         this.authenticationService.currentUser.pipe(take(1)).subscribe((data) => {
             if (!data || !data.user) return;
             this.currentUser.set(data.user);
+            this.userState.update(data.user);
+            this.cdr.detectChanges();
+        });
+    }
+
+    watchUserState(): void {
+        this.userState.get$().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(user => {
+            if (!user) {
+                this.recoverUserFromLocalStorage();
+            };
+
+            this.currentUser.set(user);
+            this.cdr.detectChanges();
         })
     }
 
