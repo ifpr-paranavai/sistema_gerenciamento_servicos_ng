@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, effect, signal } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Subject, takeUntil } from 'rxjs';
+import { count, Subject, takeUntil } from 'rxjs';
 import { DashboardRequest } from '../../core/requests/dashboard/dashboard.request';
 import { IDashboardResponse, IServiceMonthlyData, IServiceStats } from '../../core/interfaces/dashboard-response.interface';
 import { ToastService } from '../../core/requests/toastr/toast.service';
@@ -46,7 +46,7 @@ export class HomeComponent implements OnInit, OnDestroy {
             }
         },
         layout: {
-            padding: 20
+            padding: 20,
         },
         scales: {
             y: {
@@ -138,10 +138,6 @@ export class HomeComponent implements OnInit, OnDestroy {
         return date;
     }
 
-    private getUniqueServices(): string[] {
-        return [...new Set(this.serviceStats().map(stat => stat.serviceName))];
-    }
-
     private formatMonth(date: Date): string {
         return date.toLocaleDateString('pt-BR', {
             year: 'numeric',
@@ -177,18 +173,14 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     private generateColors(count: number): string[] {
-        const baseColors = [
-            '#42A5F5', // primary blue
-            '#66BB6A', // success green
-            '#FFA726', // warning orange
-            '#EC407A', // pink
-            '#AB47BC', // purple
-            '#26A69A', // teal
-            '#7E57C2', // deep purple
-            '#8D6E63', // brown
-        ];
+        
 
-        return Array(count).fill(0).map((_, i) => baseColors[i % baseColors.length]);
+        return Array(count).fill(0).map((_, i) => {
+            const hue = Math.floor(Math.random() * 360);
+            const saturation = Math.floor(Math.random() * 100);
+            const lightness = Math.floor(Math.random() * 50) + 50;
+            return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+        });
     }
 
     private loadDashboardData(): void {
@@ -207,9 +199,9 @@ export class HomeComponent implements OnInit, OnDestroy {
                     error: (error) => {
                         console.error('Dashboard error:', error);
                         this.toastService.error(
-                            'Erro ao carregar dados do dashboard',
-                            'Tente novamente mais tarde'
-                        );
+                            error.error.detail || 'Erro inesperado',
+                            'Ocorreu um erro ao carregar os dados do dashboard'
+                        )
                     }
                 });
         } catch (error) {

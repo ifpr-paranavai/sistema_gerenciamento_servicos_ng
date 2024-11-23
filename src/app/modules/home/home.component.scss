@@ -14,13 +14,12 @@
     }
 
     .chart-container {
-        flex: 1;
-        min-height: 300px;
-        max-height: 400px;
         position: relative;
+        margin: auto;
+        height: 40vh;
 
         canvas {
-            height: 100% !important;
+            height: 40vh !important;
         }
     }
 
@@ -75,4 +74,11 @@
 
 .grid {
     margin: 0;
+}
+
+.chart-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
 }
