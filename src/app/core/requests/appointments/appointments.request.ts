@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { IAppointmentResponse } from '../../interfaces/appointment-response.interface';
+import { AppointmentStatusEnum } from '../../interfaces/appointment-status.interface';
 
 
 @Injectable({
@@ -32,6 +33,14 @@ export class AppointmentsRequest {
 
   deleteAppointment(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}${id}/`);
+  }
+
+  updateAppointmentStatus(id: string, status: AppointmentStatusEnum): Observable<IAppointmentResponse> {
+      // Removido a barra extra e corrigido o caminho
+      return this.http.patch<IAppointmentResponse>(
+          `${this.apiUrl}${id}/update_status/`,
+          { status }
+      );
   }
 
 }

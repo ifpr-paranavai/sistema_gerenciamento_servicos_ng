@@ -1,0 +1,39 @@
+// :host ::ng-deep {
+//     .p-button.p-button-icon-only {
+//         width: 2rem;
+//         height: 2rem;
+        
+//         .p-button-icon {
+//             font-size: 1rem;
+//         }
+//     }
+
+//     .p-menu {
+//         width: auto;
+//         min-width: 200px;
+        
+//         .p-menuitem {
+//             &:hover {
+//                 background: var(--surface-hover);
+//             }
+            
+//             .p-menuitem-link {
+//                 padding: 0.75rem 1rem;
+                
+//                 .p-menuitem-icon {
+//                     margin-right: 0.5rem;
+//                 }
+//             }
+//         }
+//     }
+
+//     .flex.gap-2 {
+//         gap: 0.5rem;
+//     }
+
+//     .status-menu-container {
+//         position: relative;
+//         display: inline-block;
+//     }
+// }
+

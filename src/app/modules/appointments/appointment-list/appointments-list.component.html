@@ -3,13 +3,14 @@
         <h3>Agendamentos</h3>
         <span>
             <p-button label="Novo agendamento"
-                icon="pi pi-plus"
-                iconPos="right"
-                size="small" 
-                (click)="openAppointmentModal()"    
+                     icon="pi pi-plus"
+                     iconPos="right"
+                     size="small" 
+                     (click)="openAppointmentModal()"    
             />
         </span>
     </div>
+
     <p-table [value]="appointments()"
              [columns]="appointmentsColumns"
              [tableStyle]="{'min-width': '50rem'}"
@@ -21,28 +22,29 @@
         <ng-template pTemplate="header">
             <tr>
                 <th *ngFor="let col of appointmentsColumns">{{col.header}}</th>
-                <th>Ações</th>
+                <th style="width: 8rem">Ações</th>
             </tr>
         </ng-template>
-        <ng-template pTemplate="body"
-                     let-appointment>
+        <ng-template pTemplate="body" let-appointment>
             <tr>
                 <td *ngFor="let col of appointmentsColumns">
                     <ng-container [ngSwitch]="col.type">
                         <ng-container *ngSwitchCase="'severity'">
                             <p-tag [value]="$any(appointment)[col.field]"
-                                   [severity]="$any(appointment).severity">
+                                  [severity]="$any(appointment).severity">
                             </p-tag>
                         </ng-container>
                         <ng-container *ngSwitchCase="'boolean'">
                             <p-checkbox [(ngModel)]="$any(appointment)[col.field]"
-                                        [binary]="true"
-                                        [disabled]="true"></p-checkbox>
+                                      [binary]="true"
+                                      [disabled]="true">
+                            </p-checkbox>
                         </ng-container>
                         <ng-container *ngSwitchCase="'rating'">
                             <p-rating [ngModel]="$any(appointment)[col.field]"
-                                      [readonly]="true"
-                                      [cancel]="false"></p-rating>
+                                    [readonly]="true"
+                                    [cancel]="false">
+                            </p-rating>
                         </ng-container>
                         <ng-container *ngSwitchDefault>
                             {{ getCellContent(appointment, col.field) }}
@@ -50,12 +52,32 @@
                     </ng-container>
                 </td>
                 <td>
-                    <p-button icon="pi pi-pencil"
-                              styleClass="p-button-rounded p-button-success mr-2"
-                              (onClick)="editAppointment(appointment)"></p-button>
-                    <p-button icon="pi pi-trash"
-                              styleClass="p-button-rounded p-button-danger"
-                              (onClick)="deleteAppointment(appointment)"></p-button>
+                    <div class="flex gap-2 justify-content-center">
+                        <!-- Botões de ação comuns -->
+                        <p-button icon="pi pi-pencil"
+                                 styleClass="p-button-rounded p-button-success"
+                                 (onClick)="editAppointment(appointment)">
+                        </p-button>
+                        
+                        <!-- Menu de Status (apenas para provider) -->
+                        <div *ngIf="isProvider()" class="status-menu-container">
+                            <p-menu [popup]="true"
+                                   [model]="getStatusActions(appointment)"
+                                   appendTo="body"
+                                   #menu>
+                            </p-menu>
+                            <p-button icon="pi pi-ellipsis-v"
+                                     styleClass="p-button-rounded p-button-info"
+                                     (onClick)="menu.toggle($event)">
+                            </p-button>
+                        </div>
+                        
+                        <!-- Botão de exclusão -->
+                        <p-button icon="pi pi-trash"
+                                 styleClass="p-button-rounded p-button-danger"
+                                 (onClick)="deleteAppointment(appointment)">
+                        </p-button>
+                    </div>
                 </td>
             </tr>
         </ng-template>

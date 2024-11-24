@@ -7,7 +7,7 @@ export interface IUser {
     name: string;
     password: string;
     cpf: string;
-    role: Role[] | number;
+    role: Role;
     features: IFeature[];
     profile?: IProfile | null;
 }

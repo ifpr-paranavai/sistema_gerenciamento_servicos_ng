@@ -11,6 +11,10 @@ import { AppointmentsRoutingModule } from "./appointment-routing.module";
 import { AppointmentComponent } from "./appointment.component";
 import { AppointmentsListComponent } from "./appointment-list/appointments-list.component";
 import { AppointmentModalModule } from "../../core/modals/appointment-modal/appointment-modal.module";
+import { SplitButtonModule } from 'primeng/splitbutton';
+import { CommonModule } from '@angular/common';
+import { MenuModule } from 'primeng/menu';
+
 
 @NgModule({
     imports: [
@@ -21,7 +25,11 @@ import { AppointmentModalModule } from "../../core/modals/appointment-modal/appo
         FormsModule,
         RatingModule,
         CheckboxModule,
-        AppointmentModalModule
+        AppointmentModalModule,
+        CommonModule,
+        ButtonModule,
+        SplitButtonModule,
+        MenuModule
     ],
     exports: [],
     declarations: [

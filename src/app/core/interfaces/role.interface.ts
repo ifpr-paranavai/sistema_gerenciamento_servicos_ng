@@ -4,4 +4,5 @@ export interface Role {
     name: string;
     description: string;
     features: IFeature[];
+    role_type: string;
 }
