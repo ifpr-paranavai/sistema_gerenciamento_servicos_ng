@@ -11,15 +11,29 @@
 
     .p-message {
         margin-bottom: 0.5rem;
+        
+        .p-message-wrapper {
+          padding: 1rem;
+        }
+    }
+
+    .appointment-message {
+        .gap-1 {
+            gap: 0.5rem;
+        }
+        
+        .text-primary {
+            color: var(--primary-color);
+        }
     }
 
     .chart-container {
         position: relative;
         margin: auto;
-        height: 40vh;
+        height: 30vh;
 
         canvas {
-            height: 40vh !important;
+            height: 30vh !important;
         }
     }
 
@@ -61,16 +75,57 @@
     }
 }
 
+
 .appointment-card {
-    transition: transform 0.2s, box-shadow 0.2s;
-    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent;
 
     &:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
+
+    &.success-card {
+        border-left-color: var(--green-500);
+        background-color: var(--green-50);
+    }
+
+    &.warning-card {
+        border-left-color: var(--yellow-500);
+        background-color: var(--yellow-50);
+    }
+
+    &.error-card {
+        border-left-color: var(--red-500);
+        background-color: var(--red-50);
+    }
 }
 
+.appointment-status {
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+
+    &.text-red-500 {
+        background-color: var(--red-50);
+    }
+
+    &.text-yellow-500 {
+        background-color: var(--yellow-50);
+    }
+
+    &.text-green-500 {
+        background-color: var(--green-50);
+    }
+}
+
+.gap-1 {
+    gap: 0.5rem;
+}
+
+.gap-2 {
+    gap: 1rem;
+}
 
 .grid {
     margin: 0;

@@ -4,6 +4,8 @@ import { count, Subject, takeUntil } from 'rxjs';
 import { DashboardRequest } from '../../core/requests/dashboard/dashboard.request';
 import { IDashboardResponse, IServiceMonthlyData, IServiceStats } from '../../core/interfaces/dashboard-response.interface';
 import { ToastService } from '../../core/requests/toastr/toast.service';
+import { formatDistance, isBefore, isWithinInterval, addDays } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 @Component({
     selector: 'app-home',
@@ -14,6 +16,7 @@ import { ToastService } from '../../core/requests/toastr/toast.service';
 export class HomeComponent implements OnInit, OnDestroy {
     private destroy$ = new Subject<void>();
 
+    now = new Date();
     filterForm: FormGroup;
     currentView: 'chart' | 'table' = 'chart';
 
@@ -173,7 +176,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     private generateColors(count: number): string[] {
-        
+
 
         return Array(count).fill(0).map((_, i) => {
             const hue = Math.floor(Math.random() * 360);
@@ -211,5 +214,71 @@ export class HomeComponent implements OnInit, OnDestroy {
                 'Ocorreu um erro ao processar os dados'
             );
         }
+    }
+
+    getAppointmentSeverity(appointment: any): 'success' | 'warning' | 'error' {
+        const appointmentDate = new Date(appointment.appointment_date);
+        const oneDayBefore = addDays(appointmentDate, -1);
+        const now = this.now;
+
+        if (isBefore(appointmentDate, now)) {
+            return 'error';
+        }
+
+        if (isWithinInterval(now, {
+            start: oneDayBefore,
+            end: appointmentDate
+        })) {
+            return 'warning';
+        }
+
+        return 'success';
+    }
+
+    formatAppointmentDate(date: string | Date): string {
+        const appointmentDate = new Date(date);
+        return appointmentDate.toLocaleString('pt-BR', {
+            weekday: 'long',
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    getTimeStatus(date: string | Date): string {
+        const appointmentDate = new Date(date);
+        const now = this.now;
+
+        if (isBefore(appointmentDate, now)) {
+            return `Atrasado por ${formatDistance(appointmentDate, now, {
+                locale: ptBR,
+                addSuffix: false
+            })}`;
+        }
+
+        return `Em ${formatDistance(now, appointmentDate, {
+            locale: ptBR,
+            addSuffix: false
+        })}`;
+    }
+
+    getAppointmentValue(appointment: any): number {
+        return appointment.services?.reduce((total: number, service: any) =>
+            total + (service.cost || 0), 0) || 0;
+    }
+
+    getAppointmentCardClass(appointment: any): string {
+        const baseClass = 'appointment-card';
+        const severity = this.getAppointmentSeverity(appointment);
+        return `${baseClass} ${severity}-card`;
+    }
+
+    getStatusClass(appointment: any): string {
+        const severity = this.getAppointmentSeverity(appointment);
+        return severity === 'error' ? 'text-red-500' :
+            severity === 'warning' ? 'text-yellow-500' :
+                'text-green-500';
     }
 }

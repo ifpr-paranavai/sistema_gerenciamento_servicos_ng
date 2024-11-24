@@ -34,10 +34,7 @@
 
 			<!-- Chart View -->
 			<div *ngIf="currentView === 'chart'" class="chart-container">
-				<p-chart type="bar" 
-						[data]="chartData()" 
-						[options]="chartOptions()"
-						>
+				<p-chart type="bar" [data]="chartData()" [options]="chartOptions()">
 				</p-chart>
 			</div>
 
@@ -81,7 +78,11 @@
 							<div class="flex flex-column">
 								<span class="font-bold text-lg">{{appointment.serviceName}}</span>
 								<span class="text-500">{{appointment.clientName}}</span>
-								<span class="text-sm">{{appointment.date | date:'short'}}</span>
+								<span class="text-sm">Data:
+									{{formatAppointmentDate(appointment.appointment_date)}}</span>
+								<span class="text-sm text-primary font-semibold mt-2">
+									Valor: {{getAppointmentValue(appointment) | currency:'BRL'}}
+								</span>
 							</div>
 						</p-card>
 					</div>
@@ -99,16 +100,34 @@
 				</div>
 			</ng-template>
 			<div class="appointments-container" [style.maxHeight.px]="300" [style.overflow-y]="'auto'">
-				<p-message *ngFor="let appointment of upcomingAppointments()"
-					[severity]="appointment.status === 'SCHEDULED' ? 'warning' : 'error'" [styleClass]="'w-full mb-2'"
-					[text]="appointment.serviceName + ' - ' + appointment.clientName">
-					<ng-template pTemplate="icon">
-						<i class="pi pi-calendar mr-2"></i>
-					</ng-template>
-					<ng-template pTemplate="content">
-						<small class="block mt-1">{{appointment.date | date:'short'}}</small>
-					</ng-template>
-				</p-message>
+				<div *ngFor="let appointment of upcomingAppointments()" class="mb-2">
+					<p-card [styleClass]="getAppointmentCardClass(appointment)">
+						<div class="flex flex-column gap-2">
+							<!-- Título e Cliente -->
+							<div class="flex justify-content-between align-items-center">
+								<span class="font-semibold text-lg">{{appointment.serviceName}}</span>
+								<span class="text-500">Cliente: {{appointment.clientName}}</span>
+							</div>
+
+							<!-- Data e Status -->
+							<div class="flex flex-column gap-1">
+								<span class="text-sm">
+									Data: {{formatAppointmentDate(appointment.appointment_date)}}
+								</span>
+								<span class="text-sm" [ngClass]="getStatusClass(appointment)">
+									{{getTimeStatus(appointment.appointment_date)}}
+								</span>
+							</div>
+
+							<!-- Prestador e Status -->
+							<div class="flex justify-content-end align-items-center text-sm">
+								<span class="appointment-status" [ngClass]="getStatusClass(appointment)">
+									{{appointment.status}}
+								</span>
+							</div>
+						</div>
+					</p-card>
+				</div>
 			</div>
 		</p-card>
 	</div>

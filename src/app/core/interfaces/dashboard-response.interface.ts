@@ -19,7 +19,8 @@ export interface IAppointmentStats {
   clientName: string;
   date: string;
   value: number;
-  status: 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  appointment_date: string;
+  status: 'Agendado' | 'Em andamento' | 'Cancelado' | 'Concluido';
 }
 
 export interface IServiceMonthlyData {
