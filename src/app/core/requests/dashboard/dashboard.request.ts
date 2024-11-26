@@ -12,11 +12,11 @@ export class DashboardRequest {
 
   constructor(private http: HttpClient) { }
 
-  getDashboardStats(startDate?: Date, endDate?: Date): Observable<IDashboardResponse> {
+  getDashboardStats(startDate?: string, endDate?: string): Observable<IDashboardResponse> {
     let url = this.apiUrl + 'stats/';
-    
+
     if (startDate && endDate) {
-      url += `?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
+      url += `?startDate=${startDate}&endDate=${endDate}`;
     }
 
     return this.http.get<IDashboardResponse>(url);

@@ -1,11 +1,17 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, effect, signal } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { count, Subject, takeUntil } from 'rxjs';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, WritableSignal, computed, effect, signal } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { DashboardRequest } from '../../core/requests/dashboard/dashboard.request';
-import { IDashboardResponse, IServiceMonthlyData, IServiceStats } from '../../core/interfaces/dashboard-response.interface';
+import { IDashboardResponse, IServiceMonthlyData } from '../../core/interfaces/dashboard-response.interface';
 import { ToastService } from '../../core/requests/toastr/toast.service';
 import { formatDistance, isBefore, isWithinInterval, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { FrontPermissionsConstants } from '../../core/constants/front-permissions.constants';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DateUtil } from '../../core/utils/date.util';
+
+interface IFilterFormFg {
+    dateRange: FormControl<Date[] | null>;
+}
 
 @Component({
     selector: 'app-home',
@@ -13,11 +19,14 @@ import { ptBR } from 'date-fns/locale';
     styleUrls: ['./home.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class HomeComponent implements OnInit, OnDestroy {
-    private destroy$ = new Subject<void>();
+export class HomeComponent implements OnInit {
+    public userPermissions: WritableSignal<string[]> = signal([]);
+    frontPermissions = FrontPermissionsConstants;
 
     now = new Date();
-    filterForm: FormGroup;
+    filterForm: FormGroup<IFilterFormFg> = new FormGroup({
+        dateRange: new FormControl<Date[] | null>(null)
+    });
     currentView: 'chart' | 'table' = 'chart';
 
     viewOptions = [
@@ -151,33 +160,23 @@ export class HomeComponent implements OnInit, OnDestroy {
     constructor(
         private fb: FormBuilder,
         private dashboardRequest: DashboardRequest,
-        private toastService: ToastService
+        private toastService: ToastService,
+        private destroyRef: DestroyRef,
     ) {
-        this.filterForm = this.fb.group({
-            dateRange: [null]
-        });
-
         effect(() => {
             this.loadDashboardData();
         });
     }
 
     ngOnInit(): void {
-        this.filterForm.get('dateRange')?.valueChanges
-            .pipe(takeUntil(this.destroy$))
+        this.filterForm.controls.dateRange.valueChanges
+            .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe(() => {
                 this.loadDashboardData();
             });
     }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
-
     private generateColors(count: number): string[] {
-
-
         return Array(count).fill(0).map((_, i) => {
             const hue = Math.floor(Math.random() * 360);
             const saturation = Math.floor(Math.random() * 100);
@@ -187,33 +186,28 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     private loadDashboardData(): void {
-        try {
-            const dateRange = this.filterForm.get('dateRange')?.value;
-            const startDate = dateRange?.[0];
-            const endDate = dateRange?.[1];
+        const dateRange = this.filterForm.controls.dateRange.value;
+        const startDate = dateRange?.[0] || this.getDefaultStartDate();
+        const endDate = dateRange?.[1] || new Date();
 
-            this.dashboardRequest
-                .getDashboardStats(startDate, endDate)
-                .pipe(takeUntil(this.destroy$))
-                .subscribe({
-                    next: (data) => {
-                        this.dashboardData.set(data);
-                    },
-                    error: (error) => {
-                        console.error('Dashboard error:', error);
-                        this.toastService.error(
-                            error.error.detail || 'Erro inesperado',
-                            'Ocorreu um erro ao carregar os dados do dashboard'
-                        )
-                    }
-                });
-        } catch (error) {
-            console.error('Unexpected error:', error);
-            this.toastService.error(
-                'Erro inesperado',
-                'Ocorreu um erro ao processar os dados'
-            );
-        }
+        const formattedStartDate = DateUtil.formatDateToISO(startDate);
+        const formattedEndDate = DateUtil.formatDateToISO(endDate);
+
+        this.dashboardRequest
+            .getDashboardStats(formattedStartDate, formattedEndDate)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+                next: (data) => {
+                    this.dashboardData.set(data);
+                },
+                error: (error) => {
+                    console.error('Dashboard error:', error);
+                    this.toastService.error(
+                        error.error.detail || 'Erro inesperado',
+                        'Ocorreu um erro ao carregar os dados do dashboard'
+                    )
+                }
+            });
     }
 
     getAppointmentSeverity(appointment: any): 'success' | 'warning' | 'error' {
