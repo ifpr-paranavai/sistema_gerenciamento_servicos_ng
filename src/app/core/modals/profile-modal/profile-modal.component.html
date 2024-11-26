@@ -63,6 +63,10 @@
                            id="number"
                            formControlName="number"
                            class="w-full" />
+                    <small *ngIf="profileFg.controls.number?.invalid && profileFg.controls.number?.touched"
+                           class="text-red-500 text-xs">
+                        Número deve ser maior que 0.
+                    </small>
                 </div>
                 <div class="field mb-4">
                     <label for="city">Cidade</label>
@@ -91,6 +95,10 @@
                            id="zip_code"
                            formControlName="zip_code"
                            class="w-full" />
+                    <small *ngIf="profileFg.controls.zip_code?.invalid && profileFg.controls.zip_code?.touched || profileFg.controls.zip_code?.errors?.['invalidCep']"
+                           class="text-red-500 text-xs">
+                        CEP inválido.
+                    </small>
                 </div>
             </div>
         </form>

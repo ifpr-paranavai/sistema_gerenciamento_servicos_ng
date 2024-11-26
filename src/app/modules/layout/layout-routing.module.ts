@@ -50,6 +50,13 @@ const routes: Routes = [
                     ),
             },
             {
+                path: "messages",
+                loadChildren: () =>
+                    import("../message/message.module").then(
+                        (m) => m.MessageModule,
+                    ),
+            },
+            {
                 path: "**",
                 redirectTo: "home"
             }

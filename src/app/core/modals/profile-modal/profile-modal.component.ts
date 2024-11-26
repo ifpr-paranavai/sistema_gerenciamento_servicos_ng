@@ -9,8 +9,9 @@ import { IEditUserPayload } from "../../interfaces/edit-user-payload.interface";
 import { ICountryStates } from "../../interfaces/country-states.interface";
 import { CountryStatesConstants } from "../../constants/country-states.constants";
 import { UserState } from "../../abstractions/user.state";
-import { IAuthResponse } from "../../interfaces/auth-response.interface";
 import { IUser } from "../../interfaces/user.interface";
+import { positiveValueValidator } from "../../validators/cost.validator";
+import { cepValidator } from "../../validators/cep.validator";
 
 interface ProfileModalFg {
     name: FormControl<string | null>;
@@ -40,10 +41,10 @@ export class ProfileModalComponent {
         cpf: new FormControl(null, [Validators.required, cpfValidator, Validators.minLength(11), Validators.maxLength(11)]),
         profile_picture: new FormControl(null),
         street: new FormControl(null),
-        number: new FormControl(null),
+        number: new FormControl(null, [Validators.min(1)]),
         city: new FormControl(null),
         state: new FormControl(null),
-        zip_code: new FormControl(null),
+        zip_code: new FormControl(null, [cepValidator]),
     });
 
     userId?: string;

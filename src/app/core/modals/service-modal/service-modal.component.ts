@@ -5,7 +5,7 @@ import { ServiceRequest } from "../../requests/services/service.request";
 import { catchError, of, take } from "rxjs";
 import { IServiceOfferPayload } from "../../interfaces/service-offer.interface";
 import { IDocumentRequirement, ServiceResponse } from "../../interfaces/service-response.interface";
-import { costValueValidator } from "../../validators/cost.validator";
+import { positiveValueValidator } from "../../validators/cost.validator";
 import { IDocumentsTemplateResponse } from "../../interfaces/documents-template-response.interface";
 import { DocumentsTemplateRequest } from "../../requests/documents-template/documents-template.request";
 
@@ -32,7 +32,7 @@ export class ServiceModalComponent implements OnInit{
         id: new FormControl<number | null>(null),
         name: new FormControl<string | null>(null, [Validators.required]),
         description: new FormControl<string | null>(null, [Validators.required]),
-        cost: new FormControl<number | null>(null, [Validators.required, costValueValidator()]),
+        cost: new FormControl<number | null>(null, [Validators.required, positiveValueValidator()]),
         duration: new FormControl<number | null>(null, [Validators.required]),
         documentTemplates: new FormControl<IDocumentRequirement[] | null>(null)
     });
@@ -73,7 +73,7 @@ export class ServiceModalComponent implements OnInit{
     openDialog(service?: ServiceResponse): void {
         if (!service) {
             this.serviceFg.reset();
-            this.documentTemplates.update(templates => 
+            this.documentTemplates.update(templates =>
                 templates.map(template => ({
                     ...template,
                     selected: false,
@@ -85,7 +85,7 @@ export class ServiceModalComponent implements OnInit{
             return;
         }
 
-        
+
         this.serviceFg.patchValue({
             id: service.id,
             name: service.name,
@@ -93,8 +93,8 @@ export class ServiceModalComponent implements OnInit{
             cost: service.cost,
             duration: service.duration
         });
-        
-        this.documentTemplates.update(templates => 
+
+        this.documentTemplates.update(templates =>
             templates.map(template => {
                 const requirement = service.document_requirements.find(
                     req => req.document_template?.id === template.document_template?.id
@@ -106,7 +106,7 @@ export class ServiceModalComponent implements OnInit{
                 };
             })
         );
-            
+
         this.isEdit.set(true);
         this.visible.set(true);
     }
@@ -200,7 +200,7 @@ export class ServiceModalComponent implements OnInit{
                 selected: false,
                 required: false,
             })) as IDocumentRequirement[];
-            
+
             this.documentTemplates.set(templatesWithSelection);
         });
     }

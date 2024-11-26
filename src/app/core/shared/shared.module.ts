@@ -7,6 +7,7 @@ import { CurrencyFormatPipe } from "./pipes/currency.pipe";
 import { FloatLabelModule } from "primeng/floatlabel";
 import { InputNumberModule } from "primeng/inputnumber";
 import { InputTextModule } from "primeng/inputtext";
+import { InputMaskModule } from "primeng/inputmask";
 
 const exportedModules = [
     CommonModule,
@@ -16,6 +17,7 @@ const exportedModules = [
     InputTextModule,
     FloatLabelModule,
     InputNumberModule,
+    InputMaskModule,
 ];
 
 const exportedPipes = [
@@ -24,10 +26,7 @@ const exportedPipes = [
 ];
 
 @NgModule({
-    imports: [
-        ButtonModule,
-        CommonModule,
-    ],
+    imports: [],
     declarations: [
         ...exportedPipes
     ],
