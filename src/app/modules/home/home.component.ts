@@ -8,6 +8,8 @@ import { ptBR } from 'date-fns/locale';
 import { FrontPermissionsConstants } from '../../core/constants/front-permissions.constants';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DateUtil } from '../../core/utils/date.util';
+import { AuthenticationRequest } from '../../core/requests/authentication/authentication.request';
+import { IFeature } from '../../core/interfaces/feature.interface';
 
 interface IFilterFormFg {
     dateRange: FormControl<Date[] | null>;
@@ -104,6 +106,34 @@ export class HomeComponent implements OnInit {
         };
     });
 
+    constructor(
+        private dashboardRequest: DashboardRequest,
+        private toastService: ToastService,
+        private destroyRef: DestroyRef,
+        private authenticationRequest: AuthenticationRequest,
+    ) {
+        effect(() => {
+            this.loadDashboardData();
+        });
+    }
+
+    ngOnInit(): void {
+        this.recoverUserPermissions();
+        this.watchFilterForms();
+    }
+
+    private recoverUserPermissions(): void {
+        this.userPermissions.set(this.authenticationRequest.getUserFeatures().map((feature: IFeature) => feature.name));
+    }
+
+    private watchFilterForms(): void {
+        this.filterForm.controls.dateRange.valueChanges
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(() => {
+                this.loadDashboardData();
+            });
+    }
+
     private processServiceData(): IServiceMonthlyData {
         const monthlyData: IServiceMonthlyData = {};
 
@@ -155,25 +185,6 @@ export class HomeComponent implements OnInit {
             year: 'numeric',
             month: 'short'
         });
-    }
-
-    constructor(
-        private fb: FormBuilder,
-        private dashboardRequest: DashboardRequest,
-        private toastService: ToastService,
-        private destroyRef: DestroyRef,
-    ) {
-        effect(() => {
-            this.loadDashboardData();
-        });
-    }
-
-    ngOnInit(): void {
-        this.filterForm.controls.dateRange.valueChanges
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(() => {
-                this.loadDashboardData();
-            });
     }
 
     private generateColors(count: number): string[] {

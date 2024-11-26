@@ -3,7 +3,7 @@
         height: 100%;
 
         .p-card-body {
-            height: calc(100% - 4rem); // Ajuste conforme necessário
+            height: calc(100% - 4rem);
             display: flex;
             flex-direction: column;
         }
@@ -11,9 +11,9 @@
 
     .p-message {
         margin-bottom: 0.5rem;
-        
+
         .p-message-wrapper {
-          padding: 1rem;
+            padding: 1rem;
         }
     }
 
@@ -21,7 +21,7 @@
         .gap-1 {
             gap: 0.5rem;
         }
-        
+
         .text-primary {
             color: var(--primary-color);
         }
@@ -63,7 +63,6 @@
         }
     }
 
-    // Responsividade para dispositivos móveis
     @media screen and (max-width: 768px) {
         .chart-container {
             min-height: 250px;
@@ -74,7 +73,6 @@
         }
     }
 }
-
 
 .appointment-card {
     transition: all 0.2s ease;
@@ -136,4 +134,29 @@
     display: flex;
     flex-direction: column;
     position: relative;
+}
+
+.construction-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+}
+.construction-image {
+    width: 70vh;
+    margin-bottom: 20px;
+}
+.construction-text {
+    font-size: 2rem;
+    color: #3b82f6;
+}
+@media (max-width: 600px) {
+    .construction-text {
+        font-size: 1.5rem;
+    }
+    .construction-image {
+        max-width: 200px;
+    }
 }
