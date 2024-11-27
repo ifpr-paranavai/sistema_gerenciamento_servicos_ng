@@ -21,7 +21,20 @@ export class MessageComponent implements OnInit {
   searchTerm = '';
   filteredContacts = this.contacts;
   selectedContactId: number | null = null;
-  messages: { [key: number]: any[] } = {};
+  messages: { [key: number]: any[] } = {
+    1: [
+      { sender: 'Ana Maria', content: 'Olá! Como você está?', time: '10:00' },
+      { sender: 'Você', content: 'Estou bem, obrigado!', time: '10:05' }
+    ],
+    2: [
+      { sender: 'Carlos Silva', content: 'Enviou o relatório?', time: '09:00' },
+      { sender: 'Você', content: 'Sim, enviei ontem.', time: '09:10' }
+    ],
+    3: [
+      { sender: 'Beatriz Santos', content: 'Vai participar da reunião hoje?', time: '08:30' },
+      { sender: 'Você', content: 'Sim, confirmarei a presença.', time: '08:35' }
+    ]
+  };
   newMessage: string = '';
   showAddContactModal = false;
 
@@ -37,13 +50,14 @@ export class MessageComponent implements OnInit {
 
   sendMessage(): void {
     if (this.selectedContactId && this.newMessage.trim()) {
+      const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       if (!this.messages[this.selectedContactId]) {
         this.messages[this.selectedContactId] = [];
       }
       this.messages[this.selectedContactId].push({
         sender: 'Você',
         content: this.newMessage,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        time: currentTime
       });
       this.newMessage = '';
     }
@@ -76,9 +90,14 @@ export class MessageComponent implements OnInit {
     }
   }
 
+  getSelectedContact(): Contact | undefined {
+    return this.contacts.find(contact => contact.id === this.selectedContactId);
+  }  
+  
   getInitials(name: string): string {
     const names = name.split(' ');
     const initials = names.map((n) => n.charAt(0)).slice(0, 2);
-    return initials.join('');
+    return initials.join('').toUpperCase();
   }
+    
 }

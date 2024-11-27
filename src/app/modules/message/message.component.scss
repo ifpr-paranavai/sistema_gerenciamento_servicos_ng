@@ -70,12 +70,64 @@ body, html {
 }
 
 /* Lista de Contatos */
-.contacts-list li {
-  display: flex; /* Exibe imagem e texto lado a lado */
-  align-items: center; /* Centraliza verticalmente */
-  padding: 12px;
-  cursor: pointer;
-  border-bottom: 1px solid #eee;
+.contacts-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px; /* Aumenta o tamanho dos contatos */
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &.selected {
+      background-color: #e3f2fd; /* Fundo para o item selecionado */
+    }
+
+    &:hover {
+      background-color: #f9f9f9; /* Fundo ao passar o mouse */
+    }
+
+    img.contact-avatar,
+    .contact-placeholder {
+      width: 45px; /* Aumenta o tamanho do avatar */
+      height: 45px; /* Aumenta o tamanho do avatar */
+      border-radius: 50%; /* Forma circular */
+      margin-right: 15px; /* Espaçamento maior entre avatar e nome */
+      border: none; /* Remove a borda branca */
+      box-sizing: border-box; /* Garante que o padding não afeta o tamanho */
+    }
+
+    img.contact-avatar {
+      padding: 0; /* Remove o padding dos avatares com imagem */
+      background-color: transparent; /* Remove o fundo branco nos avatares */
+    }
+
+    .contact-placeholder {
+      background-color: #e0e0e0; /* Cor para o placeholder */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem; /* Aumenta o tamanho do texto */
+      font-weight: bold;
+      color: #666;
+      text-transform: uppercase;
+    }
+
+    .contact-name {
+      font-size: 1.1rem; /* Aumenta o tamanho do texto */
+      font-weight: bold;
+      color: #333;
+      line-height: 1; /* Alinhamento vertical */
+    }
+  }
+}
+
+/* Adiciona espaçamento entre a barra de pesquisa e os contatos */
+.search-bar {
+  margin-bottom: 15px; /* Espaço entre a barra de pesquisa e os contatos */
 }
 
 .contacts-list li.selected {
@@ -138,12 +190,59 @@ body, html {
 
 .chat-header {
   display: flex;
-  align-items: center; /* Centraliza verticalmente */
-  height: 60px; /* Mesma altura da sidebar-header */
-  padding: 0 1rem;
+  align-items: center;
+  background-color: #f1f1f1;
+  padding: 10px;
   border-bottom: 1px solid #ddd;
-  font-size: 1.2rem;
-  font-weight: bold;
+  height: 60px; /* Altura fixa para o cabeçalho */
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  /* Espaço fixo para o avatar */
+  .header-avatar-container {
+    width: 50px; /* Tamanho fixo */
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #e0e0e0; /* Placeholder cinza */
+    flex-shrink: 0;
+  }
+
+  .header-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .header-placeholder {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #666;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Texto ajustado ao espaço fixo */
+  .header-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    margin-left: 15px; /* Espaçamento fixo do avatar */
+    white-space: nowrap; /* Evita quebra de linha */
+    overflow: hidden; /* Caso o texto seja muito longo */
+    text-overflow: ellipsis; /* Adiciona "..." ao final do texto longo */
+  }
 }
 
 /* Conteúdo do Chat */
@@ -157,26 +256,43 @@ body, html {
   flex: 1;
   padding: 1rem;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .chat-messages .message {
-  max-width: 60%;
+  max-width: 70%;
   margin: 8px 0;
-  padding: 10px;
+  padding: 10px 15px;
   border-radius: 8px;
   font-size: 0.9rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+  position: relative;
 }
 
+/* Estilo para mensagens enviadas por você (à esquerda) */
 .chat-messages .sent {
-  align-self: flex-end;
-  background-color: #1976d2; /* Azul escuro */
-  color: white;
+  align-self: flex-start; /* Alinha à esquerda */
+  background-color: #f4f4f4; /* Fundo cinza claro */
+  color: #333; /* Texto escuro */
+  border: 1px solid #ddd; /* Borda leve */
 }
 
+/* Estilo para mensagens recebidas (à direita) */
 .chat-messages .received {
-  align-self: flex-start;
-  background-color: #f4f4f4; /* Cinza claro */
-  color: #333;
+  align-self: flex-end; /* Alinha à direita */
+  background-color: #f4f4f4; /* Fundo cinza claro */
+  color: #333; /* Texto escuro */
+}
+
+/* Exibe o horário no canto inferior direito da mensagem */
+.chat-messages .message small {
+  display: block;
+  font-size: 0.8rem;
+  color: #666; /* Cinza claro */
+  text-align: right;
+  margin-top: 5px;
 }
 
 /* Input de Mensagens */

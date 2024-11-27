@@ -18,35 +18,54 @@
         (click)="selectContact(contact.id)"
         [class.selected]="selectedContactId === contact.id"
       >
-        <div class="contact-avatar-container">
-          <img
-            *ngIf="contact.avatar"
-            [src]="contact.avatar"
-            [alt]="contact.name"
-            class="contact-avatar"
-            (error)="contact.avatar = null"
-          />
-          <div *ngIf="!contact.avatar" class="contact-placeholder">
-            {{ getInitials(contact.name) }}
-          </div>
+        <!-- Avatar ou placeholder -->
+        <img
+          *ngIf="contact.avatar"
+          [src]="contact.avatar"
+          [alt]="contact.name"
+          class="contact-avatar"
+        />
+        <div *ngIf="!contact.avatar" class="contact-placeholder">
+          {{ getInitials(contact.name) }}
         </div>
-        <h4>{{ contact.name }}</h4>
+    
+        <!-- Nome do contato -->
+        <span class="contact-name">{{ contact.name }}</span>
       </li>
-    </ul>
+    </ul>    
   </aside>
   <main class="chat-container">
     <header class="chat-header">
-      <h2>Selecione um contato</h2>
-    </header>
+      <div class="header-content">
+        <!-- Avatar só é exibido se um contato estiver selecionado -->
+        <div *ngIf="selectedContactId" class="header-avatar-container">
+          <img
+            *ngIf="getSelectedContact()?.avatar"
+            [src]="getSelectedContact()?.avatar"
+            [alt]="getSelectedContact()?.name"
+            class="header-avatar"
+          />
+          <div *ngIf="!getSelectedContact()?.avatar" class="header-placeholder">
+            {{ getInitials(getSelectedContact()?.name || '') }}
+          </div>
+        </div>
+    
+        <!-- Nome sempre exibido -->
+        <div class="header-name">
+          {{ getSelectedContact()?.name || 'Selecione um contato' }}
+        </div>
+      </div>
+    </header>    
     <div class="chat-content">
       <div class="chat-messages" *ngIf="selectedContactId; else noContactSelected">
         <div
           *ngFor="let message of messages[selectedContactId]"
-          [class.sent]="message.sender === 'Você'"
-          [class.received]="message.sender !== 'Você'"
+          [class.sent]="message.sender !== 'Você'"
+          [class.received]="message.sender === 'Você'"
           class="message"
         >
           <p>{{ message.content }}</p>
+          <small>{{ message.time }}</small>
         </div>
       </div>
       <footer class="chat-input" *ngIf="selectedContactId">
