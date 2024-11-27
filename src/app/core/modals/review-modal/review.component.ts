@@ -85,6 +85,7 @@ export class ReviewComponent implements OnInit {
             })
         ).subscribe({
             next: (response) => {
+                this.appointment.review = response;
                 this.toastService.success('Sucesso', 'Avaliação inicial salva com sucesso');
                 this.dialogVisible.set(true);
                 this.loading.set(false);
@@ -99,7 +100,9 @@ export class ReviewComponent implements OnInit {
 
         const reviewData = {
             rating: this.reviewForm.get('rating')?.value,
-            comment: this.reviewForm.get('comment')?.value
+            comment: this.reviewForm.get('comment')?.value,
+            appointment: this.appointment.id,
+            user: this.authRequest.currentUserValue?.user.id,
         };
 
         const request$ = this.appointment.review

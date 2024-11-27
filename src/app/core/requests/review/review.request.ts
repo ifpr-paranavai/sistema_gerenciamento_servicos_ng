@@ -4,18 +4,18 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class ReviewService {
-  private apiUrl = `${environment.baseUrl}/v1/appointment/reviews/`;
+    private apiUrl = `${environment.baseUrl}/v1/appointment/reviews/`;
 
-  constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient) { }
 
-  createReview(data: any): Observable<any> {
-    return this.http.post(this.apiUrl, data);
-  }
+    createReview(data: any): Observable<any> {
+        return this.http.post(this.apiUrl, data);
+    }
 
-  updateReview(id: string, data: any): Observable<any> {
-    return this.http.patch(`${this.apiUrl}${id}`, data);
-  }
+    updateReview(id: string, data: any): Observable<any> {
+        return this.http.put(`${this.apiUrl}${id}/`, data);
+    }
 }
