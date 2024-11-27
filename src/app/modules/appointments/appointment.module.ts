@@ -14,6 +14,7 @@ import { AppointmentModalModule } from "../../core/modals/appointment-modal/appo
 import { SplitButtonModule } from 'primeng/splitbutton';
 import { CommonModule } from '@angular/common';
 import { MenuModule } from 'primeng/menu';
+import { ReviewModule } from "../../core/modals/review-modal/review.module";
 
 
 @NgModule({
@@ -29,7 +30,8 @@ import { MenuModule } from 'primeng/menu';
         CommonModule,
         ButtonModule,
         SplitButtonModule,
-        MenuModule
+        MenuModule,
+        ReviewModule
     ],
     exports: [],
     declarations: [

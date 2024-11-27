@@ -16,6 +16,7 @@ export interface IAppointmentResponse {
     rating: number;
     severety?: PrimeNgSeverity;
     documents?: IDocument[];
+    review?: IReview;
 }
 
 export interface IDocument {
@@ -26,4 +27,14 @@ export interface IDocument {
     file_size: number;
     created_at?: string;
     updated_at?: string;
+}
+
+
+export interface IReview {
+    id: string;
+    rating: number;
+    comment: string;
+    appointment: string;
+    created_at: string;
+    updated_at: string;
 }
