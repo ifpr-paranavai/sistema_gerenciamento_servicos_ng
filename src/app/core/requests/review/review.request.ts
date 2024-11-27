@@ -7,7 +7,7 @@ import { environment } from '../../../../environments/environment';
   providedIn: 'root'
 })
 export class ReviewService {
-  private apiUrl = `${environment.baseUrl}/reviews`;
+  private apiUrl = `${environment.baseUrl}/v1/appointment/reviews/`;
 
   constructor(private http: HttpClient) { }
 
@@ -16,6 +16,6 @@ export class ReviewService {
   }
 
   updateReview(id: string, data: any): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/${id}`, data);
+    return this.http.patch(`${this.apiUrl}${id}`, data);
   }
 }

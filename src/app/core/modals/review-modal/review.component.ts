@@ -71,7 +71,8 @@ export class ReviewComponent implements OnInit {
         const reviewData = {
             appointment: this.appointment.id,
             rating: rating,
-            comment: ''
+            user: this.authRequest.currentUserValue?.user.id,
+            comment: '',
         };
 
         this.reviewService.createReview(reviewData).pipe(
