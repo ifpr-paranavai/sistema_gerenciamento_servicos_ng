@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from "@angular/core";
 
 @Component({
-    selector: "y-message",
+    selector: "sgs-message",
     templateUrl: "./message.component.html",
     styleUrls: ["./message.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
