@@ -1,1 +1,63 @@
-<sgs-message-list></sgs-message-list>
+<div id="app">
+  <aside class="sidebar">
+    <header class="sidebar-header">
+      <h2 class="title">Contatos</h2>
+      <button (click)="openAddContactModal()" class="add-contact-btn">+ Adicionar Contato</button>
+    </header>
+    <div class="search-container">
+      <input
+        type="text"
+        class="search-bar"
+        placeholder="Pesquisar contatos..."
+        [(ngModel)]="searchTerm"
+      />
+    </div>
+    <ul class="contacts-list">
+      <li
+        *ngFor="let contact of filteredContacts"
+        (click)="selectContact(contact.id)"
+        [class.selected]="selectedContactId === contact.id"
+      >
+        <div class="contact-avatar-container">
+          <img
+            *ngIf="contact.avatar"
+            [src]="contact.avatar"
+            [alt]="contact.name"
+            class="contact-avatar"
+            (error)="contact.avatar = null"
+          />
+          <div *ngIf="!contact.avatar" class="contact-placeholder">
+            {{ getInitials(contact.name) }}
+          </div>
+        </div>
+        <h4>{{ contact.name }}</h4>
+      </li>
+    </ul>
+  </aside>
+  <main class="chat-container">
+    <header class="chat-header">
+      <h2>Selecione um contato</h2>
+    </header>
+    <div class="chat-content">
+      <div class="chat-messages" *ngIf="selectedContactId; else noContactSelected">
+        <div
+          *ngFor="let message of messages[selectedContactId]"
+          [class.sent]="message.sender === 'Você'"
+          [class.received]="message.sender !== 'Você'"
+          class="message"
+        >
+          <p>{{ message.content }}</p>
+        </div>
+      </div>
+      <footer class="chat-input" *ngIf="selectedContactId">
+        <input type="text" [(ngModel)]="newMessage" placeholder="Digite sua mensagem..." />
+        <button (click)="sendMessage()">Enviar</button>
+      </footer>
+    </div>
+    <ng-template #noContactSelected>
+      <div class="no-contact-container">
+        <p class="no-contact-message">Nenhum contato selecionado.</p>
+      </div>
+    </ng-template>
+  </main>
+</div>

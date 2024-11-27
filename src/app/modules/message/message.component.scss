@@ -1,0 +1,222 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: #f9f9f9;
+  box-sizing: border-box;
+}
+
+#app {
+  display: flex;
+  height: 686px; /* Ocupa toda a altura da janela */
+  background-color: white;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 25%;
+  background-color: #f4f4f4; /* Cinza claro */
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center; /* Centraliza verticalmente */
+  justify-content: space-between; /* Espaça o título e o botão */
+  padding: 0 1rem;
+  height: 60px; /* Altura fixa */
+  border-bottom: 1px solid #ddd;
+}
+
+/* Título "Contatos" */
+.title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0;
+  white-space: nowrap; /* Impede que o texto quebre */
+}
+
+/* Botão "Adicionar Contato" */
+.add-contact-btn {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: white;
+  background-color: #1976d2; /* Azul escuro */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-contact-btn:hover {
+  background-color: #155aa9; /* Azul mais escuro no hover */
+}
+
+/* Barra de Pesquisa */
+.search-container {
+  padding: 0 1rem; /* Espaçamento lateral */
+  margin-top: 10px; /* Espaçamento abaixo do header */
+}
+
+.search-bar {
+  width: 100%;
+  padding: 8px;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Lista de Contatos */
+.contacts-list li {
+  display: flex; /* Exibe imagem e texto lado a lado */
+  align-items: center; /* Centraliza verticalmente */
+  padding: 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.contacts-list li.selected {
+  background-color: #e0f7fa; /* Destaque para contato selecionado */
+}
+
+.contacts-list li:hover {
+  background-color: #f1f1f1; /* Feedback ao passar o mouse */
+}
+
+/* Container da imagem ou placeholder */
+.contact-avatar-container {
+  width: 35px;
+  height: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 10px;
+}
+
+/* Estilo da imagem circular */
+.contact-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%; /* Torna a imagem circular */
+  object-fit: cover; /* Ajusta imagem para preencher completamente */
+}
+
+/* Placeholder circular */
+.contact-placeholder {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%; /* Torna a área circular */
+  background-color: #ccc; /* Cor de fundo do placeholder */
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-transform: uppercase; /* Letras maiúsculas */
+}
+
+/* Estilo da imagem circular */
+.contact-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%; /* Torna a imagem circular */
+  margin-right: 10px; /* Espaçamento entre imagem e nome */
+  object-fit: cover; /* Ajusta imagem para preencher completamente */
+}
+
+
+/* Chat */
+.chat-container {
+  width: 75%;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center; /* Centraliza verticalmente */
+  height: 60px; /* Mesma altura da sidebar-header */
+  padding: 0 1rem;
+  border-bottom: 1px solid #ddd;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* Conteúdo do Chat */
+.chat-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.chat-messages .message {
+  max-width: 60%;
+  margin: 8px 0;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.chat-messages .sent {
+  align-self: flex-end;
+  background-color: #1976d2; /* Azul escuro */
+  color: white;
+}
+
+.chat-messages .received {
+  align-self: flex-start;
+  background-color: #f4f4f4; /* Cinza claro */
+  color: #333;
+}
+
+/* Input de Mensagens */
+.chat-input {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  border-top: 1px solid #ddd;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.chat-input button {
+  padding: 6px 16px;
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.chat-input button:hover {
+  background-color: #155aa9;
+}
+
+/* Nenhum Contato Selecionado */
+.no-contact-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
+
+.no-contact-message {
+  color: #999;
+  font-size: 1rem;
+  text-align: center;
+}
