@@ -12,7 +12,7 @@ const routes: Routes = [
         canActivate: [loginGuard],
         loadChildren: () =>
             import("../login/login.module").then(
-                (m) => m.LoginModule,
+                (m) => m.LoginModule
             ),
     },
     {
@@ -32,28 +32,40 @@ const routes: Routes = [
                 path: "appointments",
                 loadChildren: () =>
                     import("../appointments/appointment.module").then(
-                        (m) => m.AppointmentsModule,
+                        (m) => m.AppointmentsModule
                     ),
             },
             {
                 path: "services",
                 loadChildren: () =>
                     import("../services/services.module").then(
-                        (m) => m.ServicesModule,
+                        (m) => m.ServicesModule
                     ),
             },
             {
                 path: "documents-template",
                 loadChildren: () =>
                     import("../documents-template/documents-template.module").then(
-                        (m) => m.DocumentsTemplateModule,
+                        (m) => m.DocumentsTemplateModule
                     ),
+            },
+            {
+                path: "message",
+                loadChildren: () =>
+                    import("../message/message.module").then(
+                        (m) => m.MessageModule
+                    ),
+            },
+            {
+                path: "",
+                redirectTo: "home",
+                pathMatch: "full"
             },
             {
                 path: "**",
                 redirectTo: "home"
             }
-        ]
+        ] // Fechando o array de children
     },
     {
         path: "**",
@@ -65,4 +77,4 @@ const routes: Routes = [
     imports: [RouterModule.forChild(routes)],
     exports: [RouterModule],
 })
-export class LayoutRoutingModule { }
+export class LayoutRoutingModule {}
