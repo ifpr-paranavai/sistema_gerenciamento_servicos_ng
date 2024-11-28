@@ -186,8 +186,7 @@ export class DocumentsTemplateModalComponent {
             const control = this.documentTemplateFg.get(key);
             control?.setErrors(null);
         });
-        this.selectedFile.set(null);
-        this.previewUrl.set(null);
+        this.removeFile();
     }
 
     onFileSelect(event: FileUploadHandlerEvent): void {
