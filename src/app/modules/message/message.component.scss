@@ -12,6 +12,7 @@
             display: flex;
             justify-content: space-between;
             width: 100%;
+            min-height: 81px;
             align-items: center;
             padding: 16px;
             border-bottom: 1px solid lightgrey;
@@ -74,17 +75,58 @@
             display: flex;
             font-size: 18px;
             font-weight: 600;
-            min-height: 73px;
+            min-height: 81px;
             align-items: center;
             padding: 16px;
             border-bottom: 1px solid lightgrey;
         }
+    }
+}
 
-        &__chat-container {
-            width: 100%;
-            min-height: calc(100vh - 121px);
-            max-height: calc(100vh - 121px);
-            background-color: white;
-        }
+.chat-container {
+    width: 100%;
+    height: calc(100vh - 130px);
+    background-color: white;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.message {
+    max-width: 60%;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+
+    &.left {
+        align-self: flex-start;
+        background-color: lightgrey;
+        color: white;
+        border: 1px solid #ddd;
+    }
+
+    &.right {
+        align-self: flex-end;
+        background-color: #4c3cf7;
+        color: white;
+    }
+}
+
+.chat-input {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+
+    ::ng-deep input {
+        width: 100%;
+        border-radius: 5px;
     }
 }
