@@ -15,18 +15,9 @@ interface Contact {
 export class MessageComponent implements OnInit {
     userMessages: string[] = ['Olá, tudo bem?'];
     myMessages: string[] = ['Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?', 'Olá, tudo bem?'];
-    newMessage: string = '';
 
     constructor() { }
 
     ngOnInit(): void {
     }
-
-    sendMessage() {
-        if (this.newMessage.trim()) {
-            this.myMessages.push(this.newMessage.trim());
-            this.newMessage = '';
-        }
-    }
-
 }
