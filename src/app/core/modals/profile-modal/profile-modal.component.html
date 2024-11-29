@@ -30,6 +30,7 @@
                            pInputText
                            id="cpf"
                            mask="000.000.000-00"
+                           placeholder="000.000.000-00"
                            formControlName="cpf"
                            class="w-full" />
                     <small *ngIf="profileFg.controls.cpf?.errors?.['required'] && profileFg.controls.cpf?.touched"
@@ -94,6 +95,7 @@
                     <input type="text"
                            pInputText
                            mask="00000-000"
+                           placeholder="00000-000"
                            id="zip_code"
                            formControlName="zip_code"
                            class="w-full" />

@@ -1,1 +1,64 @@
-<sgs-message-list></sgs-message-list>
+<div class=messages-wrapper>
+    <div class="messages-wrapper__sidebar">
+        <div class="messages-wrapper__sidebar__header">
+            <div class="messages-wrapper__sidebar__header--title">
+                Mensagens
+            </div>
+            <div>
+                <p-button label=""
+                          icon="pi pi-comments"
+                          iconPos="right"
+                          size="small" />
+            </div>
+        </div>
+        <div class="messages-wrapper__sidebar__filter">
+            <input type="text"
+                   pInputText
+                   placeholder="Pesquisar conversas"
+                   id="filter"
+                   class="w-full" />
+        </div>
+        <div class="messages-wrapper__sidebar__chat">
+            <ng-container *ngIf="true; else emptyChat">
+                <ng-container>
+                    <div class="messages-wrapper__sidebar__chat--contact">
+                        <p-avatar label="AM"
+                                  styleClass="mr-2"
+                                  size="large"
+                                  [style]="{ 'background-color': '#ece9fc', color: '#2a1261', 'font-size': '18px' }"
+                                  shape="circle" />
+                        <span>Ana Maria</span>
+                    </div>
+                    <div class="messages-wrapper__sidebar__chat--contact">
+                        <p-avatar label="AM"
+                                  styleClass="mr-2"
+                                  size="large"
+                                  [style]="{ 'background-color': '#ece9fc', color: '#2a1261', 'font-size': '18px' }"
+                                  shape="circle" />
+                        <span>Ana Maria</span>
+                    </div>
+                </ng-container>
+            </ng-container>
+            <ng-template #emptyChat>
+                <div class="messages-wrapper__sidebar__chat--empty-chat">
+                    Nenhuma conversa iniciada
+                </div>
+            </ng-template>
+        </div>
+    </div>
+    <div class="messages-wrapper__content">
+        <div class="messages-wrapper__content__header">
+            Selecione uma conversa
+        </div>
+        <ng-container *ngIf="true; else emptyContent">
+            <div class="messages-wrapper__content__chat-container">
+
+            </div>
+        </ng-container>
+        <ng-template #emptyContent>
+            <div class="messages-wrapper__content--empty">
+                Nenhuma conversa selecionada
+            </div>
+        </ng-template>
+    </div>
+</div>

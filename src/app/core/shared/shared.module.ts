@@ -8,6 +8,7 @@ import { FloatLabelModule } from "primeng/floatlabel";
 import { InputNumberModule } from "primeng/inputnumber";
 import { InputTextModule } from "primeng/inputtext";
 import { InputMaskModule } from "primeng/inputmask";
+import { AvatarModule } from 'primeng/avatar';
 
 const exportedModules = [
     CommonModule,
@@ -18,6 +19,7 @@ const exportedModules = [
     FloatLabelModule,
     InputNumberModule,
     InputMaskModule,
+    AvatarModule,
 ];
 
 const exportedPipes = [

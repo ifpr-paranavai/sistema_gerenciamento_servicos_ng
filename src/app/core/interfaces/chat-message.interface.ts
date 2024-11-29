@@ -1,26 +1,33 @@
 export interface IChatMessageListResponse {
     chat_id: number;
-    participants: ChatParticipant[];
+    participants: IChatParticipant[];
     created_at: string;
 }
 
-export interface IChatMessageSendRequest {
-
-}
-
 export interface IChatMessageSendResponse {
-
+    'message_id': number;
+    content: string;
+    timestamp: Date;
 }
 
-export interface IChatMessageGetOrCreateRequest {
-    'user_receiver_id': string;
+export interface IChatMessageSendRequest {
+    'chat_id': number;
+    content: string;
 }
 
-export interface IChatMessageGetOrCreateResponse {
-    
-}
-
-interface ChatParticipant {
+interface IChatParticipant {
+    id: string;
     name: string;
-    profile_picture: string; // Pode ser uma URL ou string vazia
+    profile_picture: string;
+}
+
+export interface IListChatMessage {
+    messages: IChatMessage[];
+}
+
+export interface IChatMessage {
+    id: string;
+    'sender_name': string;
+    content: string;
+    timestamp: Date;
 }

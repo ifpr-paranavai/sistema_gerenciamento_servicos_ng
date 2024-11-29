@@ -1,9 +1,22 @@
-import { ChangeDetectionStrategy, Component } from "@angular/core";
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+
+interface Contact {
+  id: number;
+  name: string;
+  avatar?: string | null;
+}
 
 @Component({
-    selector: "sgs-message",
-    templateUrl: "./message.component.html",
-    styleUrls: ["./message.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+  selector: 'app-message',
+  templateUrl: './message.component.html',
+  styleUrls: ['./message.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MessageComponent {}
+export class MessageComponent implements OnInit {
+
+  constructor() {}
+
+  ngOnInit(): void {
+  }
+
+}
