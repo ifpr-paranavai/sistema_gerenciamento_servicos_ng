@@ -17,8 +17,8 @@ export class ChatMessageRequest {
         return this.http.post<IChatMessageListResponse>(`${this.apiUrl}/${userReceiverId}/create_or_get_chat/`, {});
     }
 
-    listUserChatMessages(): Observable<IChatMessageListResponse> {
-        return this.http.get<IChatMessageListResponse>(`${this.apiUrl}/list_user_chats/`);
+    listUserChatMessages(): Observable<IChatMessageListResponse[]> {
+        return this.http.get<IChatMessageListResponse[]>(`${this.apiUrl}/list_user_chats/`);
     }
 
     listChatMessages(): Observable<IListChatMessage> {

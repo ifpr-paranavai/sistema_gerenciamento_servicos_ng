@@ -19,23 +19,13 @@
                    class="w-full" />
         </div>
         <div class="messages-wrapper__sidebar__chat">
-            <ng-container *ngIf="true; else emptyChat">
-                <ng-container>
-                    <div class="messages-wrapper__sidebar__chat--contact">
-                        <p-avatar label="AM"
-                                  styleClass="mr-2"
-                                  size="large"
-                                  [style]="{ 'background-color': '#ece9fc', color: '#2a1261', 'font-size': '18px' }"
-                                  shape="circle" />
-                        <span>Ana Maria</span>
-                    </div>
-                    <div class="messages-wrapper__sidebar__chat--contact">
-                        <p-avatar label="AM"
-                                  styleClass="mr-2"
-                                  size="large"
-                                  [style]="{ 'background-color': '#ece9fc', color: '#2a1261', 'font-size': '18px' }"
-                                  shape="circle" />
-                        <span>Ana Maria</span>
+            <ng-container *ngIf="contacts(); else emptyChat">
+                <ng-container *ngFor="let contact of contacts()">
+                    <div (click)="onContactSelect(contact)"
+                        [class.selected]="selectedContact()?.id === contact.id" class="messages-wrapper__sidebar__chat--contact">
+                        <p-avatar [label]="getInitials(contact.name)" styleClass="mr-2" size="large"
+                            [style]="{ 'background-color': '#ece9fc', color: '#2a1261', 'font-size': '18px' }" shape="circle"></p-avatar>
+                        <span>{{ contact.name }}</span>
                     </div>
                 </ng-container>
             </ng-container>
@@ -48,39 +38,35 @@
     </div>
     <div class="messages-wrapper__content">
         <div class="messages-wrapper__content__header">
-            <ng-container *ngIf="true; else emptyHeader">
+            <ng-container *ngIf="selectedContact(); else emptyHeader">
                 <div>
-                    <p-avatar label="AM"
+                    <p-avatar label="getInitials(selectedContact().name)"
                               styleClass="mr-2"
                               size="large"
                               [style]="{ 'background-color': '#ece9fc', color: '#2a1261', 'font-size': '18px' }"
                               shape="circle" />
-                    <span>Ana Maria</span>
+                    <span>
+                        {{ selectedContact()?.name ?? "Não informado" }}
+                    </span>
                 </div>
             </ng-container>
             <ng-template #emptyHeader>
                 Selecione uma conversa
             </ng-template>
         </div>
-        <ng-container *ngIf="true; else emptyContent">
+        <ng-container *ngIf="selectedContact(); else emptyContent">
             <div class="chat-container">
-                <div class="chat-messages">
-                    <div class="message left"
-                         *ngFor="let msg of userMessages">
+                <div class="chat-messages" #messagesContainer>
+                    <div class="message left" *ngFor="let msg of otherMessages()">
                         <span class="message-content">{{ msg }}</span>
                     </div>
-                    <div class="message right"
-                         *ngFor="let msg of myMessages">
+                    <div class="message right" *ngFor="let msg of myMessages()">
                         <span class="message-content">{{ msg }}</span>
                     </div>
                 </div>
-
+        
                 <div class="chat-input">
-                    <input type="text"
-                           pInputText
-                           placeholder="Enviar mensagem"
-                           id="message"
-                           class="w-full" />
+                    <input type="text" pInputText placeholder="Enviar mensagem" id="message" class="w-full" />
                 </div>
             </div>
         </ng-container>
