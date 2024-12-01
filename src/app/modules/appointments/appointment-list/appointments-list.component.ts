@@ -139,14 +139,7 @@ export class AppointmentsListComponent implements OnInit {
     deleteAppointment(appointment: IAppointmentResponse): void {
         this.appointmentsService
             .deleteAppointment(appointment.id)
-            .pipe(
-                take(1),
-                catchError(error => {
-                    console.error('Error deleting appointment:', error);
-                    this.toastService.error('Erro ao excluir agendamento', 'Não foi possível excluir o agendamento');
-                    return of();
-                })
-            )
+            .pipe(take(1))
             .subscribe({
                 next: () => {
                     this.appointments.set(
@@ -154,6 +147,11 @@ export class AppointmentsListComponent implements OnInit {
                     );
                     this.toastService.success('Agendamento excluído com sucesso', 'Agendamento excluído');
                 },
+                error: ({ error }) => {
+                    this.toastService.error(
+                        'Erro ao excluir agendamento',
+                        error?.detail ?? 'Não foi possível excluir o agendamento');
+                }
             });
     }
 

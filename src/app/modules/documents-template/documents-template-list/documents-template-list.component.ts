@@ -56,15 +56,14 @@ export class DocumentsTemplateListComponent implements OnInit {
 
     deleteDocumentTemplate(documentTemplate: IDocumentsTemplateResponse): void {
         this.docsTemplateRequest.deleteDocumentTemplate(documentTemplate.id!)
-            .pipe(
-                take(1),
-                catchError(() => {
-                    this.toastService.error("", "Falha ao deletar o serviço");
-                    return of(null);
-                }),
-            ).subscribe(() => {
-                this.documentsTemplateItems.update((docTemp) => docTemp.filter((dt) => dt.id !== documentTemplate.id));
-                this.toastService.success("", "Serviço deletado com sucesso")
+            .pipe(take(1)).subscribe({
+                next: () =>{
+                    this.documentsTemplateItems.update((docTemp) => docTemp.filter((dt) => dt.id !== documentTemplate.id));
+                    this.toastService.success("", "Serviço deletado com sucesso")
+                },
+                error: ({error}) => {
+                    this.toastService.error("Atenção", error?.detail ?? "Falha ao deletar Documento");
+                }
             });
     }
 

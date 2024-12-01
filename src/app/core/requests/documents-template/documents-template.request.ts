@@ -22,7 +22,7 @@ export class DocumentsTemplateRequest {
     }
 
     deleteDocumentTemplate(id: number): Observable<void> {
-        return this.http.delete<void>(`${this.apiUrl}${id}`);
+        return this.http.delete<void>(`${this.apiUrl}${id}/`);
     }
 
     getDocumentsTemplates(): Observable<IDocumentsTemplateResponse[]> {

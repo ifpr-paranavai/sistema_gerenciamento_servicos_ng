@@ -49,15 +49,14 @@ export class ServicesListComponent implements OnInit {
     deleteService(service: ServiceResponse): void {
         this.serviceRequest
             .deleteService(service.id!)
-            .pipe(
-                take(1),
-                catchError(() => {
-                    this.toastService.error("", "Falha ao deletar o serviço");
-                    return of(null);
-                }),
-            ).subscribe(() => {
-                this.services.update((services) => services.filter((s) => s.id !== service.id));
-                this.toastService.success("", "Serviço deletado com sucesso")
+            .pipe(take(1)).subscribe({
+                next: () => {
+                    this.services.update((services) => services.filter((s) => s.id !== service.id));
+                    this.toastService.success("", "Serviço deletado com sucesso")
+                },
+                error: ({error}) => {
+                    this.toastService.error("Atenção", error?.detail?? "Falha ao deletar serviço");
+                }
             });
     }
 
