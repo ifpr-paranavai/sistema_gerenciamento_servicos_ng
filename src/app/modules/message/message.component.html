@@ -22,9 +22,13 @@
             <ng-container *ngIf="contacts(); else emptyChat">
                 <ng-container *ngFor="let contact of contacts()">
                     <div (click)="onContactSelect(contact)"
-                        [class.selected]="selectedContact()?.id === contact.id" class="messages-wrapper__sidebar__chat--contact">
-                        <p-avatar [label]="getInitials(contact.name)" styleClass="mr-2" size="large"
-                            [style]="{ 'background-color': '#ece9fc', color: '#2a1261', 'font-size': '18px' }" shape="circle"></p-avatar>
+                         [class.selected]="selectedContact()?.id === contact.id"
+                         class="messages-wrapper__sidebar__chat--contact">
+                        <p-avatar [label]="getInitials(contact.name)"
+                                  styleClass="mr-2"
+                                  size="large"
+                                  [style]="{ 'background-color': '#ece9fc', color: '#2a1261', 'font-size': '18px' }"
+                                  shape="circle"></p-avatar>
                         <span>{{ contact.name }}</span>
                     </div>
                 </ng-container>
@@ -55,20 +59,33 @@
             </ng-template>
         </div>
         <ng-container *ngIf="selectedContact(); else emptyContent">
-            <div class="chat-container">
-                <div class="chat-messages" #messagesContainer>
-                    <div class="message left" *ngFor="let msg of otherMessages()">
-                        <span class="message-content">{{ msg }}</span>
+            <ng-container *ngIf="loading(); else contentTemplate">
+                <p-skeleton width="100%"
+                            height="80%" />
+            </ng-container>
+            <ng-template #contentTemplate>
+                <div class="chat-container">
+                    <div class="chat-messages"
+                         #messagesContainer>
+                        <div class="message left"
+                             *ngFor="let msg of otherMessages()">
+                            <span class="message-content">{{ msg.content }}</span>
+                        </div>
+                        <div class="message right"
+                             *ngFor="let msg of myMessages()">
+                            <span class="message-content">{{ msg.content }}</span>
+                        </div>
                     </div>
-                    <div class="message right" *ngFor="let msg of myMessages()">
-                        <span class="message-content">{{ msg }}</span>
+
+                    <div class="chat-input">
+                        <input type="text"
+                               pInputText
+                               placeholder="Enviar mensagem"
+                               id="message"
+                               class="w-full" />
                     </div>
                 </div>
-        
-                <div class="chat-input">
-                    <input type="text" pInputText placeholder="Enviar mensagem" id="message" class="w-full" />
-                </div>
-            </div>
+            </ng-template>
         </ng-container>
         <ng-template #emptyContent>
             <div class="messages-wrapper__content--empty">

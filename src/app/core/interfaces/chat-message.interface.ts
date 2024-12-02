@@ -21,10 +21,12 @@ export interface IChatParticipant {
     id: string;
     name: string;
     profile_picture?: string;
+    chatId?: number;
 }
 
 export interface IListChatMessage {
-    messages: IChatMessage[];
+    'my_messages': IChatMessage[];
+    'other_messages': IChatMessage[];
 }
 
 export interface IChatMessage {
