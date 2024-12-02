@@ -31,6 +31,7 @@ export class MessageComponent implements OnInit, AfterViewInit {
 	};
 	contacts: WritableSignal<IChatParticipant[]> = signal([]);
     loading: WritableSignal<boolean> = signal(false);
+    controlListMessages: WritableSignal<boolean> = signal(false);
 
 	constructor(
 		private chatMessageRequest: ChatMessageRequest,
@@ -41,6 +42,7 @@ export class MessageComponent implements OnInit, AfterViewInit {
 
 	ngOnInit(): void {
 		this.listUserChatMessagesData();
+        this.listMessages();
 	}
 
 	ngAfterViewInit(): void {
@@ -84,7 +86,7 @@ export class MessageComponent implements OnInit, AfterViewInit {
 
     listMessages(): void {
         if (!this.selectedContact() || !this.selectedContact()?.chatId || this.loading()) return;
-
+        this.controlListMessages.set(true);
         this.loading.set(true);
         interval(1000)
         .pipe(
@@ -112,7 +114,9 @@ export class MessageComponent implements OnInit, AfterViewInit {
 	onContactSelect(contact: IChatParticipant): void {
 		this.selectedContact.set(contact);
 
-        this.listMessages();
+        if (!this.controlListMessages()) {
+            this.listMessages();
+        }
 	}
 
 
