@@ -32,6 +32,7 @@ export class MessageComponent implements OnInit, AfterViewInit {
 	contacts: WritableSignal<IChatParticipant[]> = signal([]);
     loading: WritableSignal<boolean> = signal(false);
     controlListMessages: WritableSignal<boolean> = signal(false);
+    allMessages: WritableSignal<IChatMessage[]> = signal([]);
 
 	constructor(
 		private chatMessageRequest: ChatMessageRequest,
@@ -101,6 +102,17 @@ export class MessageComponent implements OnInit, AfterViewInit {
         .subscribe((messages) => {
             this.myMessages.set(messages.my_messages);
             this.otherMessages.set(messages.other_messages);
+
+            this.myMessages.set([
+                ...this.myMessages().map(msg => ({ ...msg, isMine: true }))
+            ]);
+
+            this.otherMessages.set([
+                ...this.otherMessages().map(msg => ({ ...msg, isMine: false }))
+            ]);
+
+            this.getSortedMessages();
+
             this.loading.set(false);
             this.cdr.detectChanges();
         });
@@ -119,5 +131,10 @@ export class MessageComponent implements OnInit, AfterViewInit {
         }
 	}
 
+    private getSortedMessages(): void {
+        const allMessages = [...this.myMessages(), ...this.otherMessages()];
+        this.allMessages.set(allMessages);
+        this.allMessages.set(this.allMessages().sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()));
+    }
 
 }

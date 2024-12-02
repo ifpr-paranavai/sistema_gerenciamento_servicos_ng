@@ -63,7 +63,7 @@
                 <p-skeleton width="100%"
                             height="80%" />
             </ng-container>
-            <ng-template #contentTemplate>
+            <!-- <ng-template #contentTemplate>
                 <div class="chat-container">
                     <div class="chat-messages"
                          #messagesContainer>
@@ -73,6 +73,26 @@
                         </div>
                         <div class="message right"
                              *ngFor="let msg of myMessages()">
+                            <span class="message-content">{{ msg.content }}</span>
+                        </div>
+                    </div>
+
+                    <div class="chat-input">
+                        <input type="text"
+                               pInputText
+                               placeholder="Enviar mensagem"
+                               id="message"
+                               class="w-full" />
+                    </div>
+                </div>
+            </ng-template> -->
+            <ng-template #contentTemplate>
+                <div class="chat-container">
+                    <div class="chat-messages"
+                         #messagesContainer>
+                        <div class="message"
+                             [ngClass]="{ 'left': !msg.isMine, 'right': msg.isMine }"
+                             *ngFor="let msg of allMessages()">
                             <span class="message-content">{{ msg.content }}</span>
                         </div>
                     </div>

@@ -34,4 +34,5 @@ export interface IChatMessage {
     'sender__name': string;
     content: string;
     timestamp: Date;
+    isMine?: boolean;
 }
