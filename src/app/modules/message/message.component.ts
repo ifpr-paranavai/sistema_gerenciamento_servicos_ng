@@ -5,7 +5,11 @@ import { catchError, interval, switchMap, take, throwError } from 'rxjs';
 import { ToastService } from '../../core/requests/toastr/toast.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { IChatMessage, IChatParticipant } from '../../core/interfaces/chat-message.interface';
+import { FormControl, FormGroup } from '@angular/forms';
 
+interface IMessageContentFg {
+    content: FormControl<string | null>;
+}
 
 @Component({
 	selector: 'sgs-message',
@@ -31,8 +35,13 @@ export class MessageComponent implements OnInit, AfterViewInit {
 	};
 	contacts: WritableSignal<IChatParticipant[]> = signal([]);
     loading: WritableSignal<boolean> = signal(false);
+    loadingMessage: WritableSignal<boolean> = signal(false);
     controlListMessages: WritableSignal<boolean> = signal(false);
     allMessages: WritableSignal<IChatMessage[]> = signal([]);
+
+    messageFg: FormGroup<IMessageContentFg> = new FormGroup({
+        content: new FormControl<string | null>(null),
+    });
 
 	constructor(
 		private chatMessageRequest: ChatMessageRequest,
@@ -135,6 +144,36 @@ export class MessageComponent implements OnInit, AfterViewInit {
         const allMessages = [...this.myMessages(), ...this.otherMessages()];
         this.allMessages.set(allMessages);
         this.allMessages.set(this.allMessages().sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()));
+    }
+
+    sendMessage(): void {
+        const content = this.messageFg.controls.content.value;
+        const canSendMessage = !this.selectedContact()
+            || !this.selectedContact()?.chatId
+            || !content
+            || content == ""
+            || this.loadingMessage();
+
+        if (canSendMessage) return;
+
+        this.loadingMessage.set(true);
+
+        this.chatMessageRequest.sendChatMessage({
+            'chat_id': this.selectedContact()!.chatId!,
+            content: content!
+        })
+        .pipe(
+            take(1),
+            catchError((error: HttpErrorResponse) => {
+                this.toastService.error('Erro ao enviar mensagem', 'Erro ao enviar mensagem');
+                this.loadingMessage.set(false);
+                return throwError(() => error);
+            })
+        )
+        .subscribe(() => {
+            this.messageFg.reset();
+            this.loadingMessage.set(false);
+        });
     }
 
 }
