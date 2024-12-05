@@ -6,6 +6,7 @@ import { ToastService } from '../../core/requests/toastr/toast.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { IChatMessage, IChatParticipant } from '../../core/interfaces/chat-message.interface';
 import { FormControl, FormGroup } from '@angular/forms';
+import { NewContactMessageComponent } from './new-contact-message/new-contact-message.component';
 
 interface IMessageContentFg {
     content: FormControl<string | null>;
@@ -19,6 +20,7 @@ interface IMessageContentFg {
 })
 export class MessageComponent implements OnInit, AfterViewInit {
 	@ViewChild('messagesContainer') messagesContainer!: ElementRef;
+    @ViewChild(NewContactMessageComponent) newContactMessageModal!: NewContactMessageComponent;
 
     otherMessages: WritableSignal<IChatMessage[]> = signal([]);
     myMessages: WritableSignal<IChatMessage[]> = signal([]);
@@ -175,6 +177,10 @@ export class MessageComponent implements OnInit, AfterViewInit {
             this.messageFg.reset();
             this.loadingMessage.set(false);
         });
+    }
+
+    newMessage(): void {
+        this.newContactMessageModal.openNewMessageModal();
     }
 
 }

@@ -1,0 +1,60 @@
+<p-dialog header="Nova Mensagem"
+          (onHide)="closeModal()"
+          [modal]="true"
+          draggable="false"
+          [(visible)]="visible">
+    <div class="new-message-wrapper">
+        <form [formGroup]="newMessageFg">
+            <div class="flex flex-column field">
+                <label for="receiver">Usuário</label>
+                <p-dropdown class="p-dropdown-user"
+                            id="receiver"
+                            appendTo="body"
+                            [options]="usersDropdownOptions()"
+                            formControlName="receiver"
+                            optionLabel="label"
+                            [filter]="true"
+                            filterBy="label"
+                            [showClear]="true"
+                            placeholder="Selecione um usuário"
+                            styleClass="w-full">
+                    <ng-template let-user
+                                 pTemplate="item">
+                        <div class="flex flex-column">
+                            <span>{{ user.label | titlecase }}</span>
+                        </div>
+                    </ng-template>
+                </p-dropdown>
+                <small class="p-error block"
+                       *ngIf="newMessageFg.get('receiverId')?.invalid && newMessageFg.get('receiverId')?.touched">
+                    Campo obrigatório
+                </small>
+            </div>
+
+            <div class="flex flex-column field">
+                <label for="message">Mensagem</label>
+                <textarea id="content"
+                          pInputTextarea
+                          formControlName="content"
+                          [rows]="3"
+                          placeholder="Digite sua mensagem">
+                </textarea>
+                <small class="p-error block"
+                       *ngIf="newMessageFg.get('content')?.invalid && newMessageFg.get('content')?.touched">
+                    Campo obrigatório
+                </small>
+            </div>
+
+            <div class="flex justify-content-end gap-2">
+                <p-button label="Cancelar"
+                          (click)="closeModal()"
+                          styleClass="p-button-text">
+                </p-button>
+                <p-button label="Enviar"
+                          (click)="sendMessage()"
+                          styleClass="p-button-primary">
+                </p-button>
+            </div>
+        </form>
+    </div>
+</p-dialog>

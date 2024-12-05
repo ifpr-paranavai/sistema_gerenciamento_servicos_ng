@@ -1,0 +1,18 @@
+.new-message-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    textarea {
+        resize: none;
+    }
+
+    .p-dropdown-user {
+        ::ng-deep {
+            div:first-child {
+                min-width: 300px;
+                max-width: 300px;
+            }
+        }
+    }
+}

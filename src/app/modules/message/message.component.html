@@ -8,7 +8,8 @@
                 <p-button label=""
                           icon="pi pi-comments"
                           iconPos="right"
-                          size="small" />
+                          size="small"
+                          (click)="newMessage()"/>
             </div>
         </div>
         <div class="messages-wrapper__sidebar__chat">
@@ -88,3 +89,8 @@
         </ng-template>
     </div>
 </div>
+
+<sgs-new-contact-message
+    #newContactMessage
+    (newMessage)="listUserChatMessagesData()">
+</sgs-new-contact-message>
