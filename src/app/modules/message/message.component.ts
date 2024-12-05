@@ -95,7 +95,7 @@ export class MessageComponent implements OnInit, AfterViewInit {
 	}
 
     listMessages(): void {
-        if (!this.selectedContact() || !this.selectedContact()?.chatId || this.loading()) return;
+        if (!this.selectedContact() || !this.selectedContact()?.chatId) return;
         this.controlListMessages.set(true);
         this.loading.set(true);
         interval(1000)
@@ -133,6 +133,7 @@ export class MessageComponent implements OnInit, AfterViewInit {
 	}
 
 	onContactSelect(contact: IChatParticipant): void {
+        this.loading.set(true);
 		this.selectedContact.set(contact);
 
         if (!this.controlListMessages()) {
