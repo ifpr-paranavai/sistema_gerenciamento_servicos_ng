@@ -5,5 +5,5 @@ export const ServicesCols: ITableColumn[] = [
     { field: 'description', header: 'Descrição' },
     { field: 'cost', header: 'Valor', type: 'currency' },
     { field: 'duration', header: 'Duração', type: 'time' },
-    { field: 'ratting_avg', header: 'Avaliação', type: 'rating' },
+    { field: 'rating_avg', header: 'Avaliação', type: 'rating' },
 ];
