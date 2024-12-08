@@ -140,11 +140,13 @@ export class ProfileModalComponent {
                 this.toastService.error("Erro", "Erro ao atualizar dados");
                 return throwError(() => error)
             }),
-            finalize(() => this.toastService.success("", "Usuário atualizado!")),
-        ).subscribe(user => {
-            this.updateUserLocalStorage(user);
-            this.userState.update(user);
-            this.cdr.detectChanges();
+        ).subscribe({
+            next: (user) => {
+                this.updateUserLocalStorage(user);
+                this.userState.update(user);
+                this.cdr.detectChanges();
+                this.toastService.success("", "Usuário atualizado!")
+            }
         });
     }
 
