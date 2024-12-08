@@ -13,29 +13,29 @@ interface IMessageContentFg {
 }
 
 @Component({
-	selector: 'sgs-message',
-	templateUrl: './message.component.html',
-	styleUrls: ['./message.component.scss'],
-	changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'sgs-message',
+    templateUrl: './message.component.html',
+    styleUrls: ['./message.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MessageComponent implements OnInit, AfterViewInit {
-	@ViewChild('messagesContainer') messagesContainer!: ElementRef;
+    @ViewChild('messagesContainer') messagesContainer!: ElementRef;
     @ViewChild(NewContactMessageComponent) newContactMessageModal!: NewContactMessageComponent;
 
     otherMessages: WritableSignal<IChatMessage[]> = signal([]);
     myMessages: WritableSignal<IChatMessage[]> = signal([]);
-	selectedContact: WritableSignal<IChatParticipant | null> = signal(null);
-	messages: { [key: number]: { myMessages: string[]; otherMessages: string[] } } = {
-		1: {
-			myMessages: ['Olá, Ana!', 'Tudo bem?'],
-			otherMessages: ['Oi, tudo sim!', 'E você?']
-		},
-		2: {
-			myMessages: ['Olá, João!', 'Como está?'],
-			otherMessages: ['Oi!', 'Estou bem, obrigado.']
-		}
-	};
-	contacts: WritableSignal<IChatParticipant[]> = signal([]);
+    selectedContact: WritableSignal<IChatParticipant | null> = signal(null);
+    messages: { [key: number]: { myMessages: string[]; otherMessages: string[] } } = {
+        1: {
+            myMessages: ['Olá, Ana!', 'Tudo bem?'],
+            otherMessages: ['Oi, tudo sim!', 'E você?']
+        },
+        2: {
+            myMessages: ['Olá, João!', 'Como está?'],
+            otherMessages: ['Oi!', 'Estou bem, obrigado.']
+        }
+    };
+    contacts: WritableSignal<IChatParticipant[]> = signal([]);
     loading: WritableSignal<boolean> = signal(false);
     loadingMessage: WritableSignal<boolean> = signal(false);
     controlListMessages: WritableSignal<boolean> = signal(false);
@@ -45,56 +45,60 @@ export class MessageComponent implements OnInit, AfterViewInit {
         content: new FormControl<string | null>(null),
     });
 
-	constructor(
-		private chatMessageRequest: ChatMessageRequest,
-		private destroyRef: DestroyRef,
-		private toastService: ToastService,
-		private cdr: ChangeDetectorRef,
-	) { }
+    constructor(
+        private chatMessageRequest: ChatMessageRequest,
+        private destroyRef: DestroyRef,
+        private toastService: ToastService,
+        private cdr: ChangeDetectorRef,
+    ) { }
 
-	ngOnInit(): void {
-		this.listUserChatMessagesData();
+    ngOnInit(): void {
+        this.startListeningUserChatMessages();
         this.listMessages();
-	}
+    }
 
-	ngAfterViewInit(): void {
-		this.scrollToBottom();
-	}
+    ngAfterViewInit(): void {
+        this.scrollToBottom();
+    }
 
-	private scrollToBottom(): void {
-		if (!this.messagesContainer) return;
-		const container = this.messagesContainer.nativeElement;
-		container.scrollTop = container.scrollHeight;
-	}
+    private scrollToBottom(): void {
+        if (!this.messagesContainer) return;
+        const container = this.messagesContainer.nativeElement;
+        container.scrollTop = container.scrollHeight;
+    }
 
-	listUserChatMessagesData(): void {
-		this.chatMessageRequest.listUserChatMessages()
+    startListeningUserChatMessages(): void {
+        interval(1000)
         .pipe(
-            take(1),
+            takeUntilDestroyed(this.destroyRef),
+            switchMap(() => this.chatMessageRequest.listUserChatMessages()),
             catchError((error: HttpErrorResponse) => {
                 this.toastService.error('Erro ao buscar mensagens', 'Nenhuma mensagem encontrada');
                 return throwError(() => error);
             })
         ).subscribe(response => {
-			if (!response?.length) throw Error("Erro ao buscar conversas");
+            if (!response?.length) {
+                this.contacts.set([]);
+                return;
+            }
 
-			const participants: IChatParticipant[] = [];
+            const participants: IChatParticipant[] = [];
 
-			response.forEach(chat => {
-				if (chat?.participants?.length) {
-					chat.participants.forEach((participant) => {
-						participants.push({
+            response.forEach(chat => {
+                if (chat?.participants?.length) {
+                    chat.participants.forEach((participant) => {
+                        participants.push({
                             ...participant,
                             chatId: chat.chat_id
                         });
-					});
-				}
+                    });
+                }
+            });
 
-				this.contacts.set(participants);
-				this.cdr.detectChanges();
-			})
-		});
-	}
+            this.contacts.set(participants);
+            this.cdr.detectChanges();
+        });
+    }
 
     listMessages(): void {
         if (!this.selectedContact() || !this.selectedContact()?.chatId) return;
@@ -129,19 +133,19 @@ export class MessageComponent implements OnInit, AfterViewInit {
         });
     }
 
-	getInitials(name: string): string {
-		if (!name) return "F";
-		return name.split(' ').map((n) => n.charAt(0)).slice(0, 2).join('');
-	}
+    getInitials(name: string): string {
+        if (!name) return "F";
+        return name.split(' ').map((n) => n.charAt(0)).slice(0, 2).join('');
+    }
 
-	onContactSelect(contact: IChatParticipant): void {
+    onContactSelect(contact: IChatParticipant): void {
         this.loading.set(true);
-		this.selectedContact.set(contact);
+        this.selectedContact.set(contact);
 
         if (!this.controlListMessages()) {
             this.listMessages();
         }
-	}
+    }
 
     private getSortedMessages(): void {
         const allMessages = [...this.myMessages(), ...this.otherMessages()];
@@ -182,5 +186,4 @@ export class MessageComponent implements OnInit, AfterViewInit {
     newMessage(): void {
         this.newContactMessageModal.openNewMessageModal();
     }
-
 }
