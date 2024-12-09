@@ -29,5 +29,12 @@ export class ChatMessageRequest {
         return this.http.post<IChatMessageSendResponse>(`${this.apiUrl}/send_message/`, data);
     }
 
+    getUnreadCount(): Observable<{count: number}> {
+        return this.http.get<{count: number}>(`${this.apiUrl}/unread_count/`);
+    }
+
+    setMessagesAsRead(chatId: number): Observable<void> {
+        return this.http.post<void>(`${this.apiUrl}/${chatId}/mark_as_read/`, {});
+    }
 
 }

@@ -58,7 +58,7 @@
                             height="80%" />
             </ng-container>
             <ng-template #contentTemplate>
-                <div class="chat-container">
+                <div class="chat-container" (click)="setVizualizedMessages()">
                     <div class="chat-messages"
                          #messagesContainer>
                         <div class="message"
