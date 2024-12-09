@@ -2,6 +2,7 @@
 <div class="flex flex-col items-center">
     <!-- Rating Stars -->
     <p-rating [ngModel]="currentRating()" [readonly]="!isClient()" [cancel]="false"
+        [disabled]="!appointment.is_completed"
         (onRate)="onRatingSelect($event.value)">
     </p-rating>
 

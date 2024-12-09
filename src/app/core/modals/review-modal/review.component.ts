@@ -48,7 +48,7 @@ export class ReviewComponent implements OnInit {
     }
 
     onRatingSelect(value: number): void {
-        if (!this.isClient()) return;
+        if (!this.isClient() || !this.appointment.is_completed) return;
 
         this.currentRating.set(value);
         this.reviewForm.patchValue({ rating: value });
