@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, signal, Writable
 import { ToastService } from "../../requests/toastr/toast.service";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { AuthenticationRequest } from "../../requests/authentication/authentication.request";
-import { catchError, finalize, switchMap, take, throwError } from "rxjs";
+import { catchError, switchMap, take, throwError } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 import { cpfValidator } from "../../validators/cpf.validator";
 import { IEditUserPayload } from "../../interfaces/edit-user-payload.interface";
@@ -10,7 +10,6 @@ import { ICountryStates } from "../../interfaces/country-states.interface";
 import { CountryStatesConstants } from "../../constants/country-states.constants";
 import { UserState } from "../../abstractions/user.state";
 import { IUser } from "../../interfaces/user.interface";
-import { positiveValueValidator } from "../../validators/cost.validator";
 import { cepValidator } from "../../validators/cep.validator";
 
 interface ProfileModalFg {

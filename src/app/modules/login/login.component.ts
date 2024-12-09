@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, WritableSignal, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, ViewChild, WritableSignal, signal } from "@angular/core";
 import { ToastService } from "../../core/requests/toastr/toast.service";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { AuthenticationRequest } from "../../core/requests/authentication/authentication.request";
 import { Router } from "@angular/router";
 import { catchError, finalize, take } from "rxjs/operators";
 import { HttpErrorResponse } from "@angular/common/http";
+import { ResetPasswordModalComponent } from "../../core/modals/reset-password-modal/reset-password-modal.component";
 
 interface ILoginFormGroup {
     email: FormControl<string | null>;
@@ -18,6 +19,7 @@ interface ILoginFormGroup {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginComponent {
+    @ViewChild(ResetPasswordModalComponent) resetPasswordModalComponent?: ResetPasswordModalComponent
 
     loading: WritableSignal<boolean> = signal(false);
 
@@ -59,5 +61,11 @@ export class LoginComponent {
                     this.toastService.error("Atenção", error.error.error);
                 }
             });
+    }
+
+    openResetPasswordModal(): void {
+        if (!this.resetPasswordModalComponent) throw new Error('ResetPasswordModalComponent not found');
+
+        this.resetPasswordModalComponent.openDialog();
     }
 }

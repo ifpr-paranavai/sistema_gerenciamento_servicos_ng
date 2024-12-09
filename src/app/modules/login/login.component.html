@@ -28,6 +28,11 @@
                     [loading]="loading()"
                     (onClick)="doUserLogin()" />
             </form>
+            <span class="mt-4 text-sm cursor-pointer text-blue-600">
+                Esqueceu sua senha ? <span (click)="openResetPasswordModal()">Clique aqui!</span>
+            </span>
         </div>
     </div>
 </div>
+
+<sgs-reset-password-modal #resetPasswordModal></sgs-reset-password-modal>

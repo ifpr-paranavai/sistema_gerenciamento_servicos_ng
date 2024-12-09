@@ -71,4 +71,10 @@ export class AuthenticationRequest {
     updateUserById(userId: string, payload: IEditUserPayload): Observable<IUser> {
         return this.http.put<IUser>(`${this.baseUrl}/v1/user/${userId}/update-user/`, payload);
     }
+
+    resetPassword(email: string): Observable<void> {
+        return this.http.post<void>(`${this.baseUrl}/v1/authentication/reset-password-request/`, {
+            email
+        });
+    }
 }
