@@ -1,11 +1,6 @@
-<p-dialog header="Novo Agendamento" 
-          [modal]="true" 
-          [style]="{width: '80vw'}" 
-          [(visible)]="visible"
-          [draggable]="false"
-          [resizable]="false"
-          (onHide)="closeModal()">
-    
+<p-dialog header="Novo Agendamento" [modal]="true" [style]="{width: '80vw'}" [(visible)]="visible" [draggable]="false"
+    [resizable]="false" (onHide)="closeModal()">
+
     <div class="p-fluid">
         <form [formGroup]="appointmentFg" class="grid">
             <!-- Seção de Informações Básicas -->
@@ -16,20 +11,13 @@
                         <!-- Serviço -->
                         <div class="col-12 md:col-4 field">
                             <label for="service">Serviço *</label>
-                            <p-dropdown id="service"
-                                      [options]="servicesDropdownOptions()"
-                                      formControlName="serviceSelected"
-                                      (onChange)="onServiceSelect($event)"
-                                      optionLabel="label"
-                                      [filter]="true"
-                                      filterBy="label"
-                                      [showClear]="true"
-                                      placeholder="Selecione um serviço"
-                                      optionLabel="label"
-                                      styleClass="w-full">
+                            <p-dropdown id="service" [options]="servicesDropdownOptions()"
+                                formControlName="serviceSelected" (onChange)="onServiceSelect($event)"
+                                optionLabel="label" [filter]="true" filterBy="label" [showClear]="true"
+                                placeholder="Selecione um serviço" optionLabel="label" styleClass="w-full">
                             </p-dropdown>
-                            <small class="p-error block" 
-                                   *ngIf="appointmentFg.get('serviceSelected')?.invalid && appointmentFg.get('serviceSelected')?.touched">
+                            <small class="p-error block"
+                                *ngIf="appointmentFg.get('serviceSelected')?.invalid && appointmentFg.get('serviceSelected')?.touched">
                                 Campo obrigatório
                             </small>
                         </div>
@@ -37,15 +25,9 @@
                         <!-- Cliente -->
                         <div class="col-12 md:col-4 field">
                             <label for="client">Cliente *</label>
-                            <p-dropdown id="client"
-                                      [options]="clientDropdownOptions()"
-                                      formControlName="client"
-                                      optionLabel="label"
-                                      [filter]="true"
-                                      filterBy="label"
-                                      [showClear]="true"
-                                      placeholder="Selecione um cliente"
-                                      styleClass="w-full">
+                            <p-dropdown id="client" [options]="clientDropdownOptions()" formControlName="client"
+                                optionLabel="label" [filter]="true" filterBy="label" [showClear]="true"
+                                placeholder="Selecione um cliente" styleClass="w-full">
                                 <ng-template let-client pTemplate="item">
                                     <div class="flex flex-column">
                                         <span>{{ client.label | titlecase }}</span>
@@ -55,8 +37,8 @@
                                     </div>
                                 </ng-template>
                             </p-dropdown>
-                            <small class="p-error block" 
-                                   *ngIf="appointmentFg.get('clientId')?.invalid && appointmentFg.get('clientId')?.touched">
+                            <small class="p-error block"
+                                *ngIf="appointmentFg.get('clientId')?.invalid && appointmentFg.get('clientId')?.touched">
                                 Campo obrigatório
                             </small>
                         </div>
@@ -64,16 +46,10 @@
                         <!-- Prestador -->
                         <div class="col-12 md:col-4 field">
                             <label for="provider">Prestador *</label>
-                            <p-dropdown id="provider"
-                                      [options]="providerDropdownOptions()"
-                                      formControlName="provider"
-                                      optionLabel="label"
-                                      [filter]="true"
-                                      filterBy="label"
-                                      [showClear]="true"
-                                      placeholder="Selecione um prestador"
-                                      (onChange)="onProviderSelect($event)"
-                                      styleClass="w-full">
+                            <p-dropdown id="provider" [options]="providerDropdownOptions()" formControlName="provider"
+                                optionLabel="label" [filter]="true" filterBy="label" [showClear]="true"
+                                placeholder="Selecione um prestador" (onChange)="onProviderSelect($event)"
+                                styleClass="w-full">
                                 <ng-template let-provider pTemplate="item">
                                     <div class="flex flex-column">
                                         <span>{{ provider.label | titlecase }}</span>
@@ -83,8 +59,8 @@
                                     </div>
                                 </ng-template>
                             </p-dropdown>
-                            <small class="p-error block" 
-                                   *ngIf="appointmentFg.get('providerId')?.invalid && appointmentFg.get('providerId')?.touched">
+                            <small class="p-error block"
+                                *ngIf="appointmentFg.get('providerId')?.invalid && appointmentFg.get('providerId')?.touched">
                                 Campo obrigatório
                             </small>
                         </div>
@@ -92,22 +68,14 @@
                         <!-- Data do Agendamento -->
                         <div class="col-12 md:col-4 field">
                             <label for="appointmentDate">Data do Agendamento *</label>
-                            <p-calendar id="appointmentDate"
-                                        formControlName="appointmentDate"
-                                        [showTime]="true"
-                                        [showIcon]="true"
-                                        dateFormat="dd/mm/yy"
-                                        [disabledDates]="disabledDates"
-                                        [hourFormat]="hourFormat"
-                                        [stepMinute]="15"
-                                        placeholder="Selecione a data"
-                                        styleClass="w-full"
-                                        [timeOnly]="false"
-                                        (onSelect)="updateDisabledDates()"
-                                        [disabledDays]="[0, 6]">
+                            <p-calendar id="appointmentDate" formControlName="appointmentDate" [showTime]="true"
+                                [showIcon]="true" dateFormat="dd/mm/yy" [disabledDates]="disabledDates"
+                                [hourFormat]="hourFormat" [stepMinute]="15" placeholder="Selecione a data"
+                                styleClass="w-full" [timeOnly]="false" (onSelect)="updateDisabledDates()"
+                                [disabledDays]="[0, 6]">
                             </p-calendar>
-                            <small class="p-error block" 
-                                   *ngIf="appointmentFg.get('appointmentDate')?.invalid && appointmentFg.get('appointmentDate')?.touched">
+                            <small class="p-error block"
+                                *ngIf="appointmentFg.get('appointmentDate')?.invalid && appointmentFg.get('appointmentDate')?.touched">
                                 Campo obrigatório
                             </small>
                             <ng-container *ngIf="selectedService">
@@ -123,11 +91,8 @@
                         <!-- Observações -->
                         <div class="col-12 field">
                             <label for="observation">Observações</label>
-                            <textarea id="observation"
-                                    pInputTextarea
-                                    formControlName="observation"
-                                    [rows]="3"
-                                    placeholder="Digite aqui observações importantes sobre o agendamento">
+                            <textarea id="observation" pInputTextarea formControlName="observation" [rows]="3"
+                                placeholder="Digite aqui observações importantes sobre o agendamento">
                             </textarea>
                         </div>
                     </div>
@@ -138,9 +103,8 @@
             <div class="col-12" *ngIf="selectedService?.document_requirements?.length">
                 <div class="surface-card p-4 border-round">
                     <div class="text-xl font-medium mb-4">Documentos Necessários</div>
-                    <p-table [value]="selectedService?.document_requirements ?? []"
-                            styleClass="p-datatable-sm"
-                            [tableStyle]="{'min-width': '50rem'}">
+                    <p-table [value]="selectedService?.document_requirements ?? []" styleClass="p-datatable-sm"
+                        [tableStyle]="{'min-width': '50rem'}">
                         <ng-template pTemplate="header">
                             <tr>
                                 <th class="w-4">Documento</th>
@@ -156,92 +120,71 @@
                                     <div class="flex align-items-center">
                                         <span class="font-medium">{{ req.document_template.name }}</span>
                                         <span class="text-red-500 ml-1" *ngIf="req.is_required">*</span>
-                                        <i class="pi pi-info-circle text-primary ml-2" 
-                                        pTooltip="Tipos de arquivo aceitos: {{ req.document_template.file_types }}"
-                                        tooltipPosition="right"></i>
+                                        <i class="pi pi-info-circle text-primary ml-2"
+                                            pTooltip="Tipos de arquivo aceitos: {{ req.document_template.file_types }}"
+                                            tooltipPosition="right"></i>
                                     </div>
                                 </td>
                                 <td>
                                     <span class="text-color-secondary">{{ req.document_template.description }}</span>
                                 </td>
                                 <td class="text-center">
-                                    <button pButton 
-                                            type="button"
-                                            icon="pi pi-download"
-                                            pTooltip="Baixar modelo do documento"
-                                            tooltipPosition="top"
-                                            (click)="downloadTemplate(req.document_template.id)"
-                                            class="p-button-rounded p-button-outlined p-button-info">
+                                    <button pButton type="button" icon="pi pi-download"
+                                        pTooltip="Baixar modelo do documento" tooltipPosition="top"
+                                        (click)="downloadTemplate(req.document_template.id)"
+                                        class="p-button-rounded p-button-outlined p-button-info">
                                     </button>
                                 </td>
                                 <td>
                                     <div class="flex align-items-center gap-2">
                                         <!-- Input file oculto -->
-                                        <input type="file" 
-                                            [id]="'doc-' + req.id"
+                                        <input type="file" [id]="'doc-' + req.id"
                                             (change)="onFileSelect($event, req.id)"
-                                            [accept]="req.document_template.file_types"
-                                            class="hidden">
-                                        
+                                            [accept]="req.document_template.file_types" class="hidden">
+
                                         <!-- Container para o arquivo -->
                                         <div class="w-full" *ngIf="selectedDocuments()[req.id]; else uploadButton">
-                                            <div class="flex align-items-center justify-content-between surface-100 border-round p-2">
+                                            <div
+                                                class="flex align-items-center justify-content-between surface-100 border-round p-2">
                                                 <div class="flex align-items-center gap-2">
                                                     <i class="pi pi-file text-primary"></i>
                                                     <span class="text-sm">{{ selectedDocuments()[req.id].name }}</span>
                                                 </div>
                                                 <div class="flex gap-2 p-2">
-                                                    <button pButton 
-                                                            type="button"
-                                                            icon="pi pi-download"
-                                                            pTooltip="Baixar arquivo"
-                                                            tooltipPosition="top"
-                                                            (click)="downloadUploadedDocument(req.id)"
-                                                            class="p-button-rounded p-button-outlined p-button-secondary p-button-sm">
+                                                    <button pButton type="button" icon="pi pi-download"
+                                                        pTooltip="Baixar arquivo" tooltipPosition="top"
+                                                        (click)="downloadUploadedDocument(req.id)"
+                                                        class="p-button-rounded p-button-outlined p-button-secondary p-button-sm">
                                                     </button>
-                                                    <button pButton 
-                                                            type="button"
-                                                            icon="pi pi-times"
-                                                            pTooltip="Remover arquivo"
-                                                            tooltipPosition="top"
-                                                            (click)="removeDocument(req.id)"
-                                                            class="p-button-rounded p-button-outlined p-button-danger p-button-sm">
+                                                    <button pButton type="button" icon="pi pi-times"
+                                                        pTooltip="Remover arquivo" tooltipPosition="top"
+                                                        (click)="removeDocument(req.id)"
+                                                        class="p-button-rounded p-button-outlined p-button-danger p-button-sm">
                                                     </button>
                                                 </div>
                                             </div>
                                         </div>
-                                        
+
                                         <!-- Template para botão de upload -->
                                         <ng-template #uploadButton>
-                                            <button pButton 
-                                                    type="button"
-                                                    icon="pi pi-upload"
-                                                    label="Selecionar arquivo"
-                                                    pTooltip="Clique para selecionar um arquivo"
-                                                    tooltipPosition="top"
-                                                    (click)="triggerFileInput('doc-' + req.id)"
-                                                    class="p-button-outlined p-button-secondary w-full">
+                                            <button pButton type="button" icon="pi pi-upload" label="Selecionar arquivo"
+                                                pTooltip="Clique para selecionar um arquivo" tooltipPosition="top"
+                                                (click)="triggerFileInput('doc-' + req.id)"
+                                                class="p-button-outlined p-button-secondary w-full">
                                             </button>
                                         </ng-template>
                                     </div>
                                 </td>
                                 <td class="text-center">
-                                    <p-tag *ngIf="selectedDocuments()[req.id]" 
-                                        severity="success" 
-                                        [value]="'Anexado'"
-                                        [pTooltip]="'Documento anexado com sucesso'"
+                                    <p-tag *ngIf="selectedDocuments()[req.id]" severity="success" [value]="'Anexado'"
+                                        [pTooltip]="'Documento anexado com sucesso'" tooltipPosition="top">
+                                    </p-tag>
+                                    <p-tag *ngIf="!selectedDocuments()[req.id] && req.is_required" severity="danger"
+                                        [value]="'Pendente'" [pTooltip]="'Este documento é obrigatório'"
                                         tooltipPosition="top">
                                     </p-tag>
-                                    <p-tag *ngIf="!selectedDocuments()[req.id] && req.is_required" 
-                                        severity="danger" 
-                                        [value]="'Pendente'"
-                                        [pTooltip]="'Este documento é obrigatório'"
-                                        tooltipPosition="top">
-                                    </p-tag>
-                                    <p-tag *ngIf="!selectedDocuments()[req.id] && !req.is_required" 
-                                        severity="warning" 
-                                        [value]="'Opcional'"
-                                        [pTooltip]="'Este documento é opcional'"
+                                    <p-tag *ngIf="!selectedDocuments()[req.id] && !req.is_required" severity="warning"
+                                        [value]="'Opcional'" [pTooltip]="'Este documento é opcional'"
                                         tooltipPosition="top">
                                     </p-tag>
                                 </td>
@@ -250,29 +193,100 @@
                     </p-table>
                 </div>
             </div>
+
+            <!-- Seção de Documentos Extras -->
+            <div class="col-12">
+                <div class="surface-card p-4 border-round">
+                    <div class="text-xl font-medium mb-4">Documentos Extras</div>
+
+                    <!-- Upload de Múltiplos Arquivos -->
+                    <div class="grid">
+                        <div class="col-12">
+                            <div class="flex align-items-center justify-content-between mb-3">
+                                <div>
+                                    <span class="text-600">Adicione documentos complementares</span>
+                                    <small class="block text-500">
+                                        Formatos aceitos: PDF, DOC, DOCX, JPG, PNG | Tamanho máximo: 5MB
+                                    </small>
+                                </div>
+
+                                <!-- Input file oculto para múltiplos arquivos -->
+                                <input type="file" #extraFileInput (change)="onExtraFileSelect($event)"
+                                    accept=".pdf,.doc,.docx,.jpg,.png" multiple class="hidden">
+
+                                <!-- Botão para upload -->
+                                <button pButton type="button" icon="pi pi-upload" label="Adicionar Documentos"
+                                    (click)="extraFileInput.click()" class="p-button-outlined">
+                                </button>
+                            </div>
+
+                            <!-- Lista de Documentos Extras -->
+                            <div *ngIf="selectedExtraDocuments().length > 0"
+                                class="border-1 border-round surface-border p-3">
+                                <p-table [value]="selectedExtraDocuments()" styleClass="p-datatable-sm"
+                                    [tableStyle]="{'min-width': '50rem'}">
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                            <th class="w-6">Nome do Arquivo</th>
+                                            <!-- <th class="w-2">Tamanho</th> -->
+                                            <th class="w-2">Tipo</th>
+                                            <th class="w-2 text-center">Ações</th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="body" let-doc>
+                                        <tr>
+                                            <td>
+                                                <div class="flex align-items-center gap-2">
+                                                    <i class="pi pi-file text-primary"></i>
+                                                    <span class="text-sm">{{ doc.name }}</span>
+                                                </div>
+                                            </td>
+                                            <!-- <td>{{ formatFileSize(doc.size) }}</td> -->
+                                            <td>{{ doc.type.split('/')[1]?.toUpperCase() }}</td>
+                                            <td>
+                                                <div class="flex justify-content-center gap-2">
+                                                    <button pButton type="button" icon="pi pi-download"
+                                                        pTooltip="Baixar arquivo" tooltipPosition="top"
+                                                        (click)="downloadExtraDocument(doc)"
+                                                        class="p-button-rounded p-button-outlined p-button-secondary p-button-sm">
+                                                    </button>
+                                                    <button pButton type="button" icon="pi pi-times"
+                                                        pTooltip="Remover arquivo" tooltipPosition="top"
+                                                        (click)="removeExtraDocument(doc)"
+                                                        class="p-button-rounded p-button-outlined p-button-danger p-button-sm">
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="emptymessage">
+                                        <tr>
+                                            <td colspan="4" class="text-center p-4">
+                                                Nenhum documento extra anexado
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </form>
     </div>
 
     <!-- Footer com botões de ação -->
     <ng-template pTemplate="footer">
         <div class="flex justify-content-end gap-2">
-            <p-button label="Cancelar"
-                     (click)="closeModal()"
-                     styleClass="p-button-text">
+            <p-button label="Cancelar" (click)="closeModal()" styleClass="p-button-text">
             </p-button>
-            <p-button label="Salvar"
-                     (click)="onSubmit()"
-                     [loading]="loading()"
-                     styleClass="p-button-primary">
+            <p-button label="Salvar" (click)="onSubmit()" [loading]="loading()" styleClass="p-button-primary">
             </p-button>
         </div>
     </ng-template>
 
     <!-- Progress Spinner durante carregamento -->
-    <p-progressSpinner *ngIf="loading()"
-                      styleClass="w-4rem h-4rem"
-                      strokeWidth="8"
-                      fill="var(--surface-ground)"
-                      animationDuration=".5s">
+    <p-progressSpinner *ngIf="loading()" styleClass="w-4rem h-4rem" strokeWidth="8" fill="var(--surface-ground)"
+        animationDuration=".5s">
     </p-progressSpinner>
 </p-dialog>

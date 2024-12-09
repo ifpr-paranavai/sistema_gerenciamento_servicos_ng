@@ -13,6 +13,7 @@ import { IProvider } from "../../interfaces/provider.interface";
 import { AppointmentStatusEnum } from "../../interfaces/appointment-status.interface";
 import { AppointmentsRequest } from "../../requests/appointments/appointments.request";
 import { DocumentFile } from "../../interfaces/documents-template-response.interface";
+import { th } from "date-fns/locale";
 
 interface IAppointmentFg {
     id: FormControl<string | null>;
@@ -24,14 +25,15 @@ interface IAppointmentFg {
     appointmentDate: FormControl<Date | null>;
     observation: FormControl<string | null>;
     documents: FormControl<{ [key: number]: File } | null>;
+    extraDocuments: FormControl<File[] | null>;
 }
 
 interface IDateConflict {
     hasConflict: boolean;
     conflictingAppointments?: {
-      start: string;
-      end: string;
-      service: string;
+        start: string;
+        end: string;
+        service: string;
     }[];
 }
 
@@ -51,6 +53,7 @@ export class AppointmentModalComponent implements OnInit {
     clientDropdownOptions: WritableSignal<IDropdown[]> = signal([]);
     providerDropdownOptions: WritableSignal<IDropdown[]> = signal([]);
     selectedDocuments: WritableSignal<{ [key: number]: DocumentFile }> = signal({});
+    selectedExtraDocuments: WritableSignal<DocumentFile[]> = signal([]);
     services: ServiceResponse[] = [];
     selectedService: ServiceResponse | null = null;
     providerAppointments: { [key: string]: IProvider } = {};
@@ -60,17 +63,17 @@ export class AppointmentModalComponent implements OnInit {
     timeIntervals = Array.from({ length: 24 }, (_, i) => i); // 0-23 horas
     invalidHours = this.timeIntervals.filter(hour => hour < 8 || hour >= 18);
     isDateDisabled = (date: Date): boolean => {
-        if (!this.selectedProvider || !this.selectedService?.duration ) {
+        if (!this.selectedProvider || !this.selectedService?.duration) {
             return false;
         }
-    
+
         const proposedStart = new Date(date);
         const proposedEnd = new Date(proposedStart.getTime() + (this.selectedService?.duration || 0) * 60000);
-    
+
         return this.selectedProvider.appointments.some(app => {
             const appointmentStart = new Date(app.start);
             const appointmentEnd = new Date(app.end);
-        
+
             return (
                 (proposedStart >= appointmentStart && proposedStart < appointmentEnd) ||
                 (proposedEnd > appointmentStart && proposedEnd <= appointmentEnd) ||
@@ -78,14 +81,14 @@ export class AppointmentModalComponent implements OnInit {
             );
         });
     };
-    
+
     isTimeDisabled = (date: Date): boolean => {
         const hour = date.getHours();
         return hour < 8 || hour >= 18;
     };
 
     get serviceDuration(): string {
-        return this.selectedService?.duration 
+        return this.selectedService?.duration
             ? `Duração do serviço: ${this.selectedService.duration} minutos`
             : '';
     }
@@ -102,6 +105,7 @@ export class AppointmentModalComponent implements OnInit {
         appointmentDate: new FormControl<Date | null>(null),
         observation: new FormControl<string | null>(null),
         documents: new FormControl<{ [key: number]: File } | null>(null),
+        extraDocuments: new FormControl<File[] | null>(null),
     });
 
     constructor(
@@ -116,38 +120,46 @@ export class AppointmentModalComponent implements OnInit {
         this.getDropdownOptions();
         this.updateDisabledDates();
     }
-    
+
+    formatFileSize(bytes: number): string {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
     updateDisabledDates(): void {
-        if (!this.selectedProvider || !this.selectedService?.duration ) {
-          this.disabledDates = [];
-          return;
+        if (!this.selectedProvider || !this.selectedService?.duration) {
+            this.disabledDates = [];
+            return;
         }
-    
+
         const newDisabledDates: Date[] = [];
         const today = new Date();
         const nextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
-    
+
         for (let d = new Date(today); d <= nextMonth; d.setDate(d.getDate() + 1)) {
-          if (this.isDateConflicting(new Date(d))) {
-            newDisabledDates.push(new Date(d));
-          }
+            if (this.isDateConflicting(new Date(d))) {
+                newDisabledDates.push(new Date(d));
+            }
         }
-    
+
         this.disabledDates = newDisabledDates;
-      }
-    
+    }
+
     isDateConflicting(date: Date): boolean {
-        if (!this.selectedProvider || !!this.selectedService?.duration ) {
+        if (!this.selectedProvider || !!this.selectedService?.duration) {
             return false;
         }
-    
+
         const proposedStart = new Date(date);
         const proposedEnd = new Date(proposedStart.getTime() + (this.selectedService?.duration || 0) * 60000);
-    
+
         return this.selectedProvider.appointments.some(app => {
             const appointmentStart = new Date(app.start);
             const appointmentEnd = new Date(app.end);
-        
+
             return (
                 (proposedStart >= appointmentStart && proposedStart < appointmentEnd) ||
                 (proposedEnd > appointmentStart && proposedEnd <= appointmentEnd) ||
@@ -161,7 +173,7 @@ export class AppointmentModalComponent implements OnInit {
         if (providerId) {
             this.selectedProvider = this.providerAppointments[providerId];
             const appointmentsCount = this.selectedProvider.appointments?.length || 0;
-            
+
             if (appointmentsCount > 0) {
                 this.toastService.info(
                     "Informação",
@@ -171,11 +183,11 @@ export class AppointmentModalComponent implements OnInit {
         } else {
             this.selectedProvider = null;
         }
-        
+
         this.appointmentFg.patchValue({ appointmentDate: null });
         this.updateDateValidation();
     }
-    
+
     private updateDateValidation(): void {
         if (this.appointmentFg.get('appointmentDate')) {
             this.appointmentFg.get('appointmentDate')?.updateValueAndValidity();
@@ -184,24 +196,25 @@ export class AppointmentModalComponent implements OnInit {
 
     openDialog(appointment?: IAppointmentResponse): void {
         this.visible.set(true);
-        
+
         if (!appointment) {
             return;
         }
-    
+
         this.isEdit.set(true);
         if (appointment.services && appointment.services.length > 0) {
             const service = appointment.services[0];
             this.selectedService = service;
-            
+
             if (service.document_requirements) {
                 this.initializeDocuments(service.document_requirements);
             }
         }
-    
+
         // Resetar os documentos antes de carregar os novos
         this.selectedDocuments.set({});
-    
+        this.selectedExtraDocuments.set([]);
+
         if (appointment.documents) {
             // Criar um objeto temporário para acumular todos os documentos
             const newDocuments: { [key: number]: DocumentFile } = {};
@@ -223,11 +236,25 @@ export class AppointmentModalComponent implements OnInit {
     
                 newDocuments[requirement.id] = documentFile;
             });
-    
-            // Atualizar o Signal com todos os documentos de uma vez
+
             this.selectedDocuments.set(newDocuments);
         }
-    
+
+        if(appointment.extra_documents) {
+            const extraDocuments: DocumentFile[] = [];
+            appointment.extra_documents.forEach(doc => {
+                const documentFile: DocumentFile = {
+                    lastModified: doc.created_at ? new Date(doc.created_at).getTime() : 0,
+                    name: doc.file_name,
+                    size: doc.file_size,
+                    type: `application/${doc.file_type}`,
+                    dataUrl: doc.file_content
+                };
+                extraDocuments.push(documentFile);
+            });
+            this.selectedExtraDocuments.set(extraDocuments);
+        }
+
         this.appointmentFg.patchValue({
             id: appointment.id,
             serviceSelected: {
@@ -252,91 +279,117 @@ export class AppointmentModalComponent implements OnInit {
 
     getFormDataValue(): FormData {
         const formData = new FormData();
-        
+
         // Dados básicos do agendamento
         formData.append('id', (this.appointmentFg.get('id')?.value || '').toString());
         formData.append('services', this.appointmentFg.get('serviceSelected')?.value?.value?.toString() || '');
         formData.append('client', this.appointmentFg.get('client')?.value?.value?.toString() || '');
         formData.append('provider', this.appointmentFg.get('provider')?.value?.value?.toString() || '');
         formData.append('status', this.appointmentFg.get('status')?.value || '');
-        
+
         const appointmentDate = this.appointmentFg.get('appointmentDate')?.value;
         formData.append('appointment_date', appointmentDate ? appointmentDate.toISOString() : '');
-        
+
         // Obter valor atual do Signal de documentos
         const selectedDocs = this.selectedDocuments();
-        
+
         // Processar documentos
         for (const [requirementId, documentFile] of Object.entries(selectedDocs)) {
             if (!documentFile) continue;
-    
+
             try {
                 if (documentFile instanceof File) {
                     formData.append(`document_requirement_${requirementId}`, documentFile);
                 } else {
                     // Se o documentFile é do tipo DocumentFile
                     const { dataUrl, type, name } = documentFile;
-                    
+
                     // Verificar se o dataUrl é válido
                     if (!dataUrl || !dataUrl.includes('base64,')) {
                         console.error(`DataUrl inválido para o documento ${requirementId}`);
                         continue;
                     }
-    
+
                     // Extrair a parte base64 do dataUrl
                     const base64Data = dataUrl.split('base64,')[1];
                     if (!base64Data) {
                         console.error(`Dados base64 inválidos para o documento ${requirementId}`);
                         continue;
                     }
-    
+
                     // Converter base64 para Blob
                     const byteString = atob(base64Data);
                     const ab = new ArrayBuffer(byteString.length);
                     const ia = new Uint8Array(ab);
-                    
+
                     for (let i = 0; i < byteString.length; i++) {
                         ia[i] = byteString.charCodeAt(i);
                     }
-                    
+
                     const blob = new Blob([ab], { type });
                     const file = new File([blob], name, { type });
-                    
+
                     formData.append(`document_requirement_${requirementId}`, file);
                 }
             } catch (error) {
                 console.error(`Erro ao processar documento ${requirementId}:`, error);
                 this.toastService.error(
-                    'Erro', 
+                    'Erro',
                     `Não foi possível processar o documento ${name}. Por favor, tente anexá-lo novamente.`
                 );
             }
         }
-        
+
+        const extraDocs = this.selectedExtraDocuments();
+        extraDocs.forEach((doc, index) => {
+            try {
+                if (!doc.dataUrl || !doc.dataUrl.includes('base64,')) {
+                    throw new Error(`DataUrl inválido para documento extra ${doc.name}`);
+                }
+
+                const base64Data = doc.dataUrl.split('base64,')[1];
+                const byteString = atob(base64Data);
+                const ab = new ArrayBuffer(byteString.length);
+                const ia = new Uint8Array(ab);
+
+                for (let i = 0; i < byteString.length; i++) {
+                    ia[i] = byteString.charCodeAt(i);
+                }
+
+                const blob = new Blob([ab], { type: doc.type });
+                const file = new File([blob], doc.name, { type: doc.type });
+
+                formData.append(`extra_document_${index}`, file);
+            } catch (error) {
+                console.error(`Erro ao processar documento extra ${doc.name}:`, error);
+                throw new Error(`Erro ao processar documento extra ${doc.name}`);
+            }
+        });
+
         return formData;
     }
 
     onSubmit(): void {
         if (this.loading()) return;
-    
+
         if (this.appointmentFg.invalid) {
             this.toastService.error("Atenção", "Preencha todos os campos obrigatórios.");
             this.appointmentFg.markAllAsTouched();
             return;
         }
-    
+
         const appointmentDate = this.appointmentFg.get('appointmentDate')?.value;
         if (appointmentDate) {
             const availability = this.checkDateAvailability(appointmentDate);
             if (availability.hasConflict) {
                 let errorMessage = 'Horário indisponível:\n';
-                
+
                 if (availability.conflictingAppointments && availability.conflictingAppointments.length > 0) {
                     availability.conflictingAppointments.forEach(conflict => {
                         if (!conflict) return;
-                        
+
                         if (conflict.service && (
-                            conflict.service.includes('Fora do horário') || 
+                            conflict.service.includes('Fora do horário') ||
                             conflict.service.includes('Não atendemos')
                         )) {
                             errorMessage += `${conflict.service}\n`;
@@ -347,25 +400,25 @@ export class AppointmentModalComponent implements OnInit {
                 } else {
                     errorMessage += 'Conflito de horário detectado.';
                 }
-                
+
                 this.toastService.error("Erro", errorMessage);
                 return;
             }
         }
-    
+
         try {
             const payload: FormData = this.getFormDataValue();
-    
+
             if (this.isEdit()) {
                 this.updateAppointment(payload);
                 return;
             }
-            
+
             this.createAppointment(payload);
         } catch (error) {
             console.error('Erro ao processar formulário:', error);
             this.toastService.error(
-                "Erro", 
+                "Erro",
                 "Ocorreu um erro ao processar o formulário. Por favor, verifique os dados e tente novamente."
             );
             this.loading.set(false);
@@ -425,7 +478,10 @@ export class AppointmentModalComponent implements OnInit {
         this.appointmentFg.reset();
         this.appointmentFg.get('documents')?.clearValidators();
         this.appointmentFg.get('documents')?.updateValueAndValidity();
-        this.selectedDocuments.set({});      
+        this.appointmentFg.get('extraDocuments')?.clearValidators();
+        this.appointmentFg.get('extraDocuments')?.updateValueAndValidity();
+        this.selectedDocuments.set({});
+        this.selectedExtraDocuments.set([]);
         this.selectedService = null;
         this.appointmentFg.markAsUntouched();
         this.appointmentFg.markAsPristine();
@@ -454,15 +510,15 @@ export class AppointmentModalComponent implements OnInit {
             this.providerAppointments = providers.reduce((acc, provider) => {
                 acc[provider.id] = provider;
                 return acc;
-              }, {} as { [key: string]: IProvider });
-        
-              this.providerDropdownOptions.set(
+            }, {} as { [key: string]: IProvider });
+
+            this.providerDropdownOptions.set(
                 providers.map(provider => ({
-                  label: provider.name,
-                  value: provider.id,
-                  complement: provider.cpf
+                    label: provider.name,
+                    value: provider.id,
+                    complement: provider.cpf
                 }))
-              );
+            );
         });
     }
 
@@ -473,61 +529,68 @@ export class AppointmentModalComponent implements OnInit {
     
         try {
             const proposedStart = new Date(date);
-            const proposedEnd = new Date(proposedStart.getTime() + (this.selectedService.duration * 60000));
-            const conflicts: { start: string; end: string; service: string }[] = [];
+            const startHour = proposedStart.getHours();
     
-            // Verificar horário comercial
-            const hour = proposedStart.getHours();
-            if (hour < 8 || hour >= 18) {
+            // Validar apenas se o início está dentro do horário comercial
+            if (startHour < 8 || startHour >= 18) {
                 return {
                     hasConflict: true,
                     conflictingAppointments: [{
-                        start: this.formatTime(proposedStart),
-                        end: this.formatTime(proposedEnd),
-                        service: 'Fora do horário comercial (8h às 18h)'
+                        start: this.formatDateTime(proposedStart),
+                        end: '',
+                        service: 'O agendamento deve começar entre 8h e 18h'
                     }]
                 };
             }
     
-            // Verificar dias da semana
-            const day = proposedStart.getDay();
-            if (day === 0 || day === 6) {
+            // Validar dia da semana inicial
+            const startDay = proposedStart.getDay();
+            if (startDay === 0 || startDay === 6) {
                 return {
                     hasConflict: true,
                     conflictingAppointments: [{
-                        start: this.formatDate(proposedStart),
-                        end: this.formatDate(proposedStart),
+                        start: this.formatDateTime(proposedStart),
+                        end: '',
                         service: 'Não atendemos aos finais de semana'
                     }]
                 };
             }
     
+            // Calcular duração real considerando dias úteis
+            const hoursPerDay = 10; // 8h às 18h = 10 horas por dia
+            const totalServiceHours = this.selectedService.duration / 60; // Converter minutos para horas
+            const totalWorkDays = Math.ceil(totalServiceHours / hoursPerDay);
+            
+            // Calcular data final real considerando apenas dias úteis
+            const proposedEnd = this.addWorkDays(proposedStart, totalWorkDays);
+    
             // Verificar conflitos com outros agendamentos
             if (this.selectedProvider.appointments) {
-                this.selectedProvider.appointments.forEach(app => {
-                    if (!app.start || !app.end || !app.service) return;
+                const conflicts = this.selectedProvider.appointments
+                    .filter(app => app.start && app.end && app.service)
+                    .filter(app => {
+                        const appointmentStart = new Date(app.start);
+                        const appointmentEnd = new Date(app.end);
     
-                    const appointmentStart = new Date(app.start);
-                    const appointmentEnd = new Date(app.end);
+                        return (
+                            (proposedStart <= appointmentEnd && proposedEnd >= appointmentStart)
+                        );
+                    })
+                    .map(app => ({
+                        start: this.formatDateTime(new Date(app.start)),
+                        end: this.formatDateTime(new Date(app.end)),
+                        service: app.service
+                    }));
     
-                    if (
-                        (proposedStart >= appointmentStart && proposedStart < appointmentEnd) ||
-                        (proposedEnd > appointmentStart && proposedEnd <= appointmentEnd) ||
-                        (proposedStart <= appointmentStart && proposedEnd >= appointmentEnd)
-                    ) {
-                        conflicts.push({
-                            start: this.formatTime(appointmentStart),
-                            end: this.formatTime(appointmentEnd),
-                            service: app.service
-                        });
-                    }
-                });
+                if (conflicts.length > 0) {
+                    return {
+                        hasConflict: true,
+                        conflictingAppointments: conflicts
+                    };
+                }
             }
     
-            return {
-                hasConflict: conflicts.length > 0,
-                conflictingAppointments: conflicts
-            };
+            return { hasConflict: false };
         } catch (error) {
             console.error('Erro ao verificar disponibilidade:', error);
             return {
@@ -540,18 +603,36 @@ export class AppointmentModalComponent implements OnInit {
             };
         }
     }
-
-    private formatTime(date: Date): string {
+    
+    private addWorkDays(startDate: Date, days: number): Date {
+        const endDate = new Date(startDate);
+        let daysAdded = 0;
+        
+        while (daysAdded < days) {
+            endDate.setDate(endDate.getDate() + 1);
+            // Pula finais de semana
+            if (endDate.getDay() !== 0 && endDate.getDay() !== 6) {
+                daysAdded++;
+            }
+        }
+    
+        // Mantém o mesmo horário do início
+        endDate.setHours(startDate.getHours(), startDate.getMinutes(), 0, 0);
+        
+        return endDate;
+    }
+    
+    private formatDateTime(date: Date): string {
         try {
-            return date.toLocaleTimeString('pt-BR', {
+            return `${date.toLocaleDateString('pt-BR')} ${date.toLocaleTimeString('pt-BR', {
                 hour: '2-digit',
                 minute: '2-digit'
-            });
+            })}`;
         } catch {
             return '';
         }
     }
-    
+
     private formatDate(date: Date): string {
         try {
             return date.toLocaleDateString('pt-BR');
@@ -586,6 +667,7 @@ export class AppointmentModalComponent implements OnInit {
     reset(): void {
         this.appointmentFg.reset();
         this.selectedDocuments.set({});
+        this.selectedExtraDocuments.set([]);
         this.selectedService = null;
         this.isEdit.set(false);
     }
@@ -593,7 +675,7 @@ export class AppointmentModalComponent implements OnInit {
     onServiceSelect(event: any): void {
         const serviceSelected = event.value;
         this.resetDocumentValidations();
-        
+
         if (!serviceSelected) {
             this.selectedService = null;
             this.selectedDocuments.set({});
@@ -602,7 +684,7 @@ export class AppointmentModalComponent implements OnInit {
 
         this.loading.set(true);
         const serviceFind = this.services.find(service => service.id === serviceSelected.value) || null;
-            
+
         if (!serviceFind) {
             this.toastService.error('Erro', 'Serviço não encontrado');
             this.loading.set(false);
@@ -617,13 +699,13 @@ export class AppointmentModalComponent implements OnInit {
 
     private resetDocumentValidations(): void {
         this.selectedDocuments.set({});
-        
+
         const documentsControl = this.appointmentFg.get('documents');
         if (documentsControl) {
             documentsControl.clearValidators();
             documentsControl.updateValueAndValidity();
         }
-        
+
         this.appointmentFg.patchValue({ documents: null });
     }
 
@@ -631,17 +713,17 @@ export class AppointmentModalComponent implements OnInit {
     triggerFileInput(elementId: string): void {
         const element = document.getElementById(elementId) as HTMLInputElement;
         if (element) {
-          element.click();
+            element.click();
         }
     }
-    
+
     onFileSelect(event: any, requirementId: number): void {
         const file = event.target.files[0];
         if (!file) return;
 
         const requirement = this.selectedService?.document_requirements
             .find(req => req.id === requirementId);
-        
+
         if (!requirement) {
             this.toastService.error('Erro', 'Requisito não encontrado');
             return;
@@ -650,10 +732,10 @@ export class AppointmentModalComponent implements OnInit {
         try {
             const allowedTypes = requirement.document_template.file_types;
             const fileExtension = file.name.split('.').pop()?.toLowerCase();
-            
+
             if (!fileExtension || !allowedTypes.includes(fileExtension)) {
                 this.toastService.error(
-                    'Tipo de arquivo não permitido', 
+                    'Tipo de arquivo não permitido',
                     `Tipos aceitos: ${allowedTypes.join(', ')}`
                 );
                 return;
@@ -662,7 +744,7 @@ export class AppointmentModalComponent implements OnInit {
             const maxSize = 5 * 1024 * 1024; // 5MB
             if (file.size > maxSize) {
                 this.toastService.error(
-                    'Arquivo muito grande', 
+                    'Arquivo muito grande',
                     'O tamanho máximo permitido é 5MB'
                 );
                 return;
@@ -679,7 +761,7 @@ export class AppointmentModalComponent implements OnInit {
                     type: file.type,
                     dataUrl: e.target.result as string
                 };
-                
+
                 // Atualiza o Signal com o novo documento
                 this.selectedDocuments.update(docs => ({
                     ...docs,
@@ -690,28 +772,28 @@ export class AppointmentModalComponent implements OnInit {
                 const currentFiles = this.appointmentFg.get('documents')?.value || {};
                 currentFiles[requirementId] = file;
                 this.appointmentFg.patchValue({ documents: currentFiles });
-                
+
                 this.toastService.success('Sucesso', 'Documento anexado com sucesso!');
             };
-            
+
             reader.readAsDataURL(file);
-            
+
         } catch (error) {
             console.error('Erro ao processar arquivo:', error);
             this.toastService.error('Erro', 'Erro ao processar o arquivo');
         }
     }
-    
+
     private initializeDocuments(requirements: IDocumentRequirement[]): void {
         this.resetDocumentValidations();
-        
+
         const documentsControl = this.appointmentFg.get('documents');
         if (documentsControl && requirements?.length) {
             const requiredValidators = requirements
                 .filter(req => req.is_required)
                 .map(req => {
                     return (control: AbstractControl) => {
-                        return this.selectedDocuments()[req.id]? null : { 
+                        return this.selectedDocuments()[req.id] ? null : {
                             required: {
                                 documentName: req.document_template.name
                             }
@@ -731,33 +813,33 @@ export class AppointmentModalComponent implements OnInit {
             const documentRequirement = this.selectedService?.document_requirements.find(
                 req => req.document_template?.id === serviceTemplateId
             );
-    
+
             if (!documentRequirement?.document_template?.document) {
                 this.toastService.error('Erro', 'Template não encontrado');
                 return;
             }
-    
+
             const file = documentRequirement.document_template.document;
-            
+
             const link = document.createElement('a');
             link.href = file.dataUrl;
             link.download = file.name;
-            
+
             document.body.appendChild(link);
             link.click();
-            
+
             setTimeout(() => {
                 document.body.removeChild(link);
             }, 100);
-            
+
             this.toastService.success('Sucesso', 'Template baixado com sucesso!');
         } catch (error) {
             console.error('Erro ao baixar template:', error);
             this.toastService.error('Erro', 'Não foi possível baixar o template');
         }
     }
-    
-    
+
+
     downloadUploadedDocument(requirementId: number): void {
         try {
             const file = this.selectedDocuments()[requirementId];
@@ -765,14 +847,14 @@ export class AppointmentModalComponent implements OnInit {
                 this.toastService.error('Erro', 'Nenhum arquivo encontrado');
                 return;
             }
-            
+
             const link = document.createElement('a');
             link.href = file.dataUrl;
             link.download = file.name;
-            
+
             document.body.appendChild(link);
             link.click();
-            
+
             setTimeout(() => {
                 document.body.removeChild(link);
             }, 100);
@@ -792,22 +874,78 @@ export class AppointmentModalComponent implements OnInit {
                 delete newDocs[requirementId];
                 return newDocs;
             });
-            
+
             // Atualiza o FormControl
             const currentFiles = this.appointmentFg.get('documents')?.value || {};
             delete currentFiles[requirementId];
             this.appointmentFg.patchValue({ documents: currentFiles });
-            
+
             // Limpa o input file
             const fileInput = document.getElementById(`doc-${requirementId}`) as HTMLInputElement;
             if (fileInput) {
                 fileInput.value = '';
             }
-            
+
             this.toastService.info('Informação', 'Documento removido com sucesso');
         } catch (error) {
             console.error('Erro ao remover documento:', error);
             this.toastService.error('Erro', 'Não foi possível remover o documento');
         }
+    }
+
+    onExtraFileSelect(event: any): void {
+        const files: FileList = event.target.files;
+        if (!files) return;
+
+        Array.from(files).forEach(file => {
+            if (file.size > 5 * 1024 * 1024) {
+                this.toastService.error(
+                    'Arquivo muito grande',
+                    `O arquivo ${file.name} excede o tamanho máximo permitido (5MB)`
+                );
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e: ProgressEvent<FileReader>) => {
+                if (!e.target?.result) return;
+
+                const documentFile: DocumentFile = {
+                    lastModified: file.lastModified,
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    dataUrl: e.target.result as string
+                };
+
+                this.selectedExtraDocuments.update(docs => [...docs, documentFile]);
+            };
+
+            reader.readAsDataURL(file);
+        });
+    }
+
+    downloadExtraDocument(doc: DocumentFile): void {
+        try {
+            const link = document.createElement('a');
+            link.href = doc.dataUrl;
+            link.download = doc.name;
+            document.body.appendChild(link);
+            link.click();
+            setTimeout(() => {
+                document.body.removeChild(link);
+            }, 100);
+            this.toastService.success('Sucesso', 'Documento baixado com sucesso!');
+        } catch (error) {
+            console.error('Erro ao baixar documento:', error);
+            this.toastService.error('Erro', 'Não foi possível baixar o documento');
+        }
+    }
+
+    removeExtraDocument(doc: DocumentFile): void {
+        this.selectedExtraDocuments.update(docs =>
+            docs.filter(d => d.name !== doc.name)
+        );
+        this.toastService.info('Informação', 'Documento removido com sucesso');
     }
 }

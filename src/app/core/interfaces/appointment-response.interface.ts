@@ -17,6 +17,7 @@ export interface IAppointmentResponse {
     severety?: PrimeNgSeverity;
     documents?: IDocument[];
     review?: IReview;
+    extra_documents?: IDocument[];
 }
 
 export interface IDocument {
