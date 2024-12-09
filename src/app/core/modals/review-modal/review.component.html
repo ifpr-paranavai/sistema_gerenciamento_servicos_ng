@@ -6,21 +6,21 @@
     </p-rating>
 
     <!-- Current Review Info -->
-    <div *ngIf="appointment.review" class="text-sm mt-2">
+    <!-- <div *ngIf="appointment.review" class="text-sm mt-2">
         <div *ngIf="appointment.review.comment" class="italic mt-1">
             "{{ appointment.review.comment }}"
         </div>
         <button *ngIf="isClient()" pButton type="button" label="Editar avaliação" class="p-button-text p-button-sm mt-2"
             (click)="showDialog()">
         </button>
-    </div>
+    </div> -->
 
     <!-- Review Dialog -->
     <p-dialog [visible]="dialogVisible()" (visibleChange)="onDialogVisibleChange($event)" [modal]="true"
         [style]="{width: '450px'}" header="Avaliação do Agendamento">
 
         <div class="p-fluid">
-            <form [formGroup]="reviewForm" class="flex flex-col gap-4">
+            <form [formGroup]="reviewForm" class="flex flex-column flex-col gap-5">
                 <!-- Stars in Dialog -->
                 <div class="flex justify-content-center">
                     <p-rating formControlName="rating" [cancel]="false" [disabled]="true">
