@@ -1,5 +1,6 @@
 <div class="wrapper">
-    <p-sidebar #sidebarRef [(visible)]="sidebarVisible">
+    <p-sidebar #sidebarRef
+               [(visible)]="sidebarVisible">
         <ng-template pTemplate="headless">
             <div class="flex flex-column h-full">
                 <div class="flex flex-column h-full">
@@ -7,78 +8,87 @@
                         <span class="inline-flex align-items-center gap-2">
                             <div class="flex align-items-center">
                                 <img src="{{ currentUser()?.profile?.profile_picture || '/assets/images/svg/sgs-logo.svg' }}"
-                                    width="65">
+                                     width="65">
                             </div>
                             <span class="font-semibold text-base text-primary">
                                 {{ currentUser()?.name ?? "SGS"}}
                             </span>
                         </span>
                         <span>
-                            <p-button type="button" (onClick)="closeCallback($event)" icon="pi pi-times" rounded="true"
-                                outlined="true" styleClass="h-2rem w-2rem">
+                            <p-button type="button"
+                                      (onClick)="closeCallback($event)"
+                                      icon="pi pi-times"
+                                      rounded="true"
+                                      outlined="true"
+                                      styleClass="h-2rem w-2rem">
                             </p-button>
                         </span>
                     </div>
                     <div class="overflow-y-auto">
                         <ul class="list-none p-3 m-0">
                             <li>
-                                <div pRipple pStyleClass="@next" enterFromClass="hidden" enterActiveClass="slidedown"
-                                    leaveToClass="hidden" leaveActiveClass="slideup"
-                                    class="p-3 flex align-items-center justify-content-between text-600 cursor-pointer p-ripple">
+                                <div pRipple
+                                     pStyleClass="@next"
+                                     enterFromClass="hidden"
+                                     enterActiveClass="slidedown"
+                                     leaveToClass="hidden"
+                                     leaveActiveClass="slideup"
+                                     class="p-3 flex align-items-center justify-content-between text-600 cursor-pointer p-ripple">
                                     <span class="font-medium">Opções de Navegação</span>
                                     <i class="pi pi-chevron-down"></i>
                                 </div>
                                 <ul class="list-none p-0 m-0 overflow-hidden">
                                     <li>
-                                        <a pRipple (click)="redirectRoute(routesConstants.HOME)"
-                                            class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
+                                        <a pRipple
+                                           (click)="redirectRoute(routesConstants.HOME)"
+                                           class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                             <i class="pi pi-home mr-2"></i>
                                             <span class="font-medium">Início</span>
                                         </a>
-                                    <li>
-                                        <a pRipple (click)="redirectRoute(routesConstants.MESSAGES)"
-                                            class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
+                                        <li>
+                                            <a pRipple
+                                            (click)="redirectRoute(routesConstants.MESSAGES)"
+                                           class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                             <i class="pi pi-comments mr-2"></i>
                                             <span class="font-medium">Mensagens</span>
-                                            <span
-                                                class="inline-flex align-items-center justify-content-center ml-auto bg-primary border-circle"
-                                                *ngIf="unreadCount() > 0" style="min-width: 1.5rem; height: 1.5rem">
-                                                {{unreadCount()}}
-                                            </span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a pRipple (click)="redirectRoute(routesConstants.APPOINTMENTS)"
-                                            class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
+                                        <a pRipple
+                                           (click)="redirectRoute(routesConstants.APPOINTMENTS)"
+                                           class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                             <i class="pi pi-calendar mr-2"></i>
                                             <span class="font-medium">Agendamentos</span>
                                         </a>
                                     </li>
                                     <ng-container
-                                        *ngIf="userPermissions().includes(frontPermissions.CAN_SHOW_SERVICES_MENU)">
+                                                  *ngIf="userPermissions().includes(frontPermissions.CAN_SHOW_SERVICES_MENU)">
                                         <li>
-                                            <a pRipple (click)="redirectRoute(routesConstants.SERVICES)"
-                                                class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
+                                            <a pRipple
+                                               (click)="redirectRoute(routesConstants.SERVICES)"
+                                               class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                                 <i class="pi pi-briefcase mr-2"></i>
                                                 <span class="font-medium">Serviços</span>
                                             </a>
                                         </li>
                                     </ng-container>
                                     <ng-container
-                                        *ngIf="userPermissions().includes(frontPermissions.CAN_SHOW_DOCUMENTS_MENU)">
+                                                  *ngIf="userPermissions().includes(frontPermissions.CAN_SHOW_DOCUMENTS_MENU)">
                                         <li>
-                                            <a pRipple (click)="redirectRoute(routesConstants.DOCUMENTS_TEMPLATE)"
-                                                class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
+                                            <a pRipple
+                                               (click)="redirectRoute(routesConstants.DOCUMENTS_TEMPLATE)"
+                                               class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                                 <i class="pi pi-folder mr-2"></i>
                                                 <span class="font-medium">Documentos</span>
                                             </a>
                                         </li>
                                     </ng-container>
                                     <ng-container
-                                        *ngIf="userPermissions().includes(frontPermissions.CAN_SHOW_DIAGRAM_UML)">
+                                                  *ngIf="userPermissions().includes(frontPermissions.CAN_SHOW_DIAGRAM_UML)">
                                         <li>
-                                            <a pRipple (click)="redirectRoute(routesConstants.DIAGRAM_CLASS)"
-                                                class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
+                                            <a pRipple
+                                               (click)="redirectRoute(routesConstants.DIAGRAM_CLASS)"
+                                               class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                                                 <i class="pi pi-external-link mr-2"></i>
                                                 <span class="font-medium">Diagrama de Classe</span>
                                             </a>
@@ -90,8 +100,9 @@
                     </div>
                 </div>
                 <div class="p-4 m-0">
-                    <a pRipple (click)="logout()"
-                        class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
+                    <a pRipple
+                       (click)="logout()"
+                       class="flex align-items-center cursor-pointer p-3 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
                         <i class="pi pi-sign-out mr-2"></i>
                         <span class="font-medium">
                             Sair
@@ -102,7 +113,8 @@
         </ng-template>
     </p-sidebar>
 
-    <span class="sidebar-menu-button" (click)="sidebarVisible.set(true)">
+    <span class="sidebar-menu-button"
+          (click)="sidebarVisible.set(true)">
         <i class="pi pi-bars"></i>
     </span>
 </div>

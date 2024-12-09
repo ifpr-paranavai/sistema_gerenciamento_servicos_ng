@@ -186,17 +186,4 @@ export class MessageComponent implements OnInit, AfterViewInit {
     newMessage(): void {
         this.newContactMessageModal.openNewMessageModal();
     }
-
-    setVizualizedMessages(): void {
-        if (!this.selectedContact()?.chatId) return;
-        this.chatMessageRequest.setMessagesAsRead(this.selectedContact()!.chatId!)
-        .pipe(
-            take(1),
-            catchError((error: HttpErrorResponse) => {
-                this.toastService.error('Erro ao marcar mensagens como lidas', 'Erro ao marcar mensagens como lidas');
-                return throwError(() => error);
-            })
-        )
-        .subscribe(() => {});
-    }
 }
