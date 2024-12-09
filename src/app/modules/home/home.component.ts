@@ -27,7 +27,7 @@ export class HomeComponent implements OnInit {
 
     now = new Date();
     filterForm: FormGroup<IFilterFormFg> = new FormGroup({
-        dateRange: new FormControl<Date[] | null>(null)
+        dateRange: new FormControl<Date[] | null>([this.getDefaultStartDate(), this.getDefaultEndDate()])
     });
     currentView: 'chart' | 'table' = 'chart';
 
@@ -180,6 +180,12 @@ export class HomeComponent implements OnInit {
         return date;
     }
 
+    private getDefaultEndDate(): Date {
+        const date = new Date();
+        date.setMonth(date.getMonth() + 1); // próximo mês por padrão
+        return date;
+    }
+
     private formatMonth(date: Date): string {
         return date.toLocaleDateString('pt-BR', {
             year: 'numeric',
@@ -199,7 +205,7 @@ export class HomeComponent implements OnInit {
     private loadDashboardData(): void {
         const dateRange = this.filterForm.controls.dateRange.value;
         const startDate = dateRange?.[0] || this.getDefaultStartDate();
-        const endDate = dateRange?.[1] || new Date();
+        const endDate = dateRange?.[1] || this.getDefaultEndDate();
 
         const formattedStartDate = DateUtil.formatDateToISO(startDate);
         const formattedEndDate = DateUtil.formatDateToISO(endDate);
