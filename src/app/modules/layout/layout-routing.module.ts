@@ -69,17 +69,10 @@ const routes: Routes = [
                 pathMatch: "full"
             },
             {
-                path: "messages",
-                loadChildren: () =>
-                    import("../message/message.module").then(
-                        (m) => m.MessageModule,
-                    ),
-            },
-            {
                 path: "**",
                 redirectTo: "home"
             }
-        ] // Fechando o array de children
+        ]
     },
     {
         path: "**",
