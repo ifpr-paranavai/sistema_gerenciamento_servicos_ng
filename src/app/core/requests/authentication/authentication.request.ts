@@ -77,4 +77,10 @@ export class AuthenticationRequest {
             email
         });
     }
+
+    changePassword(password: string, token: string ): Observable<void> {
+        return this.http.post<void>(`${this.baseUrl}/v1/authentication/reset-password-confirm/${token}/`, {
+            new_password: password
+        });
+    }
 }
