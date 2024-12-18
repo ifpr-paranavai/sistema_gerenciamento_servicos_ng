@@ -217,7 +217,7 @@ export class DocumentsTemplateModalComponent {
 
     createPreview(file: DocumentFileWithPreview): void {
         this.selectedFile.set(file);
-        if (file.preview) {
+        if (file?.preview) {
             this.previewUrl.set(file.preview);
         } else {
             this.previewUrl.set(null);
